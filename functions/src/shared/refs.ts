@@ -8,6 +8,7 @@ export const refs = {
   config: () => database.doc(`config/${EVENT_ID}`),
   user: (uid: string) => database.doc(`users/${uid}`),
   mission: (missionId: string) => database.doc(`missions/${missionId}`),
+  missionAnswerKey: (missionId: string) => database.doc(`missionAnswerKeys/${missionId}`),
   userMission: (uid: string, missionId: string) => database.doc(`userMissions/${EVENT_ID}_${uid}_${missionId}`),
   submission: (uid: string, missionId: string) => database.doc(`submissions/${EVENT_ID}_${uid}_${missionId}`),
   score: (uid: string) => database.doc(`scores/${EVENT_ID}_${uid}`),
