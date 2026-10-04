@@ -1,7 +1,7 @@
 {
   "name": "aws-day-gt-functions",
   "private": true,
-  "type": "module",
+  "type": "commonjs",
   "main": "lib/functions/src/index.js",
   "engines": { "node": "22" },
   "scripts": { "build": "tsc", "serve": "npm run build && firebase emulators:start --only functions" },

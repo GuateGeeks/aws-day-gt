@@ -10,14 +10,14 @@
     "preview": "vite preview --host 0.0.0.0",
     "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p functions/tsconfig.json",
     "lint": "tsc --noEmit -p tsconfig.app.json",
-    "test": "vitest run",
+    "test": "vitest run tests/unit tests/integration",
     "test:watch": "vitest",
     "test:rules": "vitest run tests/rules",
     "test:integration": "vitest run tests/integration",
     "test:e2e": "playwright test",
-    "emulators": "firebase emulators:start",
+    "emulators": "npx firebase emulators:start",
     "seed": "tsx scripts/seed-data.ts",
-    "deploy": "npm run build && npm --prefix functions run build && firebase deploy --project aws-day-gt"
+    "deploy": "npm run build && npm --prefix functions run build && npx firebase deploy --project aws-day-gt"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

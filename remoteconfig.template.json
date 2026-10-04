@@ -1,0 +1,14 @@
+{
+  "parameters": {
+    "registration_open": { "defaultValue": { "value": "false" }, "valueType": "BOOLEAN" },
+    "missions_enabled": { "defaultValue": { "value": "false" }, "valueType": "BOOLEAN" },
+    "leaderboard_enabled": { "defaultValue": { "value": "false" }, "valueType": "BOOLEAN" },
+    "uploads_enabled": { "defaultValue": { "value": "false" }, "valueType": "BOOLEAN" },
+    "photo_missions_enabled": { "defaultValue": { "value": "false" }, "valueType": "BOOLEAN" },
+    "maintenance_mode": { "defaultValue": { "value": "false" }, "valueType": "BOOLEAN" },
+    "max_photo_size": { "defaultValue": { "value": "1572864" }, "valueType": "NUMBER" },
+    "max_replacements": { "defaultValue": { "value": "2" }, "valueType": "NUMBER" },
+    "event_mode": { "defaultValue": { "value": "PRE_EVENT" }, "valueType": "STRING" }
+  },
+  "version": { "description": "AWS Community Day Guatemala 2026 safe defaults" }
+}

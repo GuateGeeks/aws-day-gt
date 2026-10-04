@@ -1,0 +1,8 @@
+{
+  "indexes": [
+    { "collectionGroup": "userMissions", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "userId", "order": "ASCENDING" }, { "fieldPath": "status", "order": "ASCENDING" }] },
+    { "collectionGroup": "submissions", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "status", "order": "ASCENDING" }, { "fieldPath": "submittedAt", "order": "DESCENDING" }] },
+    { "collectionGroup": "scores", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "eventId", "order": "ASCENDING" }, { "fieldPath": "totalPoints", "order": "DESCENDING" }, { "fieldPath": "completedMissions", "order": "DESCENDING" }, { "fieldPath": "finalScoreReachedAt", "order": "ASCENDING" }] }
+  ],
+  "fieldOverrides": []
+}

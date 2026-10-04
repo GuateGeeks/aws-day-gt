@@ -10,4 +10,5 @@ test-results/
 coverage/
 firepit-log.txt
 firebase-debug.log
+firestore-debug.log
 ui-debug.log
