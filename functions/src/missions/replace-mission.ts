@@ -4,6 +4,7 @@ import { EVENT_ID, MAX_REPLACEMENTS } from "../../../shared/constants";
 import { missions } from "../../../scripts/data/missions";
 import { requireUid } from "../shared/auth";
 import { database, refs } from "../shared/refs";
+import { isReplacementEligible } from "./replacement-eligibility";
 
 export const replaceMission = onCall({ region: "us-central1", enforceAppCheck: false }, async (request) => {
   const uid = requireUid(request);
@@ -12,7 +13,7 @@ export const replaceMission = onCall({ region: "us-central1", enforceAppCheck: f
   return database.runTransaction(async (transaction) => {
     const profile = await transaction.get(refs.user(uid));
     const current = await transaction.get(refs.userMission(uid, missionId));
-    if (!current.exists || current.data()?.status !== "available") throw new HttpsError("failed-precondition", "MISSION_UNAVAILABLE");
+    if (!current.exists || !isReplacementEligible(current.data() ?? {})) throw new HttpsError("failed-precondition", "MISSION_UNAVAILABLE");
     if ((profile.data()?.replacementsUsed ?? 0) >= MAX_REPLACEMENTS) throw new HttpsError("resource-exhausted", "REPLACEMENTS_EXHAUSTED");
     const assignedQuery = await database.collection("userMissions").where("userId", "==", uid).get();
     const assignedIds = new Set(assignedQuery.docs.map((doc) => doc.data().missionId));

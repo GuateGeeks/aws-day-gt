@@ -4,6 +4,7 @@ import { isAllowedRole } from "../../functions/src/shared/auth";
 import { resolveMissionSelection } from "../../functions/src/submissions/selection-result";
 import { missionAnswerKeys } from "../../scripts/data/mission-selections";
 import { missions } from "../../scripts/data/missions";
+import { isReplacementEligible } from "../../functions/src/missions/replacement-eligibility";
 
 describe("authoritative score transitions", () => {
   it("adds one approved word mission", () => {
@@ -52,5 +53,14 @@ describe("authoritative selection transitions", () => {
   it("accepts configured opinions and fails closed without a quiz key", () => {
     expect(resolveMissionSelection(mission("M45"), ["o3"], undefined, 0)).toMatchObject({ status: "approved", labels: ["Intenso"] });
     expect(() => resolveMissionSelection(mission("M16"), ["o1"], undefined, 0)).toThrowError("MISSING_ANSWER_KEY");
+  });
+});
+
+describe("mission replacement eligibility", () => {
+  it("allows available and exhausted quiz assignments only", () => {
+    expect(isReplacementEligible({ status: "available" })).toBe(true);
+    expect(isReplacementEligible({ status: "failed", attemptsUsed: 2 })).toBe(true);
+    expect(isReplacementEligible({ status: "failed", attemptsUsed: 1 })).toBe(false);
+    expect(["approved", "submitted", "rejected", "replaced", "cancelled", "expired"].every((status) => !isReplacementEligible({ status }))).toBe(true);
   });
 });
