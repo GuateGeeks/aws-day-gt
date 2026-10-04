@@ -32,6 +32,10 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    match /missionAnswerKeys/{missionId} {
+      allow read, write: if false;
+    }
+
     match /userMissions/{assignmentId} {
       allow read: if signedIn() && (resource.data.userId == request.auth.uid || staff());
       allow write: if false;

@@ -22,6 +22,7 @@ beforeEach(async () => {
     await setDoc(doc(db, "missions/M01"), { active: true, title: "Llegué", points: 15 });
     await setDoc(doc(db, "scores/aws-community-day-gt-2026_u1"), { userId: "u1", alias: "cloudquetzal", totalPoints: 0, completedMissions: 0 });
     await setDoc(doc(db, "submissions/aws-community-day-gt-2026_u1_M01"), { userId: "u1", status: "pending" });
+    await setDoc(doc(db, "missionAnswerKeys/M17"), { missionId: "M17", correctOptionIds: ["o1", "o2"] });
   });
 });
 
@@ -54,5 +55,13 @@ describe("Firestore participant boundaries", () => {
   it("allows moderators to inspect submissions", async () => {
     const db = environment.authenticatedContext("staff", { role: "moderator" }).firestore();
     await assertSucceeds(getDoc(doc(db, "submissions/aws-community-day-gt-2026_u1_M01")));
+  });
+
+  it("denies answer keys to participants and all staff roles", async () => {
+    for (const [uid, role] of [["u1", "participant"], ["staff", "moderator"], ["owner", "admin"]] as const) {
+      const db = environment.authenticatedContext(uid, { role }).firestore();
+      await assertFails(getDoc(doc(db, "missionAnswerKeys/M17")));
+      await assertFails(setDoc(doc(db, "missionAnswerKeys/M17"), { correctOptionIds: ["o4"] }));
+    }
   });
 });

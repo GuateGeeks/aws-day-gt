@@ -4,6 +4,7 @@ import { createRequire } from "node:module";
 import { EVENT_ID } from "../shared/constants";
 import { event, eventConfig } from "./data/event";
 import { missions } from "./data/missions";
+import { missionAnswerKeys } from "./data/mission-selections";
 
 const args = new Set(process.argv.slice(2));
 const projectArg = process.argv.findIndex((value) => value === "--project");
@@ -15,11 +16,12 @@ const confirmation = process.argv[process.argv.findIndex((value) => value === "-
 const writes = [
   { path: `events/${EVENT_ID}`, data: event },
   { path: `config/${EVENT_ID}`, data: eventConfig },
-  ...missions.map((mission) => ({ path: `missions/${mission.id}`, data: mission }))
+  ...missions.map((mission) => ({ path: `missions/${mission.id}`, data: mission })),
+  ...Object.values(missionAnswerKeys).map((answerKey) => ({ path: `missionAnswerKeys/${answerKey.missionId}`, data: answerKey }))
 ];
 
 console.log(`${apply ? "APPLY" : "DRY RUN"}: ${writes.length} upserts, 0 deletes in ${projectId}`);
-console.log(`event: 1, config: 1, missions: ${missions.length}`);
+console.log(`event: 1, config: 1, missions: ${missions.length}, answer keys: ${Object.keys(missionAnswerKeys).length}`);
 if (!apply) process.exit(0);
 if (confirmation !== EVENT_ID) throw new Error(`Apply requires --confirm ${EVENT_ID}`);
 
