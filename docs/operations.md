@@ -17,7 +17,9 @@ npm run deploy
 npx tsx scripts/seed-data.ts --project aws-day-gt --apply --confirm aws-community-day-gt-2026 --cli-auth
 ```
 
-The seed writes one event, one protected config document, and 50 missions. It performs no deletions. Legal text is provisional and should be replaced by an administrator before registration opens.
+The seed writes one event, one protected config document, 50 public missions, and 27 server-only quiz answer keys. It performs no deletions. Clients, moderators, and administrators cannot read answer keys directly; quiz validation runs only inside Cloud Functions. Legal text is provisional and should be replaced by an administrator before registration opens.
+
+Selection missions use either opinion mode or quiz mode. Quiz missions allow two attempts; after the second incorrect selection they become failed and may consume one of the participant's two replacements.
 
 ## Event-day controls
 
