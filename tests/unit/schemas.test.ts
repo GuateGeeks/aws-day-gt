@@ -13,6 +13,10 @@ describe("domain schemas", () => {
       points: 5,
       category: "Evento",
       validation: { evidenceType: "word", minLength: 2, maxLength: 30 },
+      selection: {
+        mode: "single", validationKind: "opinion", minSelections: 1, maxSelections: 1,
+        options: ["Inspirador", "Práctico", "Intenso", "Comunitario"].map((label, index) => ({ id: `o${index + 1}`, label }))
+      },
       tags: ["general", "closing"],
       active: true
     };
