@@ -1,5 +1,6 @@
 import { EVENT_ID } from "../../shared/constants";
 import type { EvidenceType, Mission } from "../../shared/types";
+import { missionSelectionData } from "./mission-selections";
 
 type Entry = [string, string, string, string, string?, string?, string?];
 
@@ -8,13 +9,14 @@ function makeMission(type: EvidenceType, entry: Entry): Mission {
   const points = type === "photo" ? 15 : type === "comment" ? 10 : 5;
   const isSession = Boolean(slot);
   const tags = [isSession ? "session" : "general"];
+  const selectionData = missionSelectionData[id];
   if (["M15", "M45", "M50"].includes(id)) tags.push("closing");
   return {
     id,
     eventId: EVENT_ID,
     title,
-    description: instructions,
-    instructions,
+    description: selectionData?.question ?? instructions,
+    instructions: selectionData?.question ?? instructions,
     evidenceType: type,
     points,
     category,
@@ -25,6 +27,7 @@ function makeMission(type: EvidenceType, entry: Entry): Mission {
       requiresConsent: id === "M11",
       allowShortToken: id === "M47"
     },
+    selection: selectionData?.selection,
     slot,
     room,
     speaker,

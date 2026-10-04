@@ -9,7 +9,10 @@ export type DomainErrorCode =
   | "EVENT_CLOSED"
   | "MISSION_UNAVAILABLE"
   | "DUPLICATE_SUBMISSION"
-  | "REPLACEMENTS_EXHAUSTED";
+  | "REPLACEMENTS_EXHAUSTED"
+  | "INVALID_SELECTION"
+  | "DUPLICATE_SELECTION"
+  | "INVALID_SELECTION_COUNT";
 
 export class DomainError extends Error {
   constructor(public readonly code: DomainErrorCode, message = code) {
@@ -29,5 +32,8 @@ export const errorMessages: Record<DomainErrorCode, string> = {
   EVENT_CLOSED: "La participación está cerrada por ahora.",
   MISSION_UNAVAILABLE: "Esta misión ya no está disponible.",
   DUPLICATE_SUBMISSION: "Esta misión ya recibió una respuesta.",
-  REPLACEMENTS_EXHAUSTED: "Ya utilizaste tus dos reemplazos."
+  REPLACEMENTS_EXHAUSTED: "Ya utilizaste tus dos reemplazos.",
+  INVALID_SELECTION: "La selección no pertenece a esta misión.",
+  DUPLICATE_SELECTION: "No puedes seleccionar la misma opción dos veces.",
+  INVALID_SELECTION_COUNT: "Selecciona la cantidad indicada de opciones."
 };

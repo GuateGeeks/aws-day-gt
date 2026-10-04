@@ -10,6 +10,18 @@ export const evidenceValidationSchema = z.object({
   allowShortToken: z.boolean().optional()
 });
 
+export const missionSelectionSchema = z.object({
+  mode: z.enum(["single", "multiple"]),
+  validationKind: z.enum(["opinion", "quiz"]),
+  options: z.array(z.object({ id: z.string().regex(/^o[1-6]$/), label: z.string().min(1) })).min(4).max(6),
+  minSelections: z.number().int().positive(),
+  maxSelections: z.number().int().positive()
+}).superRefine((selection, context) => {
+  if (selection.minSelections > selection.maxSelections || selection.maxSelections > selection.options.length) context.addIssue({ code: "custom", message: "Invalid selection limits" });
+  if (selection.mode === "single" && (selection.minSelections !== 1 || selection.maxSelections !== 1)) context.addIssue({ code: "custom", message: "Single selection requires exactly one option" });
+  if (new Set(selection.options.map((option) => option.id)).size !== selection.options.length) context.addIssue({ code: "custom", message: "Duplicate option IDs" });
+});
+
 export const missionSchema = z.object({
   id: z.string().regex(/^M\d{2}$/),
   eventId: z.string().min(1),
@@ -20,6 +32,7 @@ export const missionSchema = z.object({
   points: z.union([z.literal(5), z.literal(10), z.literal(15)]),
   category: z.string().min(1),
   validation: evidenceValidationSchema,
+  selection: missionSelectionSchema.optional(),
   sessionId: z.string().optional(),
   slot: z.string().optional(),
   room: z.string().optional(),
@@ -31,6 +44,7 @@ export const missionSchema = z.object({
   const expected = mission.evidenceType === "photo" ? 15 : mission.evidenceType === "comment" ? 10 : 5;
   if (mission.points !== expected) context.addIssue({ code: "custom", path: ["points"], message: "Points do not match evidence type" });
   if (mission.validation.evidenceType !== mission.evidenceType) context.addIssue({ code: "custom", path: ["validation", "evidenceType"], message: "Validation type mismatch" });
+  if (mission.evidenceType !== "photo" && !mission.selection) context.addIssue({ code: "custom", path: ["selection"], message: "Text missions require selections" });
 });
 
 export const onboardingInputSchema = z.object({

@@ -1,6 +1,6 @@
 export type Role = "participant" | "moderator" | "admin";
 export type EvidenceType = "photo" | "comment" | "word";
-export type MissionStatus = "available" | "submitted" | "approved" | "rejected" | "replaced" | "cancelled" | "expired";
+export type MissionStatus = "available" | "submitted" | "approved" | "rejected" | "failed" | "replaced" | "cancelled" | "expired";
 export type SubmissionStatus = "pending" | "approved" | "rejected";
 
 export interface EvidenceValidation {
@@ -10,6 +10,18 @@ export interface EvidenceValidation {
   requiresConsent?: boolean;
   allowShortToken?: boolean;
 }
+
+export type SelectionMode = "single" | "multiple";
+export type SelectionValidationKind = "opinion" | "quiz";
+export interface SelectionOption { id: string; label: string }
+export interface MissionSelection {
+  mode: SelectionMode;
+  validationKind: SelectionValidationKind;
+  options: SelectionOption[];
+  minSelections: number;
+  maxSelections: number;
+}
+export interface MissionAnswerKey { missionId: string; correctOptionIds: string[] }
 
 export interface Mission {
   id: string;
@@ -21,6 +33,7 @@ export interface Mission {
   points: 5 | 10 | 15;
   category: string;
   validation: EvidenceValidation;
+  selection?: MissionSelection;
   sessionId?: string;
   slot?: string;
   room?: string;
@@ -76,6 +89,7 @@ export interface UserMission {
   assignedAt: string;
   completedAt?: string;
   replacementOf?: string;
+  attemptsUsed?: number;
 }
 
 export interface Submission {
@@ -86,6 +100,7 @@ export interface Submission {
   missionId: string;
   evidenceType: EvidenceType;
   text?: string;
+  selection?: { ids: string[]; labels: string[] };
   image?: { storagePath: string; width?: number; height?: number; bytes?: number };
   status: SubmissionStatus;
   provisionalPoints: number;
