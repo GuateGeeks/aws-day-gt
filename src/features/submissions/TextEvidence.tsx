@@ -1,18 +1,37 @@
 import { httpsCallable } from "firebase/functions";
 import { useState, type FormEvent } from "react";
 import type { Mission } from "../../../shared/types";
-import { validateEvidence } from "../../../shared/validation";
-import { Button, Field, Input, StatusNotice, Textarea } from "../../design-system/components";
+import { Button, StatusNotice } from "../../design-system/components";
 import { functions } from "../../firebase/functions";
 
+type SubmissionResult = { status: "approved" | "incorrect" | "failed"; attemptsRemaining: number };
+
 export function TextEvidence({ mission }: { mission: Mission }) {
-  const draftKey = `aws-day-gt.draft.${mission.id}`; const [value, setValue] = useState(() => localStorage.getItem(draftKey) ?? "");
-  const [busy, setBusy] = useState(false); const [message, setMessage] = useState("");
-  async function submit(event: FormEvent) { event.preventDefault(); setMessage(""); let text: string;
-    try { text = validateEvidence(mission.validation, value); } catch { setMessage("La respuesta no cumple con la longitud o formato solicitado."); return; }
-    setBusy(true); try { await httpsCallable(functions, "submitTextMission")({ missionId: mission.id, operationId: crypto.randomUUID(), text }); localStorage.removeItem(draftKey); setMessage("¡Misión completada! Tus puntos ya están en el marcador."); }
-    catch { setMessage("No pudimos enviar tu respuesta. Comprueba tu conexión e intenta de nuevo."); } finally { setBusy(false); }
+  const configuration = mission.selection;
+  const [selected, setSelected] = useState<string[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [exhausted, setExhausted] = useState(false);
+  const [message, setMessage] = useState("");
+  if (!configuration) return <StatusNotice tone="error">Esta misión no tiene opciones configuradas.</StatusNotice>;
+  const activeConfiguration = configuration;
+  const validCount = selected.length >= activeConfiguration.minSelections && selected.length <= activeConfiguration.maxSelections;
+  const guidance = activeConfiguration.minSelections === activeConfiguration.maxSelections
+    ? `Selecciona ${activeConfiguration.minSelections} ${activeConfiguration.minSelections === 1 ? "opción" : "opciones"}.`
+    : `Selecciona entre ${activeConfiguration.minSelections} y ${activeConfiguration.maxSelections} opciones.`;
+  function change(optionId: string, checked: boolean) {
+    if (activeConfiguration.mode === "single") { setSelected([optionId]); return; }
+    setSelected((current) => checked ? [...current, optionId] : current.filter((id) => id !== optionId));
   }
-  const field = mission.evidenceType === "word" ? <Input id="evidence" value={value} onChange={(e) => setValue(e.target.value)} /> : <Textarea id="evidence" value={value} maxLength={mission.validation.maxLength} onChange={(e) => { setValue(e.target.value); localStorage.setItem(draftKey, e.target.value); }} />;
-  return <form className="stack" onSubmit={submit}><Field id="evidence" label={mission.evidenceType === "word" ? "Tu palabra" : "Tu respuesta"} hint={`${value.length}${mission.validation.maxLength ? ` / ${mission.validation.maxLength}` : ""} caracteres`}>{field}</Field>{message && <StatusNotice tone={message.startsWith("¡") ? "success" : "error"}>{message}</StatusNotice>}<Button type="submit" variant="accent" block loading={busy}>Enviar evidencia</Button></form>;
+  async function submit(event: FormEvent) {
+    event.preventDefault(); if (!validCount || exhausted) return; setBusy(true); setMessage("");
+    try {
+      const response = await httpsCallable(functions, "submitTextMission")({ missionId: mission.id, operationId: crypto.randomUUID(), selectionIds: selected });
+      const result = response.data as SubmissionResult;
+      if (result.status === "approved") setMessage("¡Misión completada! Tus puntos ya están en el marcador.");
+      else if (result.status === "incorrect") setMessage("La selección es incorrecta. Te queda 1 intento.");
+      else { setExhausted(true); setMessage("Agotaste los dos intentos. Puedes reemplazar esta misión si tienes un reemplazo disponible."); }
+    } catch { setMessage("No pudimos enviar tu selección. Comprueba tu conexión e intenta de nuevo."); }
+    finally { setBusy(false); }
+  }
+  return <form className="stack" onSubmit={submit}><fieldset className="selection-field stack" disabled={busy || exhausted}><legend>Elige tu respuesta</legend><p className="muted">{guidance}</p><div className="selection-options">{activeConfiguration.options.map((option) => { const checked = selected.includes(option.id); const atMaximum = activeConfiguration.mode === "multiple" && selected.length >= activeConfiguration.maxSelections; return <label className="selection-option" key={option.id}><input type={activeConfiguration.mode === "single" ? "radio" : "checkbox"} name={`selection-${mission.id}`} value={option.id} checked={checked} disabled={!checked && atMaximum} onChange={(event) => change(option.id, event.target.checked)} /><span>{option.label}</span></label>; })}</div></fieldset>{message && <StatusNotice tone={message.startsWith("¡") ? "success" : "error"}>{message}</StatusNotice>}<Button type="submit" variant="accent" block loading={busy} disabled={!validCount || exhausted}>Enviar evidencia</Button></form>;
 }
