@@ -2,9 +2,9 @@
 
 ## Firebase console prerequisites
 
-1. Enable Email link sign-in in Authentication and add the Hosting domains to Authorized domains.
-2. Upgrade the project to Blaze before deploying Cloud Functions.
-3. Enable Firestore, Cloud Storage, Analytics, and Remote Config in project `aws-day-gt`.
+1. Email link sign-in and Hosting authorized domains are configured by `npm run configure:auth`.
+2. The project uses Blaze for Cloud Functions and the default Storage bucket.
+3. The default Storage bucket is provisioned in immutable location `US-CENTRAL1`, matching the Functions region.
 4. Register reCAPTCHA Enterprise for App Check, set `VITE_FIREBASE_APPCHECK_SITE_KEY`, validate traffic, then change callable functions to enforce App Check.
 
 The first Authentication account created with `guategeeks3d@gmail.com` receives the admin custom claim. Sign out and back in after promotion to refresh the ID token.

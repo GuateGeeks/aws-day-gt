@@ -17,6 +17,8 @@
     "test:e2e": "playwright test",
     "emulators": "npx firebase emulators:start",
     "seed": "tsx scripts/seed-data.ts",
+    "configure:auth": "tsx scripts/configure-auth.ts --project aws-day-gt",
+    "configure:storage": "tsx scripts/configure-storage.ts --project aws-day-gt --location US-CENTRAL1",
     "deploy": "npm run build && npm --prefix functions run build && npx firebase deploy --project aws-day-gt"
   },
   "dependencies": {

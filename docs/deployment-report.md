@@ -10,7 +10,12 @@ Date: 2026-10-04 (America/Guatemala)
 - Firestore indexes: deployed
 - Remote Config: deployed with conservative pre-event defaults
 - Production seed: 52 upserts (1 event, 1 config, 50 missions), 0 deletes
+- Firebase Authentication: initialized; passwordless email-link provider enabled; Hosting domains authorized
+- Cloud Functions: 10 active functions in `us-central1` on Node.js 22
+- Cloud Storage: default bucket `aws-day-gt.firebasestorage.app` in `US-CENTRAL1`; restrictive evidence rules deployed
+- Artifact Registry: automatic deletion of Functions images older than one day
 - HTTP smoke checks: `/`, `/app/missions`, and `/manifest.webmanifest` returned 200
+- Callable security smoke check: unauthenticated onboarding request returned HTTP 401 `UNAUTHENTICATED`
 
 ## Verification
 
@@ -19,12 +24,10 @@ Date: 2026-10-04 (America/Guatemala)
 - 8 Firebase rules tests pass in the Firestore/Storage emulators.
 - PWA production build generated the manifest and service worker.
 
-## Console prerequisites blocking the complete participant journey
+## Remaining pre-launch operations
 
-1. Upgrade `aws-day-gt` to the Blaze plan. Cloud Functions deployment is blocked because Artifact Registry and Cloud Build cannot be enabled on the current plan.
-2. Initialize Firebase Storage and choose its permanent bucket location. Storage rules and photo uploads cannot be deployed until this is done.
-3. Enable Email link sign-in in Firebase Authentication and confirm `aws-day-gt.web.app` is an authorized domain.
-4. After Functions deploy, sign in as `guategeeks3d@gmail.com`, then sign out/in once to refresh the initial admin custom claim.
-5. Configure reCAPTCHA Enterprise App Check, observe valid traffic, and enable callable enforcement before public launch.
+1. Sign in as `guategeeks3d@gmail.com`, then sign out/in once to refresh the initial admin custom claim.
+2. Configure reCAPTCHA Enterprise App Check, observe valid traffic, and enable callable enforcement before public launch.
+3. Replace the provisional legal copy before opening public registration.
 
-Until items 1–3 are complete, the landing PWA is live but registration and mission submission are not operational.
+The production Firebase services required for registration, missions, scoring, moderation, and photo evidence are deployed. The remaining items are launch-hardening and content operations.
