@@ -1,25 +1,43 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { QuetziSprite, type QuetziMood } from "./QuetziSprite";
 
-type Props = { completed: number; line: string; onTap?: () => void; mood?: QuetziMood };
+type Props = {
+  completed: number;
+  summary: string;
+  detail: string;
+  mission?: { id: string; title: string };
+  loading?: boolean;
+  mood?: QuetziMood;
+};
 
-/** Interactive Quetzi with a speech bubble. Tapping makes Quetzi flap and say something new. */
-export function QuetziGuide({ completed, line, onTap, mood }: Props) {
+/** Interactive Quetzi that expands the current event context without navigating unexpectedly. */
+export function QuetziGuide({ completed, summary, detail, mission, loading = false, mood }: Props) {
+  const [expanded, setExpanded] = useState(false);
   const [reacting, setReacting] = useState(false);
   useEffect(() => {
     if (!reacting) return;
     const timer = window.setTimeout(() => setReacting(false), 900);
     return () => window.clearTimeout(timer);
   }, [reacting]);
-  function tap() { setReacting(true); onTap?.(); }
-  return <div className="quetzi-guide">
-    <button type="button" className="quetzi-guide__bird" onClick={tap} aria-label="Toca a Quetzi para escuchar otro consejo">
+
+  function toggle() {
+    setExpanded((value) => !value);
+    setReacting(true);
+  }
+
+  return <div className={`quetzi-guide ${expanded ? "quetzi-guide--expanded" : ""}`}>
+    <button type="button" className="quetzi-guide__bird" onClick={toggle} aria-expanded={expanded} aria-controls="quetzi-current-detail" aria-label={`${expanded ? "Contraer" : "Ampliar"} información de Quetzi`}>
       <QuetziSprite completed={completed} mood={reacting ? "happy" : mood ?? "idle"} />
     </button>
-    <p className="speech-bubble" aria-live="polite">
+    <div className="speech-bubble" aria-live="polite" aria-busy={loading || undefined}>
       <span className="speech-bubble__name">Quetzi</span>
-      {line}
-      <span className="speech-bubble__hint">Tócame para otro consejo</span>
-    </p>
+      <strong>{summary}</strong>
+      {expanded && <div id="quetzi-current-detail" className="speech-bubble__detail">
+        <p>{detail}</p>
+        {mission && <Link className="ds-button speech-bubble__action" to={`/app/missions/${mission.id}`} aria-label={`Comenzar misión: ${mission.title}`}>Comenzar misión</Link>}
+      </div>}
+      <span className="speech-bubble__hint">{expanded ? "Tócame para resumir" : "Tócame para saber más"}</span>
+    </div>
   </div>;
 }

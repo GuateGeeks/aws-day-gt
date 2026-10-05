@@ -43,12 +43,25 @@ describe("Quetzi sprite", () => {
 });
 
 describe("Quetzi guide", () => {
-  it("speaks politely and reacts to taps", () => {
-    const onTap = vi.fn();
-    render(<QuetziGuide completed={3} line="Hola" onTap={onTap} />);
-    fireEvent.click(screen.getByRole("button", { name: /Toca a Quetzi/ }));
-    expect(onTap).toHaveBeenCalledOnce();
-    expect(screen.getByText("Hola").closest("[aria-live]")).toHaveAttribute("aria-live", "polite");
+  it("expands contextual detail without navigating and then exposes the mission action", () => {
+    render(<MemoryRouter><QuetziGuide completed={3} summary="Tienes una misión ahora" detail="La sesión ocurre en Tacaná." mission={{ id: "M17", title: "Agentes con Bedrock" }} /></MemoryRouter>);
+    const toggle = screen.getByRole("button", { name: /ampliar información/i });
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByText(/La sesión ocurre/)).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Comenzar misión/i })).not.toBeInTheDocument();
+
+    fireEvent.click(toggle);
+
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByText("La sesión ocurre en Tacaná.").closest("[aria-live]")).toHaveAttribute("aria-live", "polite");
+    expect(screen.getByRole("link", { name: /Comenzar misión: Agentes con Bedrock/i })).toHaveAttribute("href", "/app/missions/M17");
+  });
+
+  it("can expand context without presenting an unrelated action", () => {
+    render(<MemoryRouter><QuetziGuide completed={3} summary="Hay actividades en curso" detail="No tienes una misión relacionada con este momento." /></MemoryRouter>);
+    fireEvent.click(screen.getByRole("button", { name: /ampliar información/i }));
+    expect(screen.getByText(/No tienes una misión relacionada/)).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Comenzar misión/i })).not.toBeInTheDocument();
   });
 });
 
