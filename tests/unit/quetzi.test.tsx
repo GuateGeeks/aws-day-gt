@@ -8,18 +8,21 @@ import { readClockOffset } from "../../src/features/companion/useNow";
 import { rowsToPixels, tailPixels } from "../../src/features/companion/quetzi-pixels";
 
 const clock = vi.hoisted(() => ({ now: new Date("2026-10-08T09:00:00-06:00") }));
+const missionState = vi.hoisted(() => ({ loading: false, items: [
+  { id: "a1", missionId: "M17", status: "available", points: 10, mission: { id: "M17", title: "Agentes con Bedrock", slot: "09:50", room: "Tacaná", evidenceType: "comment" } },
+  { id: "a2", missionId: "M01", status: "approved", points: 15, mission: { id: "M01", title: "Llegué al Community Day", evidenceType: "photo" } }
+] }));
 vi.mock("../../src/features/auth/AuthProvider", () => ({ useAuth: () => ({ profile: { alias: "ana", interests: ["IA & Agentes"] } }) }));
-vi.mock("../../src/features/missions/useMissions", () => ({
-  useMissions: () => ({ loading: false, items: [
-    { id: "a1", missionId: "M17", status: "available", points: 10, mission: { id: "M17", title: "Agentes con Bedrock", slot: "09:50", room: "Tacaná", evidenceType: "comment" } },
-    { id: "a2", missionId: "M01", status: "approved", points: 15, mission: { id: "M01", title: "Llegué al Community Day", evidenceType: "photo" } }
-  ] })
-}));
+vi.mock("../../src/features/missions/useMissions", () => ({ useMissions: () => missionState }));
 vi.mock("../../src/features/companion/useNow", async (original) => ({ ...await original<object>(), useNow: () => clock.now }));
 
 const { CompanionPage } = await import("../../src/features/companion/CompanionPage");
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  missionState.loading = false;
+  missionState.items[0].status = "available";
+});
 
 describe("Quetzi sprite", () => {
   it("starts as an egg and evolves with completed missions", () => {
@@ -81,33 +84,34 @@ describe("simulated clock", () => {
 describe("CompanionPage", () => {
   function renderPage() { return render(<MemoryRouter><CompanionPage /></MemoryRouter>); }
 
-  it("counts down before the event", () => {
+  it("keeps the pre-event countdown and official agenda", () => {
     clock.now = new Date("2026-10-08T09:00:00-06:00");
     renderPage();
-    expect(screen.getByText(/Faltan 1 día|Faltan 2 días/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "En este momento" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /Cuenta regresiva/ })).toBeInTheDocument();
-  });
-
-  it("shows only the session tied to the user's mission and defers the rest to the official agenda", () => {
-    clock.now = sessionDate("10:00");
-    renderPage();
-    const challenge = screen.getByRole("link", { name: /Agentes con Bedrock/ });
-    expect(challenge).toHaveAttribute("href", "/app/missions/M17");
-    expect(challenge).toHaveTextContent(/Ahora/);
-    expect(challenge).toHaveTextContent(/Strands Agents/);
-    expect(screen.queryByText(/The Event Happened Twice/)).not.toBeInTheDocument();
-    const official = screen.getAllByRole("link", { name: /agenda oficial/i });
-    expect(official[0]).toHaveAttribute("href", "https://awscommunitygt.com/agenda/");
-    expect(screen.getByText(/Siguiente bloque: 10:45/)).toBeInTheDocument();
-  });
-
-  it("sends people to the official agenda before the event", () => {
-    clock.now = new Date("2026-10-08T09:00:00-06:00");
-    renderPage();
     expect(screen.getByRole("link", { name: /agenda oficial/i })).toHaveAttribute("target", "_blank");
   });
 
-  it("shows feather progress", () => {
+  it("reveals only the current related mission through Quetzi", () => {
+    clock.now = sessionDate("10:00");
+    renderPage();
+    expect(screen.queryByText(/Siguiente bloque/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Pregúntale a los datos/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /ampliar información/i }));
+    expect(screen.getByText(/Strands Agents/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Comenzar misión: Agentes con Bedrock/i })).toHaveAttribute("href", "/app/missions/M17");
+  });
+
+  it("does not claim there is no mission while assignments load", () => {
+    clock.now = sessionDate("10:00");
+    missionState.loading = true;
+    renderPage();
+    fireEvent.click(screen.getByRole("button", { name: /ampliar información/i }));
+    expect(screen.getByText(/buscando si tienes una misión/i)).toBeInTheDocument();
+    expect(screen.queryByText(/no tienes una misión/i)).not.toBeInTheDocument();
+  });
+
+  it("shows compact feather progress", () => {
     clock.now = sessionDate("10:00");
     renderPage();
     expect(screen.getByText("1 de 11 plumas")).toBeInTheDocument();

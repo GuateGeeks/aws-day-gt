@@ -1,9 +1,7 @@
-import { CalendarDays, Clock3, ExternalLink, Feather, Target } from "lucide-react";
-import { Link } from "react-router-dom";
-import { OFFICIAL_AGENDA_URL, ROOMS, sessionDate } from "../../../shared/agenda";
-import { countdownTo, findSessionForMission, missionTiming, quetziStage } from "../../../shared/companion";
-import { Card, Chip, ProgressBar } from "../../design-system/components";
-import type { AssignedMission } from "../missions/useMissions";
+import { CalendarDays, Clock3, ExternalLink, Feather } from "lucide-react";
+import { OFFICIAL_AGENDA_URL, sessionDate } from "../../../shared/agenda";
+import { countdownTo, quetziStage } from "../../../shared/companion";
+import { Card, ProgressBar } from "../../design-system/components";
 import { QuetziSprite } from "./QuetziSprite";
 
 const TOTAL_FEATHERS = 11;
@@ -24,34 +22,6 @@ export function CountdownCard({ now }: { now: Date }) {
     </div>
     <p className="muted">Sábado 10 de octubre · registro desde las 7:30 · Universidad Rafael Landívar, zona 16.</p>
     <OfficialAgendaLink>Elige tus charlas en la agenda oficial</OfficialAgendaLink>
-  </Card>;
-}
-
-export function NextBlockCard({ now, nextStart }: { now: Date; nextStart?: string }) {
-  const minutes = nextStart ? countdownTo(now, sessionDate(nextStart)).totalMinutes : 0;
-  return <Card className="stack companion-card">
-    <h2><Clock3 aria-hidden size={20} /> {nextStart ? <>Siguiente bloque: {nextStart} <Chip>en {minutes} min</Chip></> : "Última parte del día"}</h2>
-    <p className="muted">Charlas, salas y cambios de último momento están en la agenda oficial.</p>
-    <OfficialAgendaLink />
-  </Card>;
-}
-
-const TIMING_LABEL = { now: "Ahora", next: "Siguiente" } as const;
-
-export function ChallengeCard({ item, now }: { item?: AssignedMission; now: Date }) {
-  if (!item) return <Card className="stack companion-card"><h2><Target aria-hidden size={20} /> Reto de Quetzi</h2><p className="muted">No tienes retos pendientes por ahora. ¡Revisa tu progreso o el ranking!</p></Card>;
-  const session = findSessionForMission(item.mission);
-  const timing = missionTiming(item.mission, now);
-  return <Card className="stack companion-card challenge-card">
-    <h2><Target aria-hidden size={20} /> Reto de Quetzi</h2>
-    <Link className="challenge-link" to={`/app/missions/${item.missionId}`}>
-      <span className="grow">
-        {timing && session && <span className="challenge-link__when">{TIMING_LABEL[timing]} · {ROOMS[session.room].short}</span>}
-        <strong>{item.mission.title}</strong>
-        <span className="muted">{session ? `«${session.title}» · ${session.start}` : "Puedes hacerlo en cualquier momento"}</span>
-      </span>
-      <Chip>+{item.points} pts</Chip>
-    </Link>
   </Card>;
 }
 

@@ -1,14 +1,13 @@
 .companion-card h2 { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); font-size: var(--text-lg); }
 .companion-cta { display: inline-flex; align-items: center; gap: var(--space-2); width: fit-content; color: var(--color-primary); font-weight: 900; text-decoration: none; }
+.companion__heading { display: grid; gap: var(--space-1); }
+.companion__heading h1 { font-size: var(--text-xl); }
+.companion-now { display: flex; align-items: center; gap: var(--space-2); padding-block: var(--space-3); color: var(--color-primary); font-size: var(--text-sm); font-weight: 900; }
+.companion-now__pulse { width: 10px; height: 10px; border-radius: 50%; background: var(--color-success); box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-success) 18%, transparent); }
 .countdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2); text-align: center; }
 .countdown div { display: grid; padding: var(--space-3); border-radius: var(--radius-md); background: var(--color-surface-2); }
 .countdown strong { font: 900 clamp(2rem, 10vw, 3rem)/1 var(--font-display); color: var(--color-primary); }
 .countdown span { color: var(--color-ink-muted); font-size: var(--text-xs); }
-.challenge-card { border-color: color-mix(in srgb, var(--color-accent-fill) 70%, var(--color-border)); }
-.challenge-link { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); border-radius: var(--radius-md); background: var(--color-surface-2); text-decoration: none; }
-.challenge-link strong, .challenge-link .muted { display: block; }
-.challenge-link .muted { font-size: var(--text-sm); }
-.challenge-link__when { display: block; color: var(--color-accent); font-size: var(--text-xs); font-weight: 900; text-transform: uppercase; letter-spacing: .08em; }
 .feather-card { display: flex; align-items: center; gap: var(--space-4); }
 .feather-card__bird { flex: 0 0 auto; width: 64px; height: 134px; }
 .feather-card .eyebrow { display: inline-flex; align-items: center; gap: 4px; }
