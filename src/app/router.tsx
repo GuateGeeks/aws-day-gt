@@ -2,7 +2,6 @@ import { Navigate, createBrowserRouter } from "react-router-dom";
 import { AppShell } from "./AppShell";
 import { ProtectedRoute, StaffRoute } from "./RouteGuards";
 import { AdminPage } from "../features/admin/AdminPage";
-import { AgendaPage } from "../features/agenda/AgendaPage";
 import { AuthCompletePage } from "../features/auth/AuthCompletePage";
 import { CompanionPage } from "../features/companion/CompanionPage";
 import { LandingPage } from "../features/auth/LandingPage";
@@ -23,7 +22,7 @@ export const router = createBrowserRouter([
     { path: "/app", element: <AppShell />, children: [
       { index: true, element: <Navigate to="hoy" replace /> },
       { path: "hoy", element: <CompanionPage /> },
-      { path: "agenda", element: <AgendaPage /> },
+      { path: "agenda", element: <Navigate to="/app/hoy" replace /> },
       { path: "missions", element: <MissionsPage /> },
       { path: "missions/:missionId", element: <MissionDetailPage /> },
       { path: "progress", element: <ProgressPage /> },

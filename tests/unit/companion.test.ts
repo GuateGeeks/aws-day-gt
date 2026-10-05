@@ -1,17 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { AGENDA, ROOMS, sessionDate } from "../../shared/agenda";
+import { AGENDA, OFFICIAL_AGENDA_URL, ROOMS, sessionDate } from "../../shared/agenda";
 import {
   countdownTo,
-  findConflicts,
   findSessionForMission,
   getEventPhase,
-  isRecommended,
+  missionTiming,
   nextSessions,
   pickChallenge,
   quetziLine,
   quetziStage,
-  sessionsAt,
-  sortByRecommendation
+  sessionsAt
 } from "../../shared/companion";
 import { missions } from "../../scripts/data/missions";
 
@@ -35,6 +33,10 @@ describe("agenda integrity", () => {
 });
 
 describe("event clock", () => {
+  it("points to the official agenda", () => {
+    expect(OFFICIAL_AGENDA_URL).toBe("https://awscommunitygt.com/agenda/");
+  });
+
   it("detects pre, live and post phases in Guatemala time", () => {
     expect(getEventPhase(new Date("2026-10-09T20:00:00-06:00"))).toBe("pre");
     expect(getEventPhase(at("07:30"))).toBe("live");
@@ -61,27 +63,12 @@ describe("event clock", () => {
   });
 });
 
-describe("recommendations", () => {
-  it("maps onboarding interests to agenda tracks", () => {
-    const security = AGENDA.find((session) => session.track === "Seguridad")!;
-    const serverless = AGENDA.find((session) => session.track === "Arquitectura & Serverless")!;
-    expect(isRecommended(security, ["Seguridad"])).toBe(true);
-    expect(isRecommended(serverless, ["Serverless"])).toBe(true);
-    expect(isRecommended(serverless, ["Seguridad"])).toBe(false);
-  });
-
-  it("puts recommended sessions first without mutating input", () => {
-    const slot = sessionsAt(at("10:50"));
-    const copy = [...slot];
-    const sorted = sortByRecommendation(slot, ["Seguridad"]);
-    expect(sorted[0]?.track).toBe("Seguridad");
-    expect(slot).toEqual(copy);
-  });
-
-  it("flags overlapping picks as conflicts", () => {
-    expect(findConflicts(["0950-tacana", "0950-acatenango"])).toHaveLength(1);
-    expect(findConflicts(["0950-tacana", "1045-tacana"])).toHaveLength(0);
-    expect(findConflicts(["1000-lab", "1140-tacana"])).toHaveLength(1);
+describe("mission timing", () => {
+  it("tells whether a mission session is happening now or next", () => {
+    expect(missionTiming({ slot: "09:50", room: "Tacaná" }, at("10:00"))).toBe("now");
+    expect(missionTiming({ slot: "10:45", room: "Tacaná" }, at("10:00"))).toBe("next");
+    expect(missionTiming({ slot: "14:10", room: "Tacaná" }, at("10:00"))).toBeUndefined();
+    expect(missionTiming({}, at("10:00"))).toBeUndefined();
   });
 });
 

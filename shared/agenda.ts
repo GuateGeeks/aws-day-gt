@@ -1,9 +1,12 @@
-// Official agenda copied from https://awscommunitygt.com/agenda/ (snapshot 2026-10-04).
+// Internal snapshot of https://awscommunitygt.com/agenda/ (2026-10-04), used only to place missions in time
+// and room. It is never shown as a browsable schedule: the official agenda remains the source of truth.
 // Times are local America/Guatemala (UTC-6, no daylight saving).
 
 export const EVENT_DATE = "2026-10-10";
 export const EVENT_UTC_OFFSET = "-06:00";
 export const EVENT_SITE_URL = "https://awscommunitygt.com/";
+/** The official agenda is the source of truth for sessions; the app only links to it. */
+export const OFFICIAL_AGENDA_URL = "https://awscommunitygt.com/agenda/";
 
 export type Track =
   | "IA & Agentes"
@@ -12,15 +15,6 @@ export type Track =
   | "DevOps & Operaciones"
   | "Seguridad"
   | "Carrera & Comunidad";
-
-export const TRACKS: readonly Track[] = [
-  "IA & Agentes",
-  "Arquitectura & Serverless",
-  "Datos & Analítica",
-  "DevOps & Operaciones",
-  "Seguridad",
-  "Carrera & Comunidad"
-];
 
 export type RoomId = "plenaria" | "tajumulco" | "tacana" | "acatenango" | "santa-maria" | "agua" | "fuego" | "kiro" | "lab";
 
@@ -136,8 +130,4 @@ export const AGENDA: readonly AgendaSession[] = rows.map(([start, end, room, kin
 
 export function sessionDate(time: string): Date {
   return new Date(`${EVENT_DATE}T${time}:00${EVENT_UTC_OFFSET}`);
-}
-
-export function agendaSlots(sessions: readonly AgendaSession[] = AGENDA): string[] {
-  return [...new Set(sessions.map((session) => session.start))].sort();
 }

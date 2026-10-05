@@ -8,7 +8,16 @@
 - Agenda is a bundled static file (`shared/agenda.ts`) copied from https://awscommunitygt.com/agenda/. Works offline; changes require redeploy.
 - Quetzi is an original pixel SVG inspired by the event's quetzal art, so it can animate and evolve.
 
-## Scope
+## Revision 2026-10-04: official agenda first
+
+The in-app agenda overlapped with https://awscommunitygt.com/agenda/. To keep the official agenda as the single source for sessions:
+
+- The Agenda tab, track filters, personal route and conflict warnings were removed. `/app/agenda` redirects to Hoy.
+- The header, Hoy, landing and mission detail link to the official agenda.
+- Hoy shows session details only for the session tied to the attendee's mission (now or next), plus the next block start time.
+- `shared/agenda.ts` stays as internal data for mission placement and day timing; it is never rendered as a schedule.
+
+## Original scope
 
 1. `shared/agenda.ts` — official sessions, rooms, buildings, tracks (America/Guatemala, UTC-6).
 2. `shared/companion.ts` — pure logic: event phase, now/next sessions, interest recommendations, slot conflicts, mission↔session matching, Quetzi evolution stage, contextual lines.

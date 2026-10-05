@@ -7,7 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "prompt",
-      includeAssets: ["icon.svg"],
+      includeAssets: ["icon.svg", "brand/aws-cd-2026-blanco.png"],
       manifest: {
         name: "AWS Community Day Guatemala 2026",
         short_name: "AWS Day GT",

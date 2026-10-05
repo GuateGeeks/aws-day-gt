@@ -75,12 +75,23 @@ describe("CompanionPage", () => {
     expect(screen.getByRole("heading", { name: /Cuenta regresiva/ })).toBeInTheDocument();
   });
 
-  it("guides through now and next sessions during the event with a matching challenge", () => {
+  it("shows only the session tied to the user's mission and defers the rest to the official agenda", () => {
     clock.now = sessionDate("10:00");
     renderPage();
-    expect(screen.getByRole("heading", { name: "Ahora" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /Siguiente/ })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Agentes con Bedrock/ })).toHaveAttribute("href", "/app/missions/M17");
+    const challenge = screen.getByRole("link", { name: /Agentes con Bedrock/ });
+    expect(challenge).toHaveAttribute("href", "/app/missions/M17");
+    expect(challenge).toHaveTextContent(/Ahora/);
+    expect(challenge).toHaveTextContent(/Strands Agents/);
+    expect(screen.queryByText(/The Event Happened Twice/)).not.toBeInTheDocument();
+    const official = screen.getAllByRole("link", { name: /agenda oficial/i });
+    expect(official[0]).toHaveAttribute("href", "https://awscommunitygt.com/agenda/");
+    expect(screen.getByText(/Siguiente bloque: 10:45/)).toBeInTheDocument();
+  });
+
+  it("sends people to the official agenda before the event", () => {
+    clock.now = new Date("2026-10-08T09:00:00-06:00");
+    renderPage();
+    expect(screen.getByRole("link", { name: /agenda oficial/i })).toHaveAttribute("target", "_blank");
   });
 
   it("shows feather progress", () => {

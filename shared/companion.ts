@@ -1,4 +1,4 @@
-import { AGENDA, ROOMS, sessionDate, type AgendaSession, type Track } from "./agenda";
+import { AGENDA, ROOMS, sessionDate, type AgendaSession } from "./agenda";
 import { QUETZI_FACTS } from "./companion-lines";
 
 export type EventPhase = "pre" | "live" | "post";
@@ -6,15 +6,6 @@ export type EventPhase = "pre" | "live" | "post";
 const DAY_START = "07:30";
 const DAY_END = "22:00";
 const MINUTE = 60_000;
-
-const INTEREST_TRACKS: Record<string, readonly Track[]> = {
-  "IA & Agentes": ["IA & Agentes"],
-  "Cloud Native": ["Arquitectura & Serverless", "DevOps & Operaciones"],
-  "Datos & Analytics": ["Datos & Analítica"],
-  Seguridad: ["Seguridad"],
-  Serverless: ["Arquitectura & Serverless"],
-  Comunidad: ["Carrera & Comunidad"]
-};
 
 export function getEventPhase(now: Date): EventPhase {
   if (now < sessionDate(DAY_START)) return "pre";
@@ -37,29 +28,17 @@ export function countdownTo(now: Date, target: Date) {
   return { days: Math.floor(totalMinutes / 1440), hours: Math.floor(totalMinutes % 1440 / 60), minutes: totalMinutes % 60, totalMinutes };
 }
 
-export function tracksForInterests(interests: readonly string[]): Set<Track> {
-  return new Set(interests.flatMap((interest) => INTEREST_TRACKS[interest] ?? []));
-}
-
-export function isRecommended(session: AgendaSession, interests: readonly string[]): boolean {
-  return Boolean(session.track && tracksForInterests(interests).has(session.track));
-}
-
-export function sortByRecommendation(sessions: readonly AgendaSession[], interests: readonly string[]): AgendaSession[] {
-  const score = (session: AgendaSession) => (isRecommended(session, interests) ? 0 : 1);
-  return [...sessions].sort((a, b) => score(a) - score(b));
-}
-
 export function findSessionForMission(mission: { slot?: string; room?: string }): AgendaSession | undefined {
   if (!mission.slot || !mission.room) return undefined;
   return AGENDA.find((session) => session.start === mission.slot && ROOMS[session.room].short === mission.room);
 }
 
-export function findConflicts(ids: readonly string[]): Array<[AgendaSession, AgendaSession]> {
-  const picked = AGENDA.filter((session) => ids.includes(session.id));
-  return picked.flatMap((a, index) => picked.slice(index + 1)
-    .filter((b) => a.start < b.end && b.start < a.end)
-    .map((b) => [a, b] as [AgendaSession, AgendaSession]));
+/** Whether the session tied to a mission is running now or is in the next slot. */
+export function missionTiming(mission: { slot?: string; room?: string }, now: Date): "now" | "next" | undefined {
+  const session = findSessionForMission(mission);
+  if (!session) return undefined;
+  if (sessionsAt(now).some((candidate) => candidate.id === session.id)) return "now";
+  return nextSessions(now).some((candidate) => candidate.id === session.id) ? "next" : undefined;
 }
 
 const STAGES = [
@@ -101,7 +80,7 @@ export function quetziLine({ phase, alias, now, tap = 0 }: LineContext): string 
   if (phase === "pre") {
     const { days, hours } = countdownTo(now, sessionDate(DAY_START));
     const when = days > 0 ? `${days} ${days === 1 ? "día" : "días"}` : `${hours} ${hours === 1 ? "hora" : "horas"}`;
-    return `¡Hola${name}! Soy Quetzi. Faltan ${when} para el Community Day. Armemos tu ruta en la Agenda.`;
+    return `¡Hola${name}! Soy Quetzi. Faltan ${when} para el Community Day. Elige tus charlas en la agenda oficial y yo te acompaño con retos.`;
   }
   if (phase === "post") return `¡Gracias por volar conmigo${name}! Fue un día increíble para la comunidad AWS de Guatemala.`;
   const current = sessionsAt(now);
@@ -110,6 +89,6 @@ export function quetziLine({ phase, alias, now, tap = 0 }: LineContext): string 
   if (current.some((session) => session.kind === "social")) return `La cena de la comunidad ya empezó${name}. ¡A celebrar lo aprendido!`;
   const next = nextSessions(now);
   const minutes = next[0] ? countdownTo(now, sessionDate(next[0].start)).totalMinutes : undefined;
-  if (minutes !== undefined && minutes <= 10) return `¡Vuela${name}! En ${minutes} min empieza el siguiente bloque. Revisa a dónde te toca ir.`;
-  return `Estoy contigo${name}. Te muestro qué pasa ahora y qué reto te queda cerca.`;
+  if (minutes !== undefined && minutes <= 10) return `¡Vuela${name}! En ${minutes} min empieza el siguiente bloque. Revisa la agenda oficial para ver a dónde ir.`;
+  return `Estoy contigo${name}. Te aviso qué reto tienes cerca; horarios y salas están en la agenda oficial.`;
 }

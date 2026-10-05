@@ -1,4 +1,4 @@
-import { ROOMS } from "../../../shared/agenda";
+import { OFFICIAL_AGENDA_URL, ROOMS } from "../../../shared/agenda";
 import { findSessionForMission } from "../../../shared/companion";
 import type { Mission } from "../../../shared/types";
 import { QuetziSprite } from "./QuetziSprite";
@@ -21,6 +21,7 @@ export function MissionCompanionHint({ mission }: { mission: Mission }) {
         ? <>Esta misión es de <strong>«{session.title}»</strong> en {room.name} ({room.building}) a las {session.start}. </>
         : null}
       {TIPS[mission.evidenceType]}
+      {session && <> <a href={OFFICIAL_AGENDA_URL} target="_blank" rel="noreferrer">Confirma horario y sala en la agenda oficial ↗</a></>}
     </p>
   </div>;
 }

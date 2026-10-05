@@ -1,11 +1,11 @@
 import { Award, Bird, CalendarDays, CircleUserRound, ListChecks, Trophy } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
+import { OFFICIAL_AGENDA_URL } from "../../shared/agenda";
 import { FeatherCelebration } from "../features/companion/FeatherCelebration";
 import { QuetziSprite } from "../features/companion/QuetziSprite";
 
 const tabs = [
   { to: "/app/hoy", label: "Hoy", icon: Bird },
-  { to: "/app/agenda", label: "Agenda", icon: CalendarDays },
   { to: "/app/missions", label: "Misiones", icon: ListChecks },
   { to: "/app/progress", label: "Progreso", icon: Award },
   { to: "/app/leaderboard", label: "Ranking", icon: Trophy }
@@ -17,6 +17,7 @@ export function AppShell() {
     <main className="page" id="main" tabIndex={-1}>
       <header className="app-header">
         <NavLink className="brand-mark" to="/app/hoy"><span className="brand-cloud"><QuetziSprite completed={11} crop="head" label="" /></span><span>AWS Day GT <small className="brand-sub">con Quetzi</small></span></NavLink>
+        <a className="header-agenda" href={OFFICIAL_AGENDA_URL} target="_blank" rel="noreferrer" aria-label="Agenda oficial (abre awscommunitygt.com)"><CalendarDays aria-hidden size={18} /><span className="header-agenda__text">Agenda oficial</span></a>
         <NavLink className="header-profile" to="/app/profile" aria-label="Perfil"><CircleUserRound aria-hidden size={26} /></NavLink>
       </header>
       <Outlet />
