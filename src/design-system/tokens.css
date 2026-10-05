@@ -1,22 +1,22 @@
 :root {
-  --color-bg: #fff8ed;
+  --color-bg: #f3f7ee;
   --color-surface: #ffffff;
-  --color-surface-2: #f6ead8;
-  --color-ink: #17233c;
-  --color-ink-muted: #56647a;
-  --color-border: #dfd2bd;
-  --color-primary: #176b87;
-  --color-primary-strong: #0d4f68;
+  --color-surface-2: #e5eedf;
+  --color-ink: #13233a;
+  --color-ink-muted: #4c5e55;
+  --color-border: #cddbc8;
+  --color-primary: #0f7a4a;
+  --color-primary-strong: #0a5534;
   --color-on-primary: #ffffff;
-  --color-accent: #c05600;
-  --color-accent-fill: #ffad52;
-  --color-on-accent: #3d2100;
+  --color-accent: #c41e3a;
+  --color-accent-fill: #f6c21a;
+  --color-on-accent: #3a2a00;
   --color-success: #177445;
   --color-success-soft: #def4e6;
   --color-danger: #ad2736;
   --color-danger-soft: #fde6e8;
-  --color-info: #4657c8;
-  --color-info-soft: #eaecff;
+  --color-info: #1d6fb8;
+  --color-info-soft: #e1f1ef;
   --shadow-color: 23 35 60;
   --font-body: "Nunito", "DM Sans", ui-rounded, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-display: "Nunito", var(--font-body);
@@ -53,24 +53,24 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg: #0f1728;
-    --color-surface: #18243a;
-    --color-surface-2: #22304a;
-    --color-ink: #f7f2e9;
-    --color-ink-muted: #b9c4d5;
-    --color-border: #34445f;
-    --color-primary: #70c8e1;
-    --color-primary-strong: #2588a8;
-    --color-on-primary: #082733;
-    --color-accent: #ffbd72;
-    --color-accent-fill: #ffad52;
-    --color-on-accent: #3d2100;
+    --color-bg: #0b1a16;
+    --color-surface: #12261f;
+    --color-surface-2: #1a3329;
+    --color-ink: #eef5ec;
+    --color-ink-muted: #a9bfb2;
+    --color-border: #2a4a3c;
+    --color-primary: #5fd39a;
+    --color-primary-strong: #2a9a62;
+    --color-on-primary: #062417;
+    --color-accent: #ff8a9b;
+    --color-accent-fill: #f6c21a;
+    --color-on-accent: #3a2a00;
     --color-success: #6bd99e;
     --color-success-soft: #15392a;
     --color-danger: #ff9ca7;
     --color-danger-soft: #472128;
-    --color-info: #b7beff;
-    --color-info-soft: #272c5b;
+    --color-info: #8cc4ff;
+    --color-info-soft: #183a44;
     --shadow-color: 0 0 0;
     color-scheme: dark;
   }

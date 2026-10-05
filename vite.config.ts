@@ -11,9 +11,9 @@ export default defineConfig({
       manifest: {
         name: "AWS Community Day Guatemala 2026",
         short_name: "AWS Day GT",
-        description: "Misiones y experiencias del AWS Community Day Guatemala 2026",
-        theme_color: "#17233c",
-        background_color: "#fff8ed",
+        description: "Quetzi, tu compañero para el AWS Community Day Guatemala 2026: agenda, ruta personal y misiones",
+        theme_color: "#0f7a4a",
+        background_color: "#f3f7ee",
         display: "standalone",
         start_url: "/",
         icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any maskable" }]

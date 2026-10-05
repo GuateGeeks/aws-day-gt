@@ -1,0 +1,13 @@
+.landing .hero { padding-block: clamp(32px, 8vw, 80px) var(--space-6); }
+.landing .hero h1 { font-size: clamp(2.4rem, 8vw, 4.6rem); }
+.landing .ds-button { text-decoration: none; }
+.landing__site { display: inline-flex; align-items: center; gap: 6px; color: var(--color-primary); font-weight: 900; }
+.landing-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-2); margin: 0 0 var(--space-6); padding: 0; list-style: none; }
+.landing-stats li { display: grid; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--color-surface-2); }
+.landing-stats strong { font: 900 var(--text-xl)/1.1 var(--font-display); color: var(--color-primary); }
+.landing-stats span { color: var(--color-ink-muted); font-size: var(--text-sm); }
+.evolution { margin-top: var(--space-8); }
+.evolution__steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.evolution__steps li { display: grid; justify-items: center; align-content: end; gap: var(--space-2); text-align: center; font-size: var(--text-xs); font-weight: 900; }
+.evolution__steps .quetzi { width: 100%; max-width: 64px; height: auto; aspect-ratio: 20 / 42; }
+@media (min-width: 640px) { .landing-stats { grid-template-columns: repeat(4, 1fr); } }

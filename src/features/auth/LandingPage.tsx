@@ -1,20 +1,40 @@
-import { ArrowRight, Camera, Cloud, Trophy } from "lucide-react";
+import { ArrowRight, Bird, CalendarHeart, ExternalLink, Feather } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Button, Card, Chip } from "../../design-system/components";
+import { EVENT_SITE_URL } from "../../../shared/agenda";
+import { quetziFact, quetziStage } from "../../../shared/companion";
+import { Card, Chip } from "../../design-system/components";
+import { QuetziGuide } from "../companion/QuetziGuide";
+import { QuetziSprite } from "../companion/QuetziSprite";
+import "./landing.css";
+
+const STATS = [["7", "salas en paralelo"], ["6", "tracks"], ["34", "voces de la comunidad"], ["11", "misiones por persona"]] as const;
+const EVOLUTION = [0, 2, 5, 9, 11];
 
 export function LandingPage() {
+  const [taps, setTaps] = useState(0);
+  const line = taps === 0 ? "¡Hola! Soy Quetzi. El 10 de octubre te acompaño por todo el AWS Community Day Guatemala." : quetziFact(taps - 1);
   return <main className="landing page">
-    <header className="landing__nav"><span className="brand-mark"><span className="brand-cloud"><Cloud aria-hidden /></span>AWS Community Day Guatemala</span><Link to="/login">Ingresar</Link></header>
+    <header className="landing__nav"><span className="brand-mark"><span className="brand-cloud"><QuetziSprite completed={11} crop="head" label="" /></span>AWS Community Day Guatemala</span><Link to="/login">Ingresar</Link></header>
     <section className="hero stack">
-      <Chip>10 de octubre · Guatemala</Chip>
-      <h1>Aprende, conecta y completa el reto.</h1>
-      <p>Convierte tu Community Day en una aventura de 11 misiones. Comparte ideas, descubre sesiones y suma hasta 100 puntos.</p>
-      <div className="cluster"><Button variant="accent" onClick={() => { location.href = "/login"; }}>Participar <ArrowRight aria-hidden size={20} /></Button><span className="muted">Acceso por enlace seguro · sin contraseña</span></div>
+      <Chip>Sábado 10 de octubre · URL, zona 16</Chip>
+      <h1>Tu compañero para el Community Day.</h1>
+      <QuetziGuide completed={11} line={line} onTap={() => setTaps((count) => count + 1)} />
+      <p>Quetzi te guía por las sesiones en paralelo, te avisa qué sigue y te reta con misiones. Cada misión aprobada le da una pluma nueva.</p>
+      <div className="cluster">
+        <Link className="ds-button ds-button--accent" to="/login">Despertar a Quetzi <ArrowRight aria-hidden size={20} /></Link>
+        <a className="landing__site" href={EVENT_SITE_URL} target="_blank" rel="noreferrer">Sitio oficial <ExternalLink aria-hidden size={16} /></a>
+      </div>
     </section>
+    <ul className="landing-stats" aria-label="El evento en números">{STATS.map(([value, label]) => <li key={label}><strong>{value}</strong><span>{label}</span></li>)}</ul>
     <section className="feature-grid" aria-label="Cómo funciona">
-      <Card><Camera aria-hidden /><h2>11 misiones</h2><p className="muted">Fotos, comentarios y palabras inspiradas por el evento.</p></Card>
-      <Card><Trophy aria-hidden /><h2>100 puntos</h2><p className="muted">Sigue tu progreso y descubre tu posición en tiempo real.</p></Card>
-      <Card><Cloud aria-hidden /><h2>Funciona offline</h2><p className="muted">Continúa explorando aunque la red del recinto se sature.</p></Card>
+      <Card><CalendarHeart aria-hidden /><h2>Arma tu ruta</h2><p className="muted">Agenda oficial con filtros por track. Marca tus charlas y te avisamos si dos chocan.</p></Card>
+      <Card><Bird aria-hidden /><h2>Sigue a Quetzi</h2><p className="muted">Qué pasa ahora, qué sigue y en qué edificio queda cada sala, aunque falle la señal.</p></Card>
+      <Card><Feather aria-hidden /><h2>Hazlo crecer</h2><p className="muted">Fotos y retos ligados a las sesiones. Hasta 100 puntos y un lugar en el ranking.</p></Card>
+    </section>
+    <section className="evolution stack" aria-labelledby="evolution-title">
+      <h2 id="evolution-title">De huevo a quetzal resplandeciente</h2>
+      <ol className="evolution__steps">{EVOLUTION.map((completed) => <li key={completed}><QuetziSprite completed={completed} label="" /><span>{quetziStage(completed).name}</span></li>)}</ol>
     </section>
   </main>;
 }
