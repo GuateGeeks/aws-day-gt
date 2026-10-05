@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { sessionDate } from "../../shared/agenda";
+import { LandingPage } from "../../src/features/auth/LandingPage";
 import { QuetziGuide } from "../../src/features/companion/QuetziGuide";
 import { QuetziSprite } from "../../src/features/companion/QuetziSprite";
 import { readClockOffset } from "../../src/features/companion/useNow";
@@ -21,7 +22,6 @@ const { CompanionPage } = await import("../../src/features/companion/CompanionPa
 afterEach(() => {
   cleanup();
   missionState.loading = false;
-  missionState.items[0].status = "available";
 });
 
 describe("Quetzi sprite", () => {
@@ -78,6 +78,14 @@ describe("simulated clock", () => {
     expect(readClockOffset("", fake, real)).toBe(offset);
     expect(readClockOffset("?ahora=real", fake, real)).toBe(0);
     expect(readClockOffset("?ahora=nope", fake, real)).toBe(0);
+  });
+});
+
+describe("LandingPage companion promise", () => {
+  it("describes current context instead of future-block alerts", () => {
+    render(<MemoryRouter><LandingPage /></MemoryRouter>);
+    expect(screen.getByText(/te muestra qué está pasando ahora/i)).toBeInTheDocument();
+    expect(screen.queryByText(/te avisa cuándo empieza el siguiente bloque/i)).not.toBeInTheDocument();
   });
 });
 

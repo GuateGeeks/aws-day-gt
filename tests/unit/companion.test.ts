@@ -88,7 +88,7 @@ describe("current moment", () => {
     { missionId: "M01", status: "available" as const, points: 15, mission: { title: "Llegué", slot: undefined, room: undefined } },
     { missionId: "M16", status: "available" as const, points: 10, mission: { ...base, title: "Talento + IA", slot: "09:50", room: "Tajumulco" } },
     { missionId: "M19", status: "available" as const, points: 10, mission: { ...base, title: "Pregúntale a los datos", slot: "10:45", room: "Tajumulco" } }
-  ];
+  ] as const;
 
   it("offers only an actionable mission tied to a session running now", () => {
     const moment = getCurrentMoment({ now: at("10:00"), alias: "ana", items, loading: false });

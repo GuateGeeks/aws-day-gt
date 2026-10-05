@@ -113,8 +113,9 @@ export function getCurrentMoment<T extends CurrentMissionCandidate>({ now, items
   if (special?.title === "Almuerzo") return { phase, kind: "meal", summary: `Es hora del almuerzo${name}`, detail: "Recarga energía y disfruta este espacio con la comunidad.", loading: false };
   if (special?.kind === "social") return { phase, kind: "social", summary: `La cena de la comunidad ya empezó${name}`, detail: "Celebremos lo aprendido y las conexiones de hoy.", loading: false };
   if (special && (special.title === "Palabras de cierre" || special.title === "Cierre")) return { phase, kind: "closing", summary: `Estamos en el cierre${name}`, detail: "Acompaña los últimos momentos del Community Day.", loading: false };
-  if (current.length && current.every((session) => session.kind === "plenary" || session.kind === "keynote")) {
-    return { phase, kind: "plenary", summary: `La comunidad está reunida${name}`, detail: `Ahora: ${current[0].title}.`, loading: false };
+  const [plenary] = current;
+  if (plenary && current.every((session) => session.kind === "plenary" || session.kind === "keynote")) {
+    return { phase, kind: "plenary", summary: `La comunidad está reunida${name}`, detail: `Ahora: ${plenary.title}.`, loading: false };
   }
 
   if (!current.length) return { phase, kind: "between", summary: `Estamos entre actividades${name}`, detail: "No hay una actividad identificada en este momento. Consulta la agenda oficial si necesitas orientarte.", loading: false };
