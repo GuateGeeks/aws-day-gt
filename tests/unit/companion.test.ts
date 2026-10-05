@@ -3,11 +3,10 @@ import { AGENDA, OFFICIAL_AGENDA_URL, ROOMS, sessionDate } from "../../shared/ag
 import {
   countdownTo,
   findSessionForMission,
+  getCurrentMoment,
   getEventPhase,
   missionTiming,
   nextSessions,
-  pickChallenge,
-  quetziLine,
   quetziStage,
   sessionsAt
 } from "../../shared/companion";
@@ -83,33 +82,62 @@ describe("Quetzi evolution", () => {
   });
 });
 
-describe("challenge picker", () => {
+describe("current moment", () => {
   const base = { evidenceType: "comment" as const, points: 10 };
   const items = [
-    { missionId: "M01", status: "approved" as const, mission: { ...base, slot: undefined, room: undefined } },
-    { missionId: "M02", status: "available" as const, mission: { ...base, slot: undefined, room: undefined } },
-    { missionId: "M19", status: "available" as const, mission: { ...base, slot: "10:45", room: "Tajumulco" } },
-    { missionId: "M16", status: "available" as const, mission: { ...base, slot: "09:50", room: "Tajumulco" } }
+    { missionId: "M01", status: "available" as const, points: 15, mission: { title: "Llegué", slot: undefined, room: undefined } },
+    { missionId: "M16", status: "available" as const, points: 10, mission: { ...base, title: "Talento + IA", slot: "09:50", room: "Tajumulco" } },
+    { missionId: "M19", status: "available" as const, points: 10, mission: { ...base, title: "Pregúntale a los datos", slot: "10:45", room: "Tajumulco" } }
   ];
 
-  it("prioritises missions for the session happening now", () => {
-    expect(pickChallenge(items, at("10:00"))?.missionId).toBe("M16");
+  it("offers only an actionable mission tied to a session running now", () => {
+    const moment = getCurrentMoment({ now: at("10:00"), alias: "ana", items, loading: false });
+    expect(moment).toMatchObject({ phase: "live", kind: "sessions", loading: false });
+    expect(moment.mission?.missionId).toBe("M16");
+    expect(moment.session?.title).toBe("Transformando el talento con AWS e IA: del temor a la ventaja");
+    expect(moment.summary).toMatch(/momento/i);
+    expect(moment.detail).toMatch(/Tajumulco/);
   });
 
-  it("then the upcoming session, then general missions", () => {
-    expect(pickChallenge(items, at("10:42"))?.missionId).toBe("M19");
-    expect(pickChallenge(items, at("18:00"))?.missionId).toBe("M02");
+  it("never substitutes a future or general mission", () => {
+    const moment = getCurrentMoment({ now: at("10:42"), items: [items[0], items[2]], loading: false });
+    expect(moment.mission).toBeUndefined();
+    expect(moment.detail).toMatch(/no tienes una misión relacionada/i);
   });
 
-  it("returns undefined when nothing is available", () => {
-    expect(pickChallenge(items.slice(0, 1), at("10:00"))).toBeUndefined();
+  it("allows a rejected mission but excludes non-actionable statuses", () => {
+    const rejected = { ...items[1], status: "rejected" as const };
+    const submitted = { ...items[1], status: "submitted" as const };
+    expect(getCurrentMoment({ now: at("10:00"), items: [rejected], loading: false }).mission?.missionId).toBe("M16");
+    expect(getCurrentMoment({ now: at("10:00"), items: [submitted], loading: false }).mission).toBeUndefined();
   });
-});
 
-describe("Quetzi lines", () => {
-  it("greets by phase and context", () => {
-    expect(quetziLine({ phase: "pre", alias: "ana", now: new Date("2026-10-08T07:00:00-06:00") })).toMatch(/ana/);
-    expect(quetziLine({ phase: "live", alias: "ana", now: at("13:30") })).toMatch(/almuerzo/i);
-    expect(quetziLine({ phase: "post", alias: "ana", now: new Date("2026-10-11T09:00:00-06:00") })).toMatch(/gracias/i);
+  it("keeps loading distinct from having no related mission", () => {
+    const loading = getCurrentMoment({ now: at("10:00"), items: [], loading: true });
+    expect(loading.loading).toBe(true);
+    expect(loading.detail).toMatch(/buscando/i);
+    expect(loading.detail).not.toMatch(/no tienes/i);
+  });
+
+  it.each([
+    ["07:45", "registration", /registro/i],
+    ["08:40", "plenary", /comunidad/i],
+    ["13:30", "meal", /almuerzo/i],
+    ["17:05", "closing", /cierre/i],
+    ["20:30", "social", /cena/i]
+  ] as const)("describes the %s event moment", (time, kind, copy) => {
+    const moment = getCurrentMoment({ now: at(time), alias: "ana", items: [], loading: false });
+    expect(moment.kind).toBe(kind);
+    expect(moment.summary).toMatch(copy);
+    expect(moment.mission).toBeUndefined();
+  });
+
+  it("handles pre-event, gaps and post-event without inventing details", () => {
+    expect(getCurrentMoment({ now: new Date("2026-10-08T09:00:00-06:00"), items: [], loading: false })).toMatchObject({ phase: "pre", kind: "pre" });
+    const gap = getCurrentMoment({ now: at("09:45"), items: items.slice(0, 1), loading: false });
+    expect(gap).toMatchObject({ phase: "live", kind: "between" });
+    expect(gap.mission).toBeUndefined();
+    expect(gap.detail).not.toMatch(/Tajumulco|Tacaná/);
+    expect(getCurrentMoment({ now: new Date("2026-10-10T22:00:00-06:00"), items: [], loading: false })).toMatchObject({ phase: "post", kind: "post" });
   });
 });

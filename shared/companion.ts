@@ -57,38 +57,77 @@ export function quetziStage(completed: number): QuetziStage {
   return { level, name, description, nextAt: STAGES.find((stage) => stage.level === level + 1)?.min };
 }
 
-type ChallengeCandidate = { missionId: string; status: string; mission: { slot?: string; room?: string } };
-
-export function pickChallenge<T extends ChallengeCandidate>(items: readonly T[], now: Date): T | undefined {
-  const available = items.filter((item) => item.status === "available" || item.status === "rejected");
-  const forSessions = (sessions: AgendaSession[]) => available.find((item) => {
-    const session = findSessionForMission(item.mission);
-    return session && sessions.some((candidate) => candidate.id === session.id);
-  });
-  return forSessions(sessionsAt(now)) ?? forSessions(nextSessions(now)) ?? available.find((item) => !item.mission.slot) ?? available[0];
-}
-
 export function quetziFact(index: number): string {
   return QUETZI_FACTS[index % QUETZI_FACTS.length] ?? "";
 }
 
-export type LineContext = { phase: EventPhase; alias?: string; now: Date; tap?: number };
+export type CurrentMomentKind = "pre" | "registration" | "plenary" | "sessions" | "meal" | "closing" | "social" | "between" | "post";
 
-export function quetziLine({ phase, alias, now, tap = 0 }: LineContext): string {
-  const name = alias ? `, ${alias}` : "";
-  if (tap > 0) return quetziFact(tap - 1);
+export type CurrentMissionCandidate = {
+  missionId: string;
+  status: string;
+  points: number;
+  mission: { title: string; slot?: string; room?: string };
+};
+
+export type CurrentMoment<T extends CurrentMissionCandidate> = {
+  phase: EventPhase;
+  kind: CurrentMomentKind;
+  summary: string;
+  detail: string;
+  loading: boolean;
+  mission?: T;
+  session?: AgendaSession;
+};
+
+type CurrentMomentInput<T extends CurrentMissionCandidate> = {
+  now: Date;
+  items: readonly T[];
+  loading: boolean;
+  alias?: string;
+};
+
+function named(alias?: string) {
+  return alias ? `, ${alias}` : "";
+}
+
+export function getCurrentMoment<T extends CurrentMissionCandidate>({ now, items, loading, alias }: CurrentMomentInput<T>): CurrentMoment<T> {
+  const phase = getEventPhase(now);
+  const name = named(alias);
   if (phase === "pre") {
     const { days, hours } = countdownTo(now, sessionDate(DAY_START));
-    const when = days > 0 ? `${days} ${days === 1 ? "día" : "días"}` : `${hours} ${hours === 1 ? "hora" : "horas"}`;
-    return `¡Hola${name}! Soy Quetzi. Faltan ${when} para el Community Day. Elige tus charlas en la agenda oficial y yo te acompaño con retos.`;
+    const amount = days > 0 ? `${days} ${days === 1 ? "día" : "días"}` : `${hours} ${hours === 1 ? "hora" : "horas"}`;
+    return { phase, kind: "pre", summary: `Faltan ${amount}${name}`, detail: "Prepárate para el Community Day y consulta tus charlas en la agenda oficial.", loading: false };
   }
-  if (phase === "post") return `¡Gracias por volar conmigo${name}! Fue un día increíble para la comunidad AWS de Guatemala.`;
+  if (phase === "post") {
+    return { phase, kind: "post", summary: `Gracias por volar conmigo${name}`, detail: "El Community Day terminó. Gracias por ser parte de la comunidad AWS de Guatemala.", loading: false };
+  }
+
   const current = sessionsAt(now);
-  if (current.some((session) => session.title === "Almuerzo")) return `¡Hora del almuerzo${name}! Recarga energía y aprovecha para conocer a alguien nuevo.`;
-  if (current.some((session) => session.title === "Registro")) return `¡Bienvenido${name}! Pasa por registro y luego busca tu primera sesión.`;
-  if (current.some((session) => session.kind === "social")) return `La cena de la comunidad ya empezó${name}. ¡A celebrar lo aprendido!`;
-  const next = nextSessions(now);
-  const minutes = next[0] ? countdownTo(now, sessionDate(next[0].start)).totalMinutes : undefined;
-  if (minutes !== undefined && minutes <= 10) return `¡Vuela${name}! En ${minutes} min empieza el siguiente bloque. Revisa la agenda oficial para ver a dónde ir.`;
-  return `Estoy contigo${name}. Te aviso qué reto tienes cerca; horarios y salas están en la agenda oficial.`;
+  const special = current.find((session) => session.title === "Registro")
+    ?? current.find((session) => session.title === "Almuerzo")
+    ?? current.find((session) => session.kind === "social")
+    ?? current.find((session) => session.title === "Palabras de cierre" || session.title === "Cierre");
+
+  if (special?.title === "Registro") return { phase, kind: "registration", summary: `Es momento del registro${name}`, detail: "Completa tu ingreso y prepárate para comenzar el día.", loading: false };
+  if (special?.title === "Almuerzo") return { phase, kind: "meal", summary: `Es hora del almuerzo${name}`, detail: "Recarga energía y disfruta este espacio con la comunidad.", loading: false };
+  if (special?.kind === "social") return { phase, kind: "social", summary: `La cena de la comunidad ya empezó${name}`, detail: "Celebremos lo aprendido y las conexiones de hoy.", loading: false };
+  if (special && (special.title === "Palabras de cierre" || special.title === "Cierre")) return { phase, kind: "closing", summary: `Estamos en el cierre${name}`, detail: "Acompaña los últimos momentos del Community Day.", loading: false };
+  if (current.length && current.every((session) => session.kind === "plenary" || session.kind === "keynote")) {
+    return { phase, kind: "plenary", summary: `La comunidad está reunida${name}`, detail: `Ahora: ${current[0].title}.`, loading: false };
+  }
+
+  if (!current.length) return { phase, kind: "between", summary: `Estamos entre actividades${name}`, detail: "No hay una actividad identificada en este momento. Consulta la agenda oficial si necesitas orientarte.", loading: false };
+  if (loading) return { phase, kind: "sessions", summary: `Hay actividades en curso${name}`, detail: "Estoy buscando si tienes una misión relacionada con este momento…", loading: true };
+
+  const match = items.find((item) => {
+    if (item.status !== "available" && item.status !== "rejected") return false;
+    const session = findSessionForMission(item.mission);
+    return session ? current.some((candidate) => candidate.id === session.id) : false;
+  });
+  const session = match ? findSessionForMission(match.mission) : undefined;
+  if (match && session) {
+    return { phase, kind: "sessions", summary: `Tienes una misión para este momento${name}`, detail: `“${session.title}” está ocurriendo ahora en ${ROOMS[session.room].short}.`, loading: false, mission: match, session };
+  }
+  return { phase, kind: "sessions", summary: `Hay actividades en curso${name}`, detail: "No tienes una misión relacionada con este momento. Disfruta la actividad que elegiste.", loading: false };
 }
