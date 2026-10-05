@@ -8,6 +8,7 @@ functions/lib/
 playwright-report/
 test-results/
 coverage/
+.worktrees/
 firepit-log.txt
 firebase-debug.log
 firestore-debug.log
