@@ -30,10 +30,10 @@ export function QuetziSprite({ completed, mood = "idle", crop = "full", label, c
   const pixels = rowsToPixels(rows, 2).filter((pixel) => stage.level >= 2 || pixel.part !== "crest");
   const viewBox = crop === "head" ? "3 0 13 13" : `0 0 ${SPRITE_WIDTH} ${SPRITE_HEIGHT}`;
   const classes = ["quetzi", `quetzi--${mood}`, `quetzi--level-${stage.level}`, isEgg && "quetzi--egg", className].filter(Boolean).join(" ");
-  const a11y = label === "" ? { "aria-hidden": true } : { role: "img", "aria-label": label ?? `Quetzi, etapa ${stage.name}` };
+  const a11y = label === "" ? { "aria-hidden": true } : { role: "img", "aria-label": label ?? `Geek, etapa ${stage.name}` };
   return <svg className={classes} viewBox={viewBox} shapeRendering="crispEdges" {...a11y}>
     <g className="quetzi__body">
-      {!isEgg && <Layer className="quetzi__tail" pixels={tailPixels(Math.min(completed, 11))} />}
+      {!isEgg && <Layer className="quetzi__tail" pixels={tailPixels(Math.min(completed, 10))} />}
       {crop === "full" && <Run pixel={BRANCH} />}
       <Layer pixels={pixels.filter((pixel) => pixel.part === "body" || pixel.part === "crest")} />
       <Layer className="quetzi__wing" pixels={pixels.filter((pixel) => pixel.part === "wing")} />

@@ -15,7 +15,7 @@ export function MissionCompanionHint({ mission }: { mission: Mission }) {
   const session = findSessionForMission(mission);
   const room = session ? ROOMS[session.room] : undefined;
   return <div className="mission-hint">
-    <QuetziSprite completed={11} crop="head" label="Quetzi" className="mission-hint__bird" />
+    <QuetziSprite completed={11} crop="head" label="Geek" className="mission-hint__bird" />
     <p>
       {session && room
         ? <>Esta misión es de <strong>«{session.title}»</strong> en {room.name} ({room.building}) a las {session.start}. </>

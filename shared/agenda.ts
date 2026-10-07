@@ -14,7 +14,8 @@ export type Track =
   | "Datos & Analítica"
   | "DevOps & Operaciones"
   | "Seguridad"
-  | "Carrera & Comunidad";
+  | "Carrera & Comunidad"
+  | "FinOps - Operaciones";
 
 export type RoomId = "plenaria" | "tajumulco" | "tacana" | "acatenango" | "santa-maria" | "agua" | "fuego" | "kiro" | "lab";
 
@@ -93,7 +94,7 @@ const rows: Row[] = [
   ["14:10", "15:00", "tajumulco", "talk", "Más allá del Disaster Recovery tradicional", "DevOps & Operaciones", "Roger Girón", "Guatemala", "GBM"],
   ["14:10", "15:00", "tacana", "talk", "Cómo conseguir oportunidades internacionales en Big Data e IA", "Carrera & Comunidad", "Mario Gómez", "Guatemala", "Factored.ai"],
   ["14:10", "15:00", "acatenango", "talk", "Bases de datos vectoriales en AWS: la clave para la IA Generativa", "Datos & Analítica", "Mario García", "México"],
-  ["14:10", "16:50", "santa-maria", "workshop", "Kiro: el nuevo aliado de FinOps", undefined, "Bárbara Gaspar", "México", "FinOps Foundation"],
+  ["14:10", "16:50", "santa-maria", "workshop", "Kiro: el nuevo aliado de FinOps", "FinOps - Operaciones", "Bárbara Gaspar", "México", "FinOps Foundation"],
   ["14:10", "15:00", "agua", "talk", "Cinco incidentes de AWS que no se resolvieron reiniciando", "DevOps & Operaciones", "Alexis Velásquez", "Colombia"],
   ["14:10", "15:00", "fuego", "talk", "Modernización de aplicaciones REST con Amazon Bedrock AgentCore Gateway y Strands Agents", "IA & Agentes", "Marlon Coti", "Guatemala", "Proticket.io | CSN"],
 

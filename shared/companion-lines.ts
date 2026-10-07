@@ -1,7 +1,7 @@
 export const QUETZI_FACTS: readonly string[] = [
   "Soy fan de las nubes: los quetzales vivimos en el bosque nuboso. ☁️",
   "El quetzal es el ave nacional de Guatemala y le da nombre a la moneda.",
-  "Mis plumas de la cola pueden ser más largas que todo mi cuerpo. ¡Cada misión me da una!",
+  "¿Ya conociste a alguien de otra área? Comparte tu Geek ID y descubre sus ideas.",
   "Tip: algunas charlas tienen cupo limitado. Llega unos minutos antes.",
   "Tajumulco está en el Edificio O. Tacaná, Acatenango, Santa María, Agua y Fuego están en el Edificio H.",
   "Casa de Kiro está en la Biblioteca. ¡Pasa a construir algo!",

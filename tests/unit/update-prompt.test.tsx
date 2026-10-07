@@ -40,7 +40,7 @@ describe("UpdateBanner", () => {
   it("announces the new version and updates on demand", async () => {
     const onUpdate = vi.fn(async () => undefined); const onDismiss = vi.fn();
     render(<UpdateBanner onUpdate={onUpdate} onDismiss={onDismiss} />);
-    expect(screen.getByRole("alertdialog", { name: /plumas nuevas/ })).toHaveAccessibleDescription(/nueva versión/);
+    expect(screen.getByRole("alertdialog", { name: /nueva versión/ })).toHaveAccessibleDescription(/nueva versión/);
     fireEvent.click(screen.getByRole("button", { name: /Actualizar/ }));
     await waitFor(() => expect(onUpdate).toHaveBeenCalledOnce());
   });

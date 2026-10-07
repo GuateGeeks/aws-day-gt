@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { challengeProfileSchema } from "./challenges/profile";
 
 export const evidenceTypeSchema = z.enum(["photo", "comment", "word"]);
 
@@ -50,6 +51,7 @@ export const missionSchema = z.object({
 export const onboardingInputSchema = z.object({
   alias: z.string().trim().min(3).max(24).regex(/^[\p{L}\p{N}_.-]+$/u),
   interests: z.array(z.string()).max(6),
+  challengeProfile: challengeProfileSchema.optional(),
   consent: z.object({
     termsVersion: z.string().min(1),
     accepted: z.literal(true),

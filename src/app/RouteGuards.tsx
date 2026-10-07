@@ -11,5 +11,5 @@ export function ProtectedRoute() {
 
 export function StaffRoute() {
   const { profile } = useAuth();
-  return profile?.role === "admin" || profile?.role === "moderator" ? <Outlet /> : <Navigate to="/app/missions" replace />;
+  return profile?.role === "admin" || profile?.role === "moderator" ? <Outlet /> : <Navigate to="/app/challenges" replace />;
 }

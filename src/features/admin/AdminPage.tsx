@@ -7,6 +7,7 @@ import { db } from "../../firebase/data";
 import { functions } from "../../firebase/functions";
 import { useAuth } from "../auth/AuthProvider";
 import { ModerationCard } from "./ModerationCard";
+import { ChallengeOperations } from "./ChallengeOperations";
 
 export function AdminPage() {
   const { profile } = useAuth();
@@ -15,7 +16,7 @@ export function AdminPage() {
   const [queueError, setQueueError] = useState(false);
 
   useEffect(() => onSnapshot(
-    query(collection(db, "submissions"), where("status", "==", "pending"), orderBy("submittedAt", "desc"), limit(50)),
+    query(collection(db, "submissions"), where("kind", "==", "challenge"), where("status", "==", "pending"), orderBy("submittedAt", "desc"), limit(50)),
     (snapshot) => {
       setSubmissions(snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }) as Submission));
       setQueueError(false);
@@ -31,6 +32,7 @@ export function AdminPage() {
 
   return <main className="page stack">
     <p className="eyebrow">Operaciones del evento</p><h1>Consola</h1>
+    <ChallengeOperations role={profile?.role} />
     <Card><div className="row"><div className="grow"><h2>Moderación pendiente</h2><p className="muted">{submissions.length} evidencias esperan revisión</p></div><strong>{profile?.role}</strong></div></Card>
     {loading
       ? <Card><p role="status">Cargando bandeja de moderación…</p></Card>

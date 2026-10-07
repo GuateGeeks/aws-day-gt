@@ -1,0 +1,13 @@
+.service-decision { display: grid; gap: 14px; }
+.service-decision__scene { position: relative; overflow: hidden; height: clamp(190px, 34vw, 270px); border: 1px solid #6bd1e9; border-radius: 20px; background: radial-gradient(circle at 50% 15%, #198eae, #0b4a65 60%, #092f46); }
+.service-decision__canvas { display: block; width: 100%; height: 100%; cursor: pointer; }
+.service-decision__hint { position: absolute; left: 12px; bottom: 10px; padding: 5px 9px; border-radius: 999px; background: #073047d9; color: white; font-size: .8rem; pointer-events: none; }
+.service-decision__options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+.service-decision__option { display: flex; align-items: center; justify-content: center; gap: 7px; min-width: 0; min-height: 54px; padding: 8px; border: 2px solid var(--color-border); border-radius: 13px; background: var(--color-surface); color: var(--color-ink); font-size: .88rem; font-weight: 850; line-height: 1.2; text-align: center; }
+.service-decision__option:hover, .service-decision__option:focus-visible, .service-decision__option.is-selected { border-color: var(--color-primary); background: var(--color-info-soft); }
+.service-decision__option.is-selected { box-shadow: 0 0 0 3px #43c8e84d; }
+.service-decision__symbol { display: block; width: 12px; height: 12px; flex: 0 0 auto; border-radius: 50%; box-shadow: 0 0 0 2px #07304722; }
+@media (max-width: 520px) {
+  .service-decision__options { grid-template-columns: 1fr; }
+  .service-decision__option { justify-content: flex-start; min-height: 44px; text-align: left; }
+}

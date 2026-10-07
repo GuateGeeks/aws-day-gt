@@ -7,14 +7,16 @@ import { CompanionPage } from "../features/companion/CompanionPage";
 import { LandingPage } from "../features/auth/LandingPage";
 import { LoginPage } from "../features/auth/LoginPage";
 import { LeaderboardPage } from "../features/leaderboard/LeaderboardPage";
-import { MissionDetailPage } from "../features/missions/MissionDetailPage";
-import { MissionsPage } from "../features/missions/MissionsPage";
 import { OnboardingPage } from "../features/onboarding/OnboardingPage";
 import { ProfilePage } from "../features/profile/ProfilePage";
 import { ProgressPage } from "../features/progress/ProgressPage";
+import { ChallengesPage } from "../features/challenges/ChallengesPage";
+import { ChallengeDetailPage } from "../features/challenges/ChallengeDetailPage";
+import { GeekIdPage } from "../features/challenges/GeekIdPage";
 
 export const router = createBrowserRouter([
   { path: "/", element: <LandingPage /> },
+  { path: "/prototipo-sala-aura.html", element: <Navigate to="/app/challenges/C08" replace /> },
   { path: "/login", element: <LoginPage /> },
   { path: "/auth/complete", element: <AuthCompletePage /> },
   { path: "/onboarding", element: <OnboardingPage /> },
@@ -23,8 +25,11 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="hoy" replace /> },
       { path: "hoy", element: <CompanionPage /> },
       { path: "agenda", element: <Navigate to="/app/hoy" replace /> },
-      { path: "missions", element: <MissionsPage /> },
-      { path: "missions/:missionId", element: <MissionDetailPage /> },
+      { path: "challenges", element: <ChallengesPage /> },
+      { path: "challenges/:challengeId", element: <ChallengeDetailPage /> },
+      { path: "geek-id", element: <GeekIdPage /> },
+      { path: "missions", element: <Navigate to="/app/challenges" replace /> },
+      { path: "missions/:missionId", element: <Navigate to="/app/challenges" replace /> },
       { path: "progress", element: <ProgressPage /> },
       { path: "leaderboard", element: <LeaderboardPage /> },
       { path: "profile", element: <ProfilePage /> }

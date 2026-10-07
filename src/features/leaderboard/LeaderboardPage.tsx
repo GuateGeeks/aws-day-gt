@@ -1,13 +1,48 @@
-import { collection, limit, onSnapshot, orderBy, query } from "firebase/firestore";
+import { httpsCallable } from "firebase/functions";
 import { Medal } from "lucide-react";
-import { useEffect, useState } from "react";
-import type { Score } from "../../../shared/types";
-import { Card, EmptyState } from "../../design-system/components";
-import { db } from "../../firebase/data";
+import { useCallback, useEffect, useState } from "react";
+import { Card, EmptyState, StatusNotice } from "../../design-system/components";
+import { functions } from "../../firebase/functions";
 import { useAuth } from "../auth/AuthProvider";
 
+interface LeaderboardRow {
+  rank: number;
+  userId: string;
+  alias: string;
+  auraTotal: number;
+  completedChallenges: number;
+}
+
+interface LeaderboardSnapshot {
+  rows: LeaderboardRow[];
+  personalRank: number | null;
+}
+
 export function LeaderboardPage() {
-  const { user } = useAuth(); const [scores, setScores] = useState<Score[]>([]);
-  useEffect(() => onSnapshot(query(collection(db, "scores"), orderBy("totalPoints", "desc"), limit(50)), (snap) => setScores(snap.docs.map((item) => item.data() as Score).sort((a, b) => b.totalPoints - a.totalPoints || String(a.finalScoreReachedAt ?? "9999").localeCompare(String(b.finalScoreReachedAt ?? "9999"))))), []);
-  return <section className="stack"><p className="eyebrow">Comunidad en acción</p><h1>Ranking</h1><p className="muted">Los empates se ordenan por quién alcanzó primero su puntaje.</p>{scores.length ? <Card className="leaderboard"><ol>{scores.map((score, index) => <li className={score.userId === user?.uid ? "is-you" : ""} key={score.userId}><span className="rank">{index < 3 ? <Medal aria-label={`Posición ${index + 1}`} /> : index + 1}</span><strong className="grow">{score.alias}{score.userId === user?.uid ? " (tú)" : ""}</strong><span>{score.totalPoints} pts</span></li>)}</ol></Card> : <EmptyState title="El ranking empieza pronto">Sé la primera persona en completar una misión.</EmptyState>}</section>;
+  const { user } = useAuth();
+  const [rows, setRows] = useState<LeaderboardRow[]>([]);
+  const [state, setState] = useState<"loading" | "ready" | "error">("loading");
+
+  const load = useCallback(async () => {
+    setState("loading");
+    try {
+      const result = await httpsCallable<unknown, LeaderboardSnapshot>(functions, "getLeaderboardSnapshot")({});
+      setRows(result.data.rows);
+      setState("ready");
+    } catch {
+      setState("error");
+    }
+  }, []);
+
+  useEffect(() => { void load(); }, [load]);
+
+  return <section className="stack leaderboard-page">
+    <p className="eyebrow">Comunidad en acción</p>
+    <h1>Ranking de Aura</h1>
+    <p className="muted">Solo aparecen participantes registrados. El ranking cuenta el Aura obtenida en Challenges.</p>
+    {state === "loading" ? <p role="status">Cargando ranking…</p> : null}
+    {state === "error" ? <div className="stack"><StatusNotice tone="error">No pudimos cargar el ranking.</StatusNotice><button type="button" onClick={() => void load()}>Intentar de nuevo</button></div> : null}
+    {state === "ready" && rows.length ? <Card className="leaderboard"><ol>{rows.map((row) => <li className={row.userId === user?.uid ? "is-you" : ""} key={row.userId}><span className="rank">{row.rank <= 3 ? <Medal aria-label={`Posición ${row.rank}`} /> : row.rank}</span><strong className="grow">{row.alias}{row.userId === user?.uid ? " (tú)" : ""}</strong><span>{row.auraTotal} Aura</span></li>)}</ol></Card> : null}
+    {state === "ready" && !rows.length ? <EmptyState title="El ranking empieza pronto">Sé la primera persona en completar un Challenge.</EmptyState> : null}
+  </section>;
 }

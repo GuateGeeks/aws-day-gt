@@ -28,10 +28,13 @@ export function ModerationCard({ submission, onReview }: ModerationCardProps) {
   }
 
   const reviewDisabled = !imageReady || reviewing !== null;
+  const challengeLabel: Record<string, string> = { C15: "Community Aura", C16: "Selfie con speaker", C17: "Selfie en un stand" };
+  const reviewHint: Record<string, string> = { C16: "Confirma que aparezcan el participante y un speaker del evento.", C17: "Confirma que aparezcan el participante y un stand del evento." };
 
   return <Card className="stack">
-    <div className="row"><strong className="grow">Misión {submission.missionId}</strong><span>{submission.provisionalPoints} pts</span></div>
+    <div className="row"><strong className="grow">{challengeLabel[submission.missionId] ?? submission.missionId}</strong><span>{submission.provisionalPoints} Aura</span></div>
     <p className="muted">Participante: {submission.userId.slice(0, 8)}…</p>
+    {reviewHint[submission.missionId] && <p className="muted">{reviewHint[submission.missionId]}</p>}
     <PrivateEvidenceImage storagePath={submission.image?.storagePath} missionId={submission.missionId} onReadyChange={handleReadyChange} />
     {reviewError && <StatusNotice tone="error">No pudimos guardar la revisión. Intenta de nuevo.</StatusNotice>}
     <div className="cluster">

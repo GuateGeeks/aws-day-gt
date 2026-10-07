@@ -14,7 +14,7 @@ export function UpdateBanner({ onUpdate, onDismiss }: Props) {
   return <div className="update-banner" role="alertdialog" aria-labelledby="update-title" aria-describedby="update-desc">
     <QuetziSprite completed={11} mood="happy" crop="head" label="" />
     <div className="grow">
-      <strong id="update-title">¡Quetzi tiene plumas nuevas!</strong>
+      <strong id="update-title">Hay una nueva versión</strong>
       <p id="update-desc" className="muted">Hay una nueva versión de la app. Actualiza para ver los últimos cambios.</p>
     </div>
     <div className="update-banner__actions">

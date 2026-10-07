@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
-import { useMissions } from "../missions/useMissions";
+import { useChallenges } from "../challenges/useChallenges";
 import { QuetziSprite } from "./QuetziSprite";
 import "./companion.css";
 
-const SEEN_KEY = "quetzi.feathers-seen";
+const SEEN_KEY = "aura.challenges-seen";
 const VISIBLE_MS = 6000;
 
 function readSeen(uid: string): number | null {
@@ -14,18 +14,18 @@ function writeSeen(uid: string, count: number) {
   try { localStorage.setItem(`${SEEN_KEY}.${uid}`, String(count)); } catch { /* blocked storage: celebrate again next time */ }
 }
 
-/** Shows a toast with a celebrating Quetzi whenever a mission is newly approved. */
+/** Shows the newly awarded Aura after a Challenge completes. */
 export function FeatherCelebration() {
-  const { user } = useAuth(); const { items, loading } = useMissions();
+  const { user } = useAuth(); const { items, loading } = useChallenges();
   const [celebrating, setCelebrating] = useState<number | null>(null);
-  const approved = items.filter((item) => item.status === "approved").length;
+  const awarded = items.reduce((sum, item) => sum + (item.progress.auraAwarded ?? 0), 0);
 
   useEffect(() => {
     if (!user || loading) return;
     const seen = readSeen(user.uid);
-    if (seen !== null && approved > seen) setCelebrating(approved);
-    if (seen === null || approved !== seen) writeSeen(user.uid, approved);
-  }, [user, loading, approved]);
+    if (seen !== null && awarded > seen) setCelebrating(awarded - seen);
+    if (seen === null || awarded !== seen) writeSeen(user.uid, awarded);
+  }, [user, loading, awarded]);
 
   useEffect(() => {
     if (celebrating === null) return;
@@ -35,8 +35,8 @@ export function FeatherCelebration() {
 
   if (celebrating === null) return null;
   return <div className="feather-toast" role="status">
-    <QuetziSprite completed={celebrating} mood="celebrate" crop="head" label="Quetzi celebrando" />
-    <p className="grow"><strong>¡Nueva pluma para Quetzi!</strong><br /><span className="muted">Misión aprobada · {celebrating} de 11</span></p>
+    <QuetziSprite completed={Math.min(10, items.filter((item) => item.progress.status === "completed").length)} mood="celebrate" crop="head" label="Geek celebrando" />
+    <p className="grow"><strong>CHALLENGE COMPLETE</strong><br /><span className="muted">+{celebrating} Aura</span></p>
     <button type="button" onClick={() => setCelebrating(null)} aria-label="Cerrar celebración">✕</button>
   </div>;
 }

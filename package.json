@@ -3,7 +3,9 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc --noEmit -p tsconfig.app.json && vite build",
@@ -17,20 +19,28 @@
     "test:e2e": "playwright test",
     "emulators": "npx firebase emulators:start",
     "seed": "tsx scripts/seed-data.ts",
+    "backfill:ranking:emulator": "tsx scripts/backfill-ranking-emulator.ts",
+    "retire:cloud-trio:emulator": "tsx scripts/retire-cloud-trio-emulator.ts",
     "configure:auth": "tsx scripts/configure-auth.ts --project aws-day-gt",
     "configure:storage": "tsx scripts/configure-storage.ts --project aws-day-gt --location US-CENTRAL1",
-    "deploy": "npm run build && npm --prefix functions run build && npx firebase deploy --project aws-day-gt"
+    "deploy": "npm run build && npm --prefix functions run build && npx firebase deploy --project aws-day-gt",
+    "configure:event-codes:emulator": "tsx scripts/configure-local-event-codes.ts",
+    "sync:challenges:emulator": "tsx scripts/sync-local-challenges.ts",
+    "configure:event-codes:production": "tsx scripts/configure-production-event-codes.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@tanstack/react-query": "^5.90.2",
+    "@zxing/browser": "^0.2.1",
     "firebase": "^12.4.0",
     "idb": "^8.0.3",
     "lucide-react": "^0.544.0",
+    "qrcode": "^1.5.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.63.0",
     "react-router-dom": "^7.9.3",
+    "three": "^0.180.0",
     "zod": "^4.1.11"
   },
   "devDependencies": {
@@ -40,8 +50,10 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/node": "^22.18.7",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",
+    "@types/three": "^0.180.0",
     "@vitejs/plugin-react": "^5.0.4",
     "firebase-admin": "^13.5.0",
     "firebase-functions": "^6.4.0",

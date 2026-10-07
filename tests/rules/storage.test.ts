@@ -6,7 +6,8 @@ const rules = readFileSync("firebase/storage.rules", "utf8");
 describe("Storage evidence boundaries", () => {
   it("binds uploads to the authenticated user path", () => {
     expect(rules).toContain("request.auth.uid == uid");
-    expect(rules).toContain("match /evidence/{eventId}/{uid}/{missionId}/{fileName}");
+    expect(rules).toContain("match /evidence/{eventId}/{uid}/{challengeId}/{fileName}");
+    expect(rules).toContain("challengeId in ['C15', 'C16', 'C17']");
   });
 
   it("limits upload size and image MIME types", () => {

@@ -1,4 +1,5 @@
 import { createRequire } from "node:module";
+import { authAlreadyInitialized } from "./data/auth-initialization";
 
 const projectId = process.argv[process.argv.findIndex((value) => value === "--project") + 1] || "aws-day-gt";
 const require = createRequire(import.meta.url);
@@ -10,7 +11,8 @@ const { access_token: accessToken } = await getAccessToken(tokenStore.refresh_to
 const headers = { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" };
 
 const initialize = await fetch(`https://identitytoolkit.googleapis.com/v2/projects/${projectId}/identityPlatform:initializeAuth`, { method: "POST", headers, body: "{}" });
-if (!initialize.ok && initialize.status !== 409) throw new Error(`Auth initialization failed: ${initialize.status} ${await initialize.text()}`);
+const initializeBody = await initialize.text();
+if (!initialize.ok && !authAlreadyInitialized(initialize.status, initializeBody)) throw new Error(`Auth initialization failed: ${initialize.status} ${initializeBody}`);
 
 const configUrl = `https://identitytoolkit.googleapis.com/admin/v2/projects/${projectId}/config`;
 const existingResponse = await fetch(configUrl, { headers });

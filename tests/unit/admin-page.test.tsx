@@ -5,6 +5,7 @@ import { AdminPage } from "../../src/features/admin/AdminPage";
 const mocks = vi.hoisted(() => ({
   snapshotSuccess: undefined as undefined | ((snapshot: { docs: Array<{ id: string; data: () => Record<string, unknown> }> }) => void),
   snapshotError: undefined as undefined | (() => void),
+  where: vi.fn(() => "pending"),
   review: vi.fn(async () => ({ data: { status: "approved" } }))
 }));
 
@@ -13,7 +14,7 @@ vi.mock("firebase/firestore", () => ({
   limit: vi.fn(() => "limit"),
   orderBy: vi.fn(() => "order"),
   query: vi.fn(() => "pending-query"),
-  where: vi.fn(() => "pending"),
+  where: mocks.where,
   onSnapshot: vi.fn((_query, success, error) => {
     mocks.snapshotSuccess = success;
     mocks.snapshotError = error;
@@ -35,9 +36,10 @@ const pendingSubmission = {
   operationId: "operation-1",
   eventId: "aws-community-day-gt-2026",
   userId: "participant-1234",
-  missionId: "M01",
+  missionId: "C15",
+  kind: "challenge",
   evidenceType: "photo",
-  image: { storagePath: "evidence/event/participant-1234/M01/photo.webp" },
+  image: { storagePath: "evidence/event/participant-1234/C15/photo.webp" },
   status: "pending",
   provisionalPoints: 15,
   finalPoints: 0,
@@ -52,6 +54,7 @@ describe("AdminPage moderation queue", () => {
     mocks.snapshotSuccess = undefined;
     mocks.snapshotError = undefined;
     mocks.review.mockClear();
+    mocks.where.mockClear();
   });
 
   it("distinguishes loading, an empty queue, and a subscription error", () => {
@@ -68,6 +71,7 @@ describe("AdminPage moderation queue", () => {
 
   it("keeps review controls disabled until the private photograph is ready", () => {
     render(<AdminPage />);
+    expect(mocks.where).toHaveBeenCalledWith("kind", "==", "challenge");
     act(() => mocks.snapshotSuccess?.({ docs: [{ id: "submission-1", data: () => pendingSubmission }] }));
 
     expect(screen.getByRole("button", { name: /Aprobar/u })).toBeDisabled();

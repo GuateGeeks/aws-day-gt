@@ -77,7 +77,8 @@ describe("Quetzi evolution", () => {
     expect(quetziStage(0)).toMatchObject({ level: 0, name: "Huevo", nextAt: 1 });
     expect(quetziStage(2)).toMatchObject({ level: 1, name: "Polluelo", nextAt: 4 });
     expect(quetziStage(5)).toMatchObject({ level: 2, nextAt: 8 });
-    expect(quetziStage(9)).toMatchObject({ level: 3, nextAt: 11 });
+    expect(quetziStage(9)).toMatchObject({ level: 3, nextAt: 10 });
+    expect(quetziStage(10)).toMatchObject({ level: 4, name: "Quetzal resplandeciente", nextAt: undefined });
     expect(quetziStage(11)).toMatchObject({ level: 4, name: "Quetzal resplandeciente", nextAt: undefined });
     expect(quetziStage(30).level).toBe(4);
   });

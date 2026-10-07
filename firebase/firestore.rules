@@ -28,26 +28,51 @@ service cloud.firestore {
     }
 
     match /missions/{missionId} {
-      allow read: if signedIn() && (resource.data.active == true || staff());
-      allow write: if false;
+      allow read, write: if false;
     }
 
     match /missionAnswerKeys/{missionId} {
       allow read, write: if false;
     }
 
-    match /userMissions/{assignmentId} {
+    match /challenges/{challengeId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    match /challengeSecrets/{challengeId} {
+      allow read, write: if false;
+    }
+
+    match /challengeAssignments/{uid} {
+      allow read: if owns(uid) || staff();
+      allow write: if false;
+    }
+
+    match /challengeProgress/{progressId} {
       allow read: if signedIn() && (resource.data.userId == request.auth.uid || staff());
       allow write: if false;
     }
 
+    match /connections/{connectionId} { allow read, write: if false; }
+    match /geekIdTokens/{tokenHash} { allow read, write: if false; }
+    match /experienceTokens/{tokenHash} { allow read, write: if false; }
+    match /experienceStations/{stationId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    match /userMissions/{assignmentId} {
+      allow read, write: if false;
+    }
+
     match /submissions/{submissionId} {
-      allow read: if signedIn() && (resource.data.userId == request.auth.uid || staff());
+      allow read: if signedIn() && resource.data.kind == 'challenge' && (resource.data.userId == request.auth.uid || staff());
       allow write: if false;
     }
 
     match /scores/{scoreId} {
-      allow read: if signedIn();
+      allow read: if signedIn() && (resource.data.userId == request.auth.uid || staff());
       allow write: if false;
     }
 

@@ -71,6 +71,10 @@ export interface UserProfile {
   aliasNormalized: string;
   role: Role;
   interests: string[];
+  primaryRole?: import("./challenges/profile").ChallengeProfile["primaryRole"];
+  experienceLevel?: import("./challenges/profile").ChallengeProfile["experienceLevel"];
+  firstAwsCommunityDay?: boolean;
+  awsInterest?: import("./challenges/profile").ChallengeProfile["awsInterest"];
   consent: UserConsent;
   onboardingComplete: boolean;
   replacementsUsed: number;
@@ -115,6 +119,10 @@ export interface Score {
   eventId: string;
   alias: string;
   totalPoints: number;
+  auraTotal?: number;
+  registeredForRanking?: boolean;
+  completedChallenges?: number;
+  auraReachedAt?: unknown;
   completedMissions: number;
   photoMissions: number;
   commentMissions: number;

@@ -33,7 +33,6 @@ export function PrivateEvidenceImage({ storagePath, missionId, onReadyChange }: 
       if (!active) return;
       objectUrl = URL.createObjectURL(blob);
       setImage({ status: "ready", objectUrl });
-      onReadyChange?.(true);
     }).catch(() => {
       if (active) setImage({ status: "error" });
     });
@@ -52,5 +51,5 @@ export function PrivateEvidenceImage({ storagePath, missionId, onReadyChange }: 
     return <StatusNotice tone="error"><span>No pudimos cargar esta fotografía.</span><Button type="button" variant="secondary" onClick={() => setAttempt((value) => value + 1)}>Reintentar</Button></StatusNotice>;
   }
 
-  return <div className="moderation-photo"><img className="moderation-photo__image" src={image.objectUrl} alt={`Evidencia fotográfica de la misión ${missionId}`} /></div>;
+  return <div className="moderation-photo"><img className="moderation-photo__image" src={image.objectUrl} alt={`Evidencia fotográfica del Challenge ${missionId}`} onLoad={() => onReadyChange?.(true)} onError={() => { onReadyChange?.(false); setImage({ status: "error" }); }} /></div>;
 }

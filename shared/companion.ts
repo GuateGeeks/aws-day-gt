@@ -42,11 +42,11 @@ export function missionTiming(mission: { slot?: string; room?: string }, now: Da
 }
 
 const STAGES = [
-  { level: 0, min: 0, name: "Huevo", description: "Quetzi está por nacer. Completa tu primera misión." },
-  { level: 1, min: 1, name: "Polluelo", description: "¡Quetzi salió del cascarón! Cada misión le da una pluma." },
+  { level: 0, min: 0, name: "Huevo", description: "Geek está por nacer. Completa tu primer Challenge." },
+  { level: 1, min: 1, name: "Polluelo", description: "¡Geek salió del cascarón! Sigue completando Challenges." },
   { level: 2, min: 4, name: "Quetzal joven", description: "Ya tiene cresta y su cola empieza a brillar." },
   { level: 3, min: 8, name: "Quetzal", description: "Plumas largas y orgullo chapín. Ya casi vuela libre." },
-  { level: 4, min: 11, name: "Quetzal resplandeciente", description: "Completaste todo tu reto. ¡Quetzi vuela libre!" }
+  { level: 4, min: 10, name: "Quetzal resplandeciente", description: "Completaste todos tus Challenges. ¡Geek vuela libre!" }
 ] as const;
 
 export type QuetziStage = { level: 0 | 1 | 2 | 3 | 4; name: string; description: string; nextAt?: number };
@@ -80,7 +80,7 @@ export function quetziLine({ phase, alias, now, tap = 0 }: LineContext): string 
   if (phase === "pre") {
     const { days, hours } = countdownTo(now, sessionDate(DAY_START));
     const when = days > 0 ? `${days} ${days === 1 ? "día" : "días"}` : `${hours} ${hours === 1 ? "hora" : "horas"}`;
-    return `¡Hola${name}! Soy Quetzi. Faltan ${when} para el Community Day. Elige tus charlas en la agenda oficial y yo te acompaño con retos.`;
+    return `¡Hola${name}! Soy Geek, tu guía GuateGeeks. Faltan ${when} para el Community Day. Elige tus charlas en la agenda oficial y yo te acompaño con retos.`;
   }
   if (phase === "post") return `¡Gracias por volar conmigo${name}! Fue un día increíble para la comunidad AWS de Guatemala.`;
   const current = sessionsAt(now);

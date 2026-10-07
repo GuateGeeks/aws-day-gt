@@ -1,0 +1,24 @@
+.architecture { display: grid; gap: 16px; }
+.architecture__heading { display: grid; gap: 8px; }
+.architecture__heading h2 { margin: 0; font-size: clamp(1.35rem, 3vw, 1.8rem); line-height: 1.25; }
+.architecture__heading p { margin: 0; color: var(--color-ink-muted); }
+.architecture__room { position: relative; height: 330px; border-radius: 20px; overflow: hidden; background: linear-gradient(#081c2a, #0e5971); }
+.architecture__canvas { display: block; width: 100%; height: 100%; }
+.architecture__choices { position: absolute; z-index: 2; inset: auto 12px 14px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.architecture__choice { min-height: 48px; border: 1.5px solid #72d6ee; border-radius: 12px; background: #0e364bcf; color: white; font-weight: 800; font-size: .95rem; cursor: pointer; }
+.architecture__choice:hover, .architecture__choice:focus-visible { background: #0e89af; outline: 2px solid #d8f7ff; outline-offset: 2px; }
+.architecture__choice.is-selected { border-color: #fff; background: #08779a; }
+.architecture__choice:disabled { cursor: default; opacity: .9; }
+.architecture__actions { position: absolute; z-index: 2; inset: 10px 12px auto; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.architecture__feedback { margin: 0; max-width: 75%; padding: 9px 11px; border: 1px solid #72d6ee; border-radius: 10px; background: #0d3448e8; color: white; line-height: 1.35; font-size: .86rem; font-weight: 700; }
+.architecture__actions .ds-button { flex: 0 0 auto; }
+@media (max-width: 800px) {
+  .architecture__room { height: 220px; }
+}
+@media (max-width: 560px) {
+  .architecture__room { height: 205px; }
+  .architecture__choices { inset: auto 8px 8px; gap: 5px; }
+  .architecture__choice { font-size: .8rem; padding: 5px 3px; }
+  .architecture__feedback { font-size: .75rem; padding: 7px; }
+  .architecture__actions .ds-button { min-width: 95px; }
+}

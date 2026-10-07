@@ -1,0 +1,27 @@
+import { cleanup, render, screen, within } from "@testing-library/react";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("../../src/features/companion/FeatherCelebration", () => ({ FeatherCelebration: () => null }));
+const { AppShell } = await import("../../src/app/AppShell");
+afterEach(cleanup);
+
+describe("AppShell skip link", () => {
+  it("lands after the header and navigation at a focusable content container", () => {
+    render(<MemoryRouter initialEntries={["/app/challenges"]}><Routes><Route path="/app" element={<AppShell />}><Route path="challenges" element={<h1>Contenido de retos</h1>} /></Route></Routes></MemoryRouter>);
+    const skip = screen.getByRole("link", { name: "Saltar al contenido" });
+    expect(skip).toHaveAttribute("href", "#content");
+    const destination = document.getElementById("content");
+    expect(destination).toHaveAttribute("tabindex", "-1");
+    expect(within(destination!).getByRole("heading", { name: "Contenido de retos" })).toBeInTheDocument();
+    const nav = screen.getByRole("navigation", { name: "Navegación principal" });
+    expect(destination!.compareDocumentPosition(nav) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
+    expect(destination!.contains(nav)).toBe(false);
+  });
+
+  it("uses the supplied GuateGeeks eyes as the application mark", () => {
+    render(<MemoryRouter initialEntries={["/app/challenges"]}><Routes><Route path="/app" element={<AppShell />}><Route path="challenges" element={<h1>Challenges</h1>} /></Route></Routes></MemoryRouter>);
+    const brand = screen.getByRole("link", { name: /GuateGeeks Aura/u });
+    expect(brand.querySelector("img")).toHaveAttribute("src", "/brand/geek-eyes.png");
+  });
+});

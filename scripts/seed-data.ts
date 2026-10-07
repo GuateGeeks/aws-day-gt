@@ -2,9 +2,10 @@ import { applicationDefault, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { createRequire } from "node:module";
 import { EVENT_ID } from "../shared/constants";
+import { challenges } from "../shared/challenges/catalog";
+import { challengeSecrets } from "./data/challenge-secrets";
+import { experienceStations } from "../shared/challenges/stations";
 import { event, eventConfig } from "./data/event";
-import { missions } from "./data/missions";
-import { missionAnswerKeys } from "./data/mission-selections";
 
 const args = new Set(process.argv.slice(2));
 const projectArg = process.argv.findIndex((value) => value === "--project");
@@ -12,16 +13,18 @@ const projectId = projectArg >= 0 ? process.argv[projectArg + 1] : "aws-day-gt";
 const apply = args.has("--apply");
 const cliAuth = args.has("--cli-auth");
 const confirmation = process.argv[process.argv.findIndex((value) => value === "--confirm") + 1];
+const seedTimestamp = new Date().toISOString();
 
 const writes = [
   { path: `events/${EVENT_ID}`, data: event },
   { path: `config/${EVENT_ID}`, data: eventConfig },
-  ...missions.map((mission) => ({ path: `missions/${mission.id}`, data: mission })),
-  ...Object.values(missionAnswerKeys).map((answerKey) => ({ path: `missionAnswerKeys/${answerKey.missionId}`, data: answerKey }))
+  ...challenges.map((challenge) => ({ path: `challenges/${challenge.id}`, data: { ...challenge, createdAt: seedTimestamp, updatedAt: seedTimestamp }, createOnly: true })),
+  ...challengeSecrets.map((secret) => ({ path: `challengeSecrets/${secret.challengeId}`, data: secret, createOnly: true })),
+  ...experienceStations.map((station) => ({ path: `experienceStations/${station.id}`, data: station, createOnly: true }))
 ];
 
-console.log(`${apply ? "APPLY" : "DRY RUN"}: ${writes.length} upserts, 0 deletes in ${projectId}`);
-console.log(`event: 1, config: 1, missions: ${missions.length}, answer keys: ${Object.keys(missionAnswerKeys).length}`);
+console.log(`${apply ? "APPLY" : "DRY RUN"}: ${writes.length} potential writes (${challenges.length + challengeSecrets.length + experienceStations.length} create-if-missing), 0 deletes in ${projectId}`);
+console.log(`event: 1, config: 1, challenges: ${challenges.length}, challenge secrets: ${challengeSecrets.length}, experience stations: ${experienceStations.length}`);
 if (!apply) process.exit(0);
 if (confirmation !== EVENT_ID) throw new Error(`Apply requires --confirm ${EVENT_ID}`);
 
@@ -32,7 +35,7 @@ function firestoreValue(value: unknown): FirestoreValue {
   if (typeof value === "boolean") return { booleanValue: value };
   if (typeof value === "number") return Number.isInteger(value) ? { integerValue: String(value) } : { doubleValue: value };
   if (Array.isArray(value)) return { arrayValue: { values: value.map(firestoreValue) } };
-  return { mapValue: { fields: Object.fromEntries(Object.entries(value as Record<string, unknown>).map(([key, item]) => [key, firestoreValue(item)])) } };
+  return { mapValue: { fields: Object.fromEntries(Object.entries(value as Record<string, unknown>).filter(([, item]) => item !== undefined).map(([key, item]) => [key, firestoreValue(item)])) } };
 }
 
 if (cliAuth) {
@@ -42,10 +45,18 @@ if (cliAuth) {
   if (!tokenStore?.refresh_token) throw new Error("Firebase CLI is not signed in");
   const { getAccessToken } = require("firebase-tools/lib/auth") as { getAccessToken(refreshToken: string, scopes: string[]): Promise<{ access_token: string }> };
   const { access_token: accessToken } = await getAccessToken(tokenStore.refresh_token, ["https://www.googleapis.com/auth/cloud-platform"]);
+  const documentBase = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents`;
+  const existing = new Set<string>();
+  for (const write of writes.filter((item) => "createOnly" in item && item.createOnly)) {
+    const lookup = await fetch(`${documentBase}/${write.path}`, { headers: { Authorization: `Bearer ${accessToken}` } });
+    if (lookup.ok) existing.add(write.path);
+    else if (lookup.status !== 404) throw new Error(`Firestore seed lookup failed: ${lookup.status} for ${write.path}`);
+  }
+  const selectedWrites = writes.filter((write) => !existing.has(write.path));
   const response = await fetch(`https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents:commit`, {
     method: "POST",
     headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ writes: writes.map((write) => ({ update: { name: `projects/${projectId}/databases/(default)/documents/${write.path}`, fields: (firestoreValue(write.data).mapValue?.fields ?? {}) } })) })
+    body: JSON.stringify({ writes: selectedWrites.map((write) => ({ update: { name: `projects/${projectId}/databases/(default)/documents/${write.path}`, fields: (firestoreValue(write.data).mapValue?.fields ?? {}) }, ...("createOnly" in write && write.createOnly ? { currentDocument: { exists: false } } : { updateMask: { fieldPaths: Object.keys(write.data) } }) })) })
   });
   if (!response.ok) throw new Error(`Firestore seed failed: ${response.status} ${await response.text()}`);
   console.log(`Seed applied safely to ${projectId} using the authenticated Firebase CLI session.`);
@@ -54,7 +65,15 @@ if (cliAuth) {
 
 const app = getApps()[0] ?? initializeApp({ credential: applicationDefault(), projectId });
 const database = getFirestore(app);
+database.settings({ ignoreUndefinedProperties: true });
 const batch = database.batch();
-for (const write of writes) batch.set(database.doc(write.path), write.data, { merge: true });
+const createOnlyWrites = writes.filter((item) => "createOnly" in item && item.createOnly);
+const existingDocuments = await database.getAll(...createOnlyWrites.map((write) => database.doc(write.path)));
+const existingPaths = new Set(existingDocuments.filter((snapshot) => snapshot.exists).map((snapshot) => snapshot.ref.path));
+for (const write of writes) {
+  if (existingPaths.has(write.path)) continue;
+  if ("createOnly" in write && write.createOnly) batch.create(database.doc(write.path), write.data);
+  else batch.set(database.doc(write.path), write.data, { merge: true });
+}
 await batch.commit();
 console.log(`Seed applied safely to ${projectId}.`);

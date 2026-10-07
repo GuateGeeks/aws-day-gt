@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { sessionDate } from "../../shared/agenda";
+import { quetziLine } from "../../shared/companion";
 import { QuetziGuide } from "../../src/features/companion/QuetziGuide";
 import { QuetziSprite } from "../../src/features/companion/QuetziSprite";
 import { readClockOffset } from "../../src/features/companion/useNow";
@@ -15,6 +16,7 @@ vi.mock("../../src/features/missions/useMissions", () => ({
     { id: "a2", missionId: "M01", status: "approved", points: 15, mission: { id: "M01", title: "Llegué al Community Day", evidenceType: "photo" } }
   ] })
 }));
+vi.mock("../../src/features/challenges/useChallenges", () => ({ useChallenges: () => ({ items: [{ challenge: { id: "C13", title: "Experiencia VR GuateGeeks", auraReward: 250 }, progress: { status: "available" } }] }) }));
 vi.mock("../../src/features/companion/useNow", async (original) => ({ ...await original<object>(), useNow: () => clock.now }));
 
 const { CompanionPage } = await import("../../src/features/companion/CompanionPage");
@@ -24,9 +26,9 @@ afterEach(cleanup);
 describe("Quetzi sprite", () => {
   it("starts as an egg and evolves with completed missions", () => {
     const { rerender } = render(<QuetziSprite completed={0} />);
-    expect(screen.getByRole("img")).toHaveAccessibleName("Quetzi, etapa Huevo");
-    rerender(<QuetziSprite completed={11} />);
-    expect(screen.getByRole("img")).toHaveAccessibleName("Quetzi, etapa Quetzal resplandeciente");
+    expect(screen.getByRole("img")).toHaveAccessibleName("Geek, etapa Huevo");
+    rerender(<QuetziSprite completed={10} />);
+    expect(screen.getByRole("img")).toHaveAccessibleName("Geek, etapa Quetzal resplandeciente");
   });
 
   it("grows its tail one feather per mission", () => {
@@ -46,9 +48,15 @@ describe("Quetzi guide", () => {
   it("speaks politely and reacts to taps", () => {
     const onTap = vi.fn();
     render(<QuetziGuide completed={3} line="Hola" onTap={onTap} />);
-    fireEvent.click(screen.getByRole("button", { name: /Toca a Quetzi/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Toca a Geek/ }));
     expect(onTap).toHaveBeenCalledOnce();
     expect(screen.getByText("Hola").closest("[aria-live]")).toHaveAttribute("aria-live", "polite");
+    expect(screen.getByText("Geek")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Toca a Geek/ })).toBeInTheDocument();
+  });
+
+  it("introduces the guide as Geek before the event", () => {
+    expect(quetziLine({ phase: "pre", alias: "Ana", now: new Date("2026-10-08T09:00:00-06:00") })).toContain("Soy Geek");
   });
 });
 
@@ -75,13 +83,11 @@ describe("CompanionPage", () => {
     expect(screen.getByRole("heading", { name: /Cuenta regresiva/ })).toBeInTheDocument();
   });
 
-  it("shows only the session tied to the user's mission and defers the rest to the official agenda", () => {
+  it("shows the next Aura Challenge and the official agenda without a historical mission", () => {
     clock.now = sessionDate("10:00");
     renderPage();
-    const challenge = screen.getByRole("link", { name: /Agentes con Bedrock/ });
-    expect(challenge).toHaveAttribute("href", "/app/missions/M17");
-    expect(challenge).toHaveTextContent(/Ahora/);
-    expect(challenge).toHaveTextContent(/Strands Agents/);
+    expect(screen.getByRole("link", { name: /Experiencia VR GuateGeeks/ })).toHaveAttribute("href", "/app/challenges/C13");
+    expect(screen.queryByRole("link", { name: /Agentes con Bedrock/ })).not.toBeInTheDocument();
     expect(screen.queryByText(/The Event Happened Twice/)).not.toBeInTheDocument();
     const official = screen.getAllByRole("link", { name: /agenda oficial/i });
     expect(official[0]).toHaveAttribute("href", "https://awscommunitygt.com/agenda/");
@@ -94,9 +100,10 @@ describe("CompanionPage", () => {
     expect(screen.getByRole("link", { name: /agenda oficial/i })).toHaveAttribute("target", "_blank");
   });
 
-  it("shows feather progress", () => {
+  it("offers the main Aura Challenges from the home screen", () => {
     clock.now = sessionDate("10:00");
     renderPage();
-    expect(screen.getByText("1 de 11 plumas")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Ver todos mis retos" })).toHaveAttribute("href", "/app/challenges");
+    expect(screen.queryByText("Misiones anteriores")).not.toBeInTheDocument();
   });
 });

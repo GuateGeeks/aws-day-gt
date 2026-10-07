@@ -3,7 +3,7 @@
 .landing .ds-button { text-decoration: none; }
 .landing__site { display: inline-flex; align-items: center; gap: 6px; color: var(--color-primary); font-weight: 900; }
 .landing-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-2); margin: 0 0 var(--space-6); padding: 0; list-style: none; }
-.landing-stats li { display: grid; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--color-surface-2); }
+.landing-stats li { display: grid; padding: var(--space-3) var(--space-4); border: 1px solid #b8e8f3; border-radius: var(--radius-md); background: linear-gradient(145deg, #fff, #dff8fd); box-shadow: 0 6px 20px #0e89af12; }
 .landing-stats strong { font: 900 var(--text-xl)/1.1 var(--font-display); color: var(--color-primary); }
 .landing-stats span { color: var(--color-ink-muted); font-size: var(--text-sm); }
 .evolution { margin-top: var(--space-8); }
@@ -15,3 +15,28 @@
 .event-logo img { width: 100%; max-width: 520px; height: auto; }
 .event-logo--compact { padding: var(--space-4); border-radius: var(--radius-lg); }
 .event-logo--compact img { max-width: 280px; }
+.geek-brand-panel { position: relative; isolation: isolate; overflow: hidden; display: grid; grid-template-columns: minmax(88px, .85fr) minmax(0, 1fr); align-items: center; gap: clamp(12px, 4vw, 30px); min-height: 210px; padding: clamp(20px, 5vw, 44px); border: 2px solid #70d4e9; border-radius: var(--radius-xl); background: linear-gradient(125deg, #fff 0%, #e8fbff 42%, #a3eaf7 100%); box-shadow: 0 24px 54px #0e89af24; }
+.geek-brand-panel::after { position: absolute; z-index: -1; width: 210px; height: 210px; right: -85px; bottom: -125px; border: 24px solid #ffffff9e; border-radius: 50%; content: ""; }
+.geek-brand-panel__eyes { display: grid; place-items: center; min-width: 0; padding: clamp(8px, 2vw, 18px); border-radius: 26px; background: linear-gradient(145deg, #08779a, #43c8e8); box-shadow: 0 0 0 1px #0e89af, 0 14px 30px #0e89af40; transform: rotate(-3deg); transition: transform var(--duration-base) var(--ease); }
+.geek-brand-panel:hover .geek-brand-panel__eyes { transform: rotate(0deg) translateY(-3px); }
+.geek-brand-panel__eyes img { display: block; width: 100%; max-width: 260px; height: auto; }
+.geek-brand-panel__text { display: grid; justify-items: start; min-width: 0; font: 400 clamp(1.85rem, 6vw, 4rem)/.94 var(--font-display); letter-spacing: -.065em; }
+.geek-brand-panel__text > span { color: #56656c; }
+.geek-brand-panel__text > strong { color: #08779a; font-weight: 900; }
+.geek-brand-panel__text > small { margin-top: var(--space-3); color: #07536c; font: 900 clamp(.7rem, 2vw, .95rem)/1.2 var(--font-body); letter-spacing: .08em; text-transform: uppercase; }
+.geek-brand-panel--compact { min-height: 132px; padding: var(--space-5); border-radius: var(--radius-lg); }
+.geek-brand-panel--compact .geek-brand-panel__text { font-size: clamp(1.7rem, 5vw, 2.7rem); }
+.landing-event { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); margin: 0 0 var(--space-6); padding: var(--space-3) var(--space-4); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); }
+.event-logo--mini { width: 178px; padding: var(--space-2); border-radius: var(--radius-md); box-shadow: none; }
+.event-logo--mini img { width: 100%; }
+@media (min-width: 900px) {
+  .landing .hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); align-items: start; gap: 20px 48px; max-width: none; }
+  .landing .hero > :not(.geek-brand-panel) { grid-column: 1; }
+  .landing .hero > .ds-chip { justify-self: start; }
+  .landing .hero .geek-brand-panel { grid-column: 2; grid-row: 1 / span 5; align-self: stretch; min-height: 470px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-6); }
+  .landing .hero .geek-brand-panel__eyes { width: min(100%, 290px); }
+  .landing .hero .geek-brand-panel__text { justify-items: center; text-align: center; }
+  .landing .hero h1 { font-size: clamp(3rem, 5.2vw, 4.6rem); }
+  .landing .hero .quetzi-guide__bird { width: 104px; height: 176px; }
+}
+@media (max-width: 380px) { .geek-brand-panel { min-height: 160px; padding: var(--space-4); } .geek-brand-panel__text { font-size: 1.65rem; } .geek-brand-panel__text > small { font-size: .6rem; letter-spacing: .04em; } }

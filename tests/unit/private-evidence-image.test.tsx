@@ -40,9 +40,11 @@ describe("PrivateEvidenceImage", () => {
     expect(onReadyChange).toHaveBeenCalledWith(false);
     resolveBlob(new Blob(["photo"], { type: "image/webp" }));
 
-    const image = await screen.findByRole("img", { name: "Evidencia fotográfica de la misión M01" });
+    const image = await screen.findByRole("img", { name: "Evidencia fotográfica del Challenge M01" });
     expect(image).toHaveAttribute("src", "blob:private-evidence");
     expect(refMock).toHaveBeenCalledWith(expect.objectContaining({ name: "test-storage" }), "evidence/event/user/M01/photo.webp");
+    expect(onReadyChange).toHaveBeenLastCalledWith(false);
+    fireEvent.load(image);
     expect(onReadyChange).toHaveBeenLastCalledWith(true);
   });
 
@@ -57,7 +59,7 @@ describe("PrivateEvidenceImage", () => {
     expect(screen.queryByText(/secret\.webp/u)).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Reintentar" }));
 
-    expect(await screen.findByRole("img", { name: "Evidencia fotográfica de la misión M02" })).toBeInTheDocument();
+    expect(await screen.findByRole("img", { name: "Evidencia fotográfica del Challenge M02" })).toBeInTheDocument();
     expect(getBlobMock).toHaveBeenCalledTimes(2);
   });
 
@@ -76,5 +78,17 @@ describe("PrivateEvidenceImage", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent("No pudimos cargar esta fotografía.");
     expect(getBlobMock).not.toHaveBeenCalled();
+  });
+
+  it("keeps moderation disabled and shows a retry if the downloaded image cannot render", async () => {
+    getBlobMock.mockResolvedValue(new Blob(["not an image"], { type: "image/webp" }));
+    const onReadyChange = vi.fn();
+    render(<PrivateEvidenceImage storagePath="evidence/event/user/C16/photo.webp" missionId="C16" onReadyChange={onReadyChange} />);
+    const image = await screen.findByRole("img", { name: "Evidencia fotográfica del Challenge C16" });
+    expect(onReadyChange).toHaveBeenLastCalledWith(false);
+    fireEvent.error(image);
+    expect(await screen.findByRole("alert")).toHaveTextContent("No pudimos cargar esta fotografía.");
+    expect(onReadyChange).toHaveBeenLastCalledWith(false);
+    expect(screen.getByRole("button", { name: "Reintentar" })).toBeInTheDocument();
   });
 });
