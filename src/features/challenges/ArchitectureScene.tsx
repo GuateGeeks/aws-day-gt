@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { serviceIconSrc } from "./awsServiceIcons";
 
 type Props = { selected: string | null };
 
@@ -32,6 +33,8 @@ export function ArchitectureScene({ selected }: Props) {
     scene.add(grid);
 
     const nodes = new Map<string, THREE.Group>();
+    const textures: THREE.Texture[] = [];
+    const textureLoader = new THREE.TextureLoader();
     for (const item of [
       { id: "sqs", x: -3.1, color: 0x9a9c9e },
       { id: "lambda", x: 0, color: 0x0e89af },
@@ -45,6 +48,16 @@ export function ArchitectureScene({ selected }: Props) {
       const cube = new THREE.Mesh(new THREE.BoxGeometry(1.22, 1.22, 1.22), new THREE.MeshStandardMaterial({ color: item.color, emissive: item.color, emissiveIntensity: 0.14, metalness: 0.3, roughness: 0.32 }));
       cube.rotation.y = 0.35;
       group.add(cube);
+      const iconSrc = serviceIconSrc(item.id);
+      if (iconSrc) {
+        const texture = textureLoader.load(iconSrc);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        textures.push(texture);
+        const icon = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthWrite: false }));
+        icon.position.set(0, 0.12, 0.78);
+        icon.scale.set(0.9, 0.9, 1);
+        group.add(icon);
+      }
       group.userData.cube = cube;
       scene.add(group);
       nodes.set(item.id, group);
@@ -95,11 +108,13 @@ export function ArchitectureScene({ selected }: Props) {
       cancelAnimationFrame(frameId);
       observer.disconnect();
       scene.traverse((object) => {
-        if (!(object instanceof THREE.Mesh || object instanceof THREE.Line)) return;
-        object.geometry.dispose();
-        const materials = Array.isArray(object.material) ? object.material : [object.material];
-        materials.forEach((material) => material.dispose());
+        if (object instanceof THREE.Mesh || object instanceof THREE.Line) {
+          object.geometry.dispose();
+          const materials = Array.isArray(object.material) ? object.material : [object.material];
+          materials.forEach((material) => material.dispose());
+        } else if (object instanceof THREE.Sprite) object.material.dispose();
       });
+      textures.forEach((texture) => texture.dispose());
       renderer.dispose();
     };
   }, []);

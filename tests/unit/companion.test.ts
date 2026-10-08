@@ -45,6 +45,9 @@ describe("event clock", () => {
     const liveTalks = getAgendaSpotlight(at("10:00"));
     expect(liveTalks.status).toBe("live");
     expect(liveTalks.sessions.some((session) => session.title === "The Event Happened Twice")).toBe(true);
+    const withWorkshop = getAgendaSpotlight(at("11:04"));
+    expect(withWorkshop.sessions[0]?.start).toBe("10:45");
+    expect(withWorkshop.sessions.some((session) => session.title === "Workshop práctico")).toBe(true);
   });
   it("points to the official agenda", () => {
     expect(OFFICIAL_AGENDA_URL).toBe("https://awscommunitygt.com/agenda/");

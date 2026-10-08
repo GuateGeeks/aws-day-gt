@@ -5,7 +5,7 @@
 .architecture__room { position: relative; height: 330px; border-radius: 20px; overflow: hidden; background: linear-gradient(#081c2a, #0e5971); }
 .architecture__canvas { display: block; width: 100%; height: 100%; }
 .architecture__choices { position: absolute; z-index: 2; inset: auto 12px 14px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-.architecture__choice { min-height: 48px; border: 1.5px solid #72d6ee; border-radius: 12px; background: #0e364bcf; color: white; font-weight: 800; font-size: .95rem; cursor: pointer; }
+.architecture__choice { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; border: 1.5px solid #72d6ee; border-radius: 12px; background: #0e364bcf; color: white; font-weight: 800; font-size: .95rem; cursor: pointer; }
 .architecture__choice:hover, .architecture__choice:focus-visible { background: #087b87; outline: 2px solid #e0f5ee; outline-offset: 2px; }
 .architecture__choice.is-selected { border-color: #fff; background: #08779a; }
 .architecture__choice:disabled { cursor: default; opacity: .9; }
@@ -18,7 +18,8 @@
 @media (max-width: 560px) {
   .architecture__room { height: 205px; }
   .architecture__choices { inset: auto 8px 8px; gap: 5px; }
-  .architecture__choice { font-size: .8rem; padding: 5px 3px; }
+  .architecture__choice { flex-direction: column; gap: 3px; font-size: .75rem; padding: 5px 3px; }
+  .architecture__choice .aws-service-icon { width: 24px; height: 24px; }
   .architecture__feedback { font-size: .75rem; padding: 7px; }
   .architecture__actions .ds-button { min-width: 95px; }
 }

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import type { ChallengeOption } from "../../../shared/challenges/types";
+import { AwsServiceIcon, serviceIconSrc } from "./awsServiceIcons";
 import "./service-decision.css";
 
 type Props = { options: ChallengeOption[]; selected: string | null; onSelect: (id: string) => void };
@@ -32,6 +33,8 @@ export function ServiceDecisionScene({ options, selected, onSelect }: Props) {
     floor.position.y = -0.2;
     scene.add(floor);
     const pickable: THREE.Object3D[] = [];
+    const textures: THREE.Texture[] = [];
+    const textureLoader = new THREE.TextureLoader();
     const tokens = options.map((option, index) => {
       const group = new THREE.Group();
       group.position.set((index - (options.length - 1) / 2) * 2.15, 0.65, 0);
@@ -43,6 +46,18 @@ export function ServiceDecisionScene({ options, selected, onSelect }: Props) {
       core.userData.optionId = option.id;
       group.add(core);
       pickable.push(core);
+      const iconSrc = serviceIconSrc(option.id);
+      if (iconSrc) {
+        const texture = textureLoader.load(iconSrc);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        textures.push(texture);
+        const icon = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthWrite: false }));
+        icon.position.set(0, 0.08, 0.72);
+        icon.scale.set(0.82, 0.82, 1);
+        icon.userData.optionId = option.id;
+        group.add(icon);
+        pickable.push(icon);
+      }
       const halo = new THREE.Mesh(new THREE.TorusGeometry(0.9, 0.045, 10, 42), new THREE.MeshStandardMaterial({ color: 0xa8eaf6, emissive: 0x288eb5, emissiveIntensity: 0.3 }));
       halo.rotation.x = Math.PI / 2;
       halo.position.y = -0.4;
@@ -90,11 +105,13 @@ export function ServiceDecisionScene({ options, selected, onSelect }: Props) {
       observer.disconnect();
       canvas.removeEventListener("pointerup", chooseFromScene);
       scene.traverse((object) => {
-        if (!(object instanceof THREE.Mesh)) return;
-        object.geometry.dispose();
-        const materials = Array.isArray(object.material) ? object.material : [object.material];
-        materials.forEach((material) => material.dispose());
+        if (object instanceof THREE.Mesh) {
+          object.geometry.dispose();
+          const materials = Array.isArray(object.material) ? object.material : [object.material];
+          materials.forEach((material) => material.dispose());
+        } else if (object instanceof THREE.Sprite) object.material.dispose();
       });
+      textures.forEach((texture) => texture.dispose());
       renderer.dispose();
     };
   }, [options]);
@@ -105,8 +122,8 @@ export function ServiceDecisionScene({ options, selected, onSelect }: Props) {
       <span className="service-decision__hint">{selected ? `Elegiste: ${options.find((option) => option.id === selected)?.label ?? selected}` : "Toca un objeto o elige su nombre"}</span>
     </div>
     <div className="service-decision__options" role="group" aria-label="Servicios AWS">
-      {options.map((option, index) => <button key={option.id} type="button" className={`service-decision__option${selected === option.id ? " is-selected" : ""}`} onClick={() => onSelect(option.id)} aria-pressed={selected === option.id}>
-        <span className="service-decision__symbol" style={{ background: `#${colors[index % colors.length]!.toString(16).padStart(6, "0")}` }} aria-hidden="true" />
+      {options.map((option) => <button key={option.id} type="button" className={`service-decision__option${selected === option.id ? " is-selected" : ""}`} onClick={() => onSelect(option.id)} aria-pressed={selected === option.id}>
+        <AwsServiceIcon id={option.id} />
         {option.label}
       </button>)}
     </div>

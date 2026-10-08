@@ -6,7 +6,7 @@ import { quetziLine } from "../../shared/companion";
 import { QuetziGuide } from "../../src/features/companion/QuetziGuide";
 import { AgendaSpotlightCard } from "../../src/features/companion/CompanionCards";
 import { QuetziSprite } from "../../src/features/companion/QuetziSprite";
-import { effectiveEventNow, readClockOffset } from "../../src/features/companion/useNow";
+import { effectiveEventNow, readClockOffset, rehearsalEnabledForHost } from "../../src/features/companion/useNow";
 
 const clock = vi.hoisted(() => ({ now: new Date("2026-10-08T09:00:00-06:00") }));
 vi.mock("../../src/features/auth/AuthProvider", () => ({ useAuth: () => ({ profile: { alias: "ana", interests: ["IA & Agentes"] } }) }));
@@ -56,6 +56,11 @@ describe("Quetzi guide", () => {
 });
 
 describe("simulated clock", () => {
+  it("enables the October 8 rehearsal on the local web host without Firebase emulators", () => {
+    expect(rehearsalEnabledForHost("127.0.0.1")).toBe(true);
+    expect(rehearsalEnabledForHost("localhost")).toBe(true);
+    expect(rehearsalEnabledForHost("aws-day-gt.web.app")).toBe(false);
+  });
   it("runs the October 8 local rehearsal at the matching event time without changing production", () => {
     const real = new Date("2026-10-08T10:25:00-06:00");
     expect(effectiveEventNow(real, true, 0).toISOString()).toBe("2026-10-10T16:25:00.000Z");
@@ -137,7 +142,7 @@ describe("CompanionPage", () => {
 describe("local agenda rehearsal", () => {
   it("shows current registration and the following block under the rehearsal date", () => {
     render(<AgendaSpotlightCard now={sessionDate("08:15")} rehearsal />);
-    expect(screen.getByText("Ensayo local · 8 de octubre · hora de Guatemala")).toBeInTheDocument();
+    expect(screen.getByText("Sábado 10 de octubre · simulación local · hora de Guatemala")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Registro" })).toBeInTheDocument();
     expect(screen.getByText("A continuación")).toBeInTheDocument();
     expect(screen.getByText(/08:30 · en 15 min/)).toBeInTheDocument();

@@ -13,6 +13,7 @@ describe("3D AWS service selection", () => {
       return <ServiceDecisionScene options={[{ id: "sqs", label: "Amazon SQS" }, { id: "sns", label: "Amazon SNS" }, { id: "cloudwatch", label: "Amazon CloudWatch" }]} selected={selected} onSelect={setSelected} />;
     }
     render(<Example />);
+    expect(screen.getByRole("button", { name: "Amazon SNS" }).querySelector("img")).toHaveAttribute("src", "/aws-services/sns.svg");
     await userEvent.click(screen.getByRole("button", { name: "Amazon SQS" }));
     expect(screen.getByRole("button", { name: "Amazon SQS" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("button", { name: "Amazon SNS" })).toHaveAttribute("aria-pressed", "false");

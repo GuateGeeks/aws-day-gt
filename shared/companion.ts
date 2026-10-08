@@ -41,7 +41,7 @@ export function getAgendaSpotlight(now: Date): AgendaSpotlight {
     return { status: "preview", sessions: AGENDA.filter((session) => session.title === "Registro") };
   }
   const current = sessionsAt(now);
-  if (current.length) return { status: "live", sessions: current };
+  if (current.length) return { status: "live", sessions: current.sort((a, b) => b.start.localeCompare(a.start)) };
   const upcoming = nextSessions(now);
   return upcoming.length ? { status: "upcoming", sessions: upcoming } : { status: "ended", sessions: [] };
 }

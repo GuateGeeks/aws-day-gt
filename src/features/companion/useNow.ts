@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { EVENT_UTC_OFFSET } from "../../../shared/agenda";
-import { useFirebaseEmulators } from "../../firebase/app";
 
 const OFFSET_KEY = "quetzi.simulated-offset";
 const REAL_KEY = "quetzi.use-real-clock";
 const MANUAL_KEY = "quetzi.use-manual-clock";
 const LOCAL_TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
 const TICK_MS = 20_000;
+
+export function rehearsalEnabledForHost(hostname: string): boolean {
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1" || hostname === "[::1]";
+}
 
 /**
  * `?ahora=2026-10-10T10:00` (Guatemala time) lets organizers preview the day.
@@ -42,7 +45,7 @@ export function effectiveEventNow(realNow: Date, enabled: boolean, offset = 0): 
 }
 
 export function isLocalRehearsalActive(): boolean {
-  if (!useFirebaseEmulators) return false;
+  if (!rehearsalEnabledForHost(window.location.hostname)) return false;
   try {
     if (window.sessionStorage.getItem(REAL_KEY) === "true" || window.sessionStorage.getItem(MANUAL_KEY) === "true") return false;
     const savedOffset = Number(window.sessionStorage.getItem(OFFSET_KEY));
@@ -53,7 +56,7 @@ export function isLocalRehearsalActive(): boolean {
 export function useNow(): Date {
   const [offset] = useState(() => readClockOffset(window.location.search, window.sessionStorage));
   const [rehearsalEnabled] = useState(() => {
-    if (!useFirebaseEmulators) return false;
+    if (!rehearsalEnabledForHost(window.location.hostname)) return false;
     try { return window.sessionStorage.getItem(REAL_KEY) !== "true" && window.sessionStorage.getItem(MANUAL_KEY) !== "true"; }
     catch { return true; }
   });

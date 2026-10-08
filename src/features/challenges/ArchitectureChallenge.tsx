@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { formatCredits } from "../../design-system/credits";
 import { ArchitectureScene } from "./ArchitectureScene";
+import { AwsServiceIcon } from "./awsServiceIcons";
 import "./architecture.css";
 
 type Result = { status: string; stage?: number; auraAwarded?: number; auraDeducted?: number; solution?: string; incorrectReason?: string };
@@ -64,7 +65,7 @@ export function ArchitectureChallenge({ savedStage, submit }: Props) {
       <ArchitectureScene selected={selected} />
       <div className="architecture__actions"><p className="architecture__feedback" role="status" aria-live="polite">{feedback || "Elige un servicio."}</p>{stage === 0 && <button className="ds-button ds-button--accent" type="button" disabled={!correct} onClick={next}>Siguiente</button>}</div>
       <div className="architecture__choices" role="group" aria-label="Servicios de la arquitectura">
-        {services.map((service) => <button key={service.id} type="button" className={`architecture__choice${selected === service.id ? " is-selected" : ""}`} disabled={busy || correct || done} onClick={() => void choose(service.id)}>{service.label}</button>)}
+        {services.map((service) => <button key={service.id} type="button" className={`architecture__choice${selected === service.id ? " is-selected" : ""}`} disabled={busy || correct || done} onClick={() => void choose(service.id)}><AwsServiceIcon id={service.id} />{service.label}</button>)}
       </div>
     </div>
   </div>;

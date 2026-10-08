@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { challenges } from "../../shared/challenges/catalog";
@@ -14,6 +14,18 @@ function item(id: string, status: "available" | "completed" | "locked" | "failed
 }
 
 describe("Challenge completion", () => {
+  it("shows official service icons in matching and sequence questions", () => {
+    mock.items = [item("C07", "available")];
+    const view = render(<MemoryRouter initialEntries={["/app/challenges/C07"]}><Routes><Route path="/app/challenges/:challengeId" element={<ChallengeDetailPage />} /></Routes></MemoryRouter>);
+    const s3 = screen.getAllByRole("button", { name: "Amazon S3" })[0]!;
+    expect(s3.querySelector("img")).toHaveAttribute("src", "/aws-services/s3.svg");
+    fireEvent.click(s3);
+    expect(s3).toHaveAttribute("aria-pressed", "true");
+    view.unmount();
+    mock.items = [item("C06", "available")];
+    render(<MemoryRouter initialEntries={["/app/challenges/C06"]}><Routes><Route path="/app/challenges/:challengeId" element={<ChallengeDetailPage />} /></Routes></MemoryRouter>);
+    expect(screen.getByRole("button", { name: "Amazon API Gateway" }).querySelector("img")).toHaveAttribute("src", "/aws-services/api-gateway.svg");
+  });
   it("shows C08 as a simple selection without the generic validation control", async () => {
     mock.items = [item("C08", "available")];
     render(<MemoryRouter initialEntries={["/app/challenges/C08"]}><Routes><Route path="/app/challenges/:challengeId" element={<ChallengeDetailPage />} /></Routes></MemoryRouter>);

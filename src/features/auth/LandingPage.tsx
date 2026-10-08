@@ -19,7 +19,7 @@ export function LandingPage() {
     <header className="landing__nav"><span className="brand-mark"><GuateGeeksLogo className="brand-logo" /><span className="brand-copy"><span className="brand-title__full">AWS Community Day</span><span className="brand-title__short">AWS Day</span><small className="brand-sub">Guatemala · GuateGeeks</small></span></span><Link to="/login">Ingresar</Link></header>
     <section className="hero stack">
       <GeekBrandPanel />
-      <Chip>{rehearsal ? "Ensayo local · 8 de octubre" : "Sábado 10 de octubre"} · Universidad Rafael Landívar, zona 16</Chip>
+      <Chip>Sábado 10 de octubre{rehearsal ? " · simulación local" : ""} · Universidad Rafael Landívar, zona 16</Chip>
       <h1>Vive el evento. Gana créditos.</h1>
       <p>Explora AWS Community Day Guatemala con desafíos rápidos, experiencias y momentos para compartir. Cada logro suma monedas a tu recorrido.</p>
       <div className="cluster">

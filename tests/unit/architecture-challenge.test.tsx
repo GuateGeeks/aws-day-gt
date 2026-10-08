@@ -14,6 +14,7 @@ describe("Rescata la señal", () => {
     );
     const user = userEvent.setup();
     render(<ArchitectureChallenge savedStage={0} submit={submit} />);
+    expect(screen.getByRole("button", { name: "DynamoDB" }).querySelector("img")).toHaveAttribute("src", "/aws-services/dynamodb.svg");
     expect(screen.getByText(/La misma inscripción apareció dos veces/u)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Siguiente" })).toBeDisabled();
     await user.click(screen.getByRole("button", { name: "DynamoDB" }));
