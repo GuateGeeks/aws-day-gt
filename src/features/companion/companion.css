@@ -1,9 +1,7 @@
 .companion-card h2 { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); font-size: var(--text-lg); }
 .agenda-spotlight { overflow: hidden; padding: 0; border-color: #aecbd4; box-shadow: 0 18px 48px #102d3b1c; }
-.agenda-spotlight__masthead { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: 132px; padding: var(--space-3) var(--space-5); background: linear-gradient(115deg, #e7f3f6 0%, #f8fbfa 48%, #e4f6ed 100%); border-bottom: 4px solid #f69a21; }
-.agenda-spotlight__masthead > img { display: block; width: min(62%, 350px); height: 112px; object-fit: cover; object-position: center 46%; border-radius: 12px; }
-.agenda-spotlight__credit { display: inline-flex; align-items: center; gap: var(--space-2); max-width: 190px; color: #194254; font-size: var(--text-xs); font-weight: 900; line-height: 1.2; }
-.agenda-spotlight__credit img { width: 42px; height: 42px; flex: 0 0 auto; object-fit: contain; border: 1px solid #dbe5e8; border-radius: 50%; background: #fff; }
+.agenda-spotlight__masthead { display: grid; place-items: center; height: 186px; overflow: hidden; background: radial-gradient(circle at 90% 20%, #087b87 0%, #0e4252 42%, #142c41 100%); border-bottom: 4px solid #f69a21; }
+.agenda-spotlight__masthead > img { display: block; width: min(88%, 560px); height: 165px; object-fit: contain; }
 .agenda-spotlight__body { padding: clamp(20px, 4vw, 32px); }
 .agenda-spotlight__top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-2); color: var(--color-ink-muted); font-size: var(--text-sm); font-weight: 800; }
 .agenda-spotlight__status { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: var(--radius-pill); background: #e6f3f5; color: #14546a; font-size: var(--text-xs); font-weight: 900; text-transform: uppercase; letter-spacing: .08em; }
@@ -20,13 +18,13 @@
 .agenda-spotlight__other li span { color: #a44d00; font-size: var(--text-xs); font-weight: 900; }
 .agenda-spotlight__other li h3 { margin-block: 4px; font-size: var(--text-sm); line-height: 1.25; overflow-wrap: anywhere; }
 .agenda-spotlight__other li small { color: var(--color-ink-muted); }
+.agenda-spotlight__next { padding-top: var(--space-4); border-top: 1px solid var(--color-border); }
+.agenda-spotlight__next-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-2); }
+.agenda-spotlight__next-heading span { color: #a44d00; font-size: var(--text-sm); font-weight: 900; }
+.agenda-spotlight__next li { background: #fff9ef; }
 .agenda-spotlight__note { padding: var(--space-3); border-radius: var(--radius-sm); background: #e8f5f7; color: #285567; font-size: var(--text-sm); }
-@media (max-width: 600px) { .agenda-spotlight__masthead { min-height: 112px; padding: var(--space-2) var(--space-3); } .agenda-spotlight__masthead > img { width: 62%; height: 94px; } .agenda-spotlight__credit { max-width: 105px; flex-direction: column; text-align: center; font-size: .67rem; } .agenda-spotlight__credit img { width: 34px; height: 34px; } .agenda-spotlight__other ul { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { .agenda-spotlight__masthead { height: 142px; } .agenda-spotlight__masthead > img { width: 92%; height: 128px; } .agenda-spotlight__other ul { grid-template-columns: 1fr; } }
 .companion-cta { display: inline-flex; align-items: center; gap: var(--space-2); width: fit-content; color: var(--color-primary); font-weight: 900; text-decoration: none; }
-.countdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2); text-align: center; }
-.countdown div { display: grid; padding: var(--space-3); border-radius: var(--radius-md); background: var(--color-surface-2); }
-.countdown strong { font: 900 clamp(2rem, 10vw, 3rem)/1 var(--font-display); color: var(--color-primary); }
-.countdown span { color: var(--color-ink-muted); font-size: var(--text-xs); }
 .challenge-card { border-color: color-mix(in srgb, var(--color-accent-fill) 70%, var(--color-border)); }
 .challenge-link { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); border-radius: var(--radius-md); background: var(--color-surface-2); text-decoration: none; }
 .challenge-link strong, .challenge-link .muted { display: block; }
@@ -42,3 +40,15 @@
 @media (min-width: 800px) { .feather-toast { bottom: 120px; } }
 .mission-hint { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-lg); background: var(--color-info-soft); }
 .mission-hint__bird { flex: 0 0 auto; width: 44px; height: 44px; }
+.agenda-reminder { position: fixed; z-index: 95; right: 16px; bottom: 24px; width: min(420px, calc(100vw - 32px)); display: flex; align-items: flex-start; gap: var(--space-3); padding: var(--space-4); border: 2px solid #f69a21; border-radius: var(--radius-lg); color: #123e51; background: #fffaf0; box-shadow: var(--shadow-2); }
+.agenda-reminder > svg { flex: 0 0 auto; color: #a44d00; }
+.agenda-reminder > div { display: grid; gap: 3px; min-width: 0; }
+.agenda-reminder strong { font-size: var(--text-md); }
+.agenda-reminder span { font-size: var(--text-sm); }
+.agenda-reminder a { color: var(--color-primary); font-weight: 900; }
+.agenda-reminder button { margin-left: auto; padding: 3px; border: 0; background: transparent; color: #123e51; cursor: pointer; }
+.agenda-browser-reminder { display: inline-flex; align-items: center; gap: 6px; width: fit-content; padding: 8px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-surface); color: var(--color-primary); font-size: var(--text-sm); font-weight: 800; cursor: pointer; }
+.agenda-browser-reminder:disabled { cursor: default; opacity: .7; }
+@media (max-width: 799px) { .agenda-reminder { bottom: calc(82px + var(--safe-bottom)); } }
+.companion-partner-note { padding: var(--space-3) 0; color: var(--color-ink-muted); font-size: var(--text-sm); text-align: center; }
+.companion-partner-note a { color: var(--color-primary); font-weight: 900; }

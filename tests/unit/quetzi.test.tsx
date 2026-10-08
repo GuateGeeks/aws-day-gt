@@ -4,8 +4,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { sessionDate } from "../../shared/agenda";
 import { quetziLine } from "../../shared/companion";
 import { QuetziGuide } from "../../src/features/companion/QuetziGuide";
+import { AgendaSpotlightCard } from "../../src/features/companion/CompanionCards";
 import { QuetziSprite } from "../../src/features/companion/QuetziSprite";
-import { readClockOffset } from "../../src/features/companion/useNow";
+import { effectiveEventNow, readClockOffset } from "../../src/features/companion/useNow";
 import { rowsToPixels, tailPixels } from "../../src/features/companion/quetzi-pixels";
 
 const clock = vi.hoisted(() => ({ now: new Date("2026-10-08T09:00:00-06:00") }));
@@ -61,14 +62,23 @@ describe("Quetzi guide", () => {
 });
 
 describe("simulated clock", () => {
+  it("runs the October 8 local rehearsal at the matching event time without changing production", () => {
+    const real = new Date("2026-10-08T10:25:00-06:00");
+    expect(effectiveEventNow(real, true, 0).toISOString()).toBe("2026-10-10T16:25:00.000Z");
+    expect(effectiveEventNow(real, false, 0)).toEqual(real);
+    expect(effectiveEventNow(new Date("2026-10-09T10:25:00-06:00"), true, 0)).toEqual(new Date("2026-10-09T10:25:00-06:00"));
+    expect(effectiveEventNow(real, true, 60_000)).toEqual(new Date(real.getTime() + 60_000));
+  });
   it("stores an offset from ?ahora and clears it with real", () => {
     const storage = new Map<string, string>();
     const fake = { getItem: (key: string) => storage.get(key) ?? null, setItem: (key: string, value: string) => { storage.set(key, value); }, removeItem: (key: string) => { storage.delete(key); } };
     const real = new Date("2026-10-04T12:00:00-06:00").getTime();
     const offset = readClockOffset("?ahora=2026-10-10T10:00", fake, real);
     expect(real + offset).toBe(sessionDate("10:00").getTime());
+    expect(storage.get("quetzi.use-manual-clock")).toBe("true");
     expect(readClockOffset("", fake, real)).toBe(offset);
     expect(readClockOffset("?ahora=real", fake, real)).toBe(0);
+    expect(storage.has("quetzi.use-manual-clock")).toBe(false);
     expect(readClockOffset("?ahora=nope", fake, real)).toBe(0);
   });
 });
@@ -90,13 +100,18 @@ describe("CompanionPage", () => {
     expect(screen.getByText("En vivo")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "The Event Happened Twice" })).toBeInTheDocument();
     expect(screen.queryByText("Vista previa")).not.toBeInTheDocument();
+    expect(screen.getByText("A continuación")).toBeInTheDocument();
+    expect(screen.getByText(/10:45/)).toBeInTheDocument();
+    expect(screen.getAllByRole("listitem").length).toBeGreaterThan(5);
+    expect(screen.queryByText("Creado por GuateGeeks")).not.toBeInTheDocument();
   });
 
-  it("counts down before the event", () => {
+  it("does not show a countdown", () => {
     clock.now = new Date("2026-10-08T09:00:00-06:00");
     renderPage();
-    expect(screen.getByText(/Faltan 1 día|Faltan 2 días/)).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /Cuenta regresiva/ })).toBeInTheDocument();
+    expect(screen.getByText(/Soy Geek/)).toBeInTheDocument();
+    expect(screen.queryByText(/Faltan \d/)).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: /Cuenta regresiva/ })).not.toBeInTheDocument();
   });
 
   it("shows the next credit challenge and the active talks without historical missions", () => {
@@ -121,5 +136,15 @@ describe("CompanionPage", () => {
     renderPage();
     expect(screen.getByRole("link", { name: "Ver todos mis retos" })).toHaveAttribute("href", "/app/challenges");
     expect(screen.queryByText("Misiones anteriores")).not.toBeInTheDocument();
+  });
+});
+
+describe("local agenda rehearsal", () => {
+  it("shows current registration and the following block under the rehearsal date", () => {
+    render(<AgendaSpotlightCard now={sessionDate("08:15")} rehearsal />);
+    expect(screen.getByText("Ensayo local · 8 de octubre · hora de Guatemala")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Registro" })).toBeInTheDocument();
+    expect(screen.getByText("A continuación")).toBeInTheDocument();
+    expect(screen.getByText(/08:30 · en 15 min/)).toBeInTheDocument();
   });
 });

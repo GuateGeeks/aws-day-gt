@@ -71,7 +71,7 @@
 .geek-brand-panel__event { display: block; width: min(100%, 520px); height: auto; max-height: 320px; object-fit: contain; }
 .geek-brand-panel__event { height: 220px; object-fit: cover; object-position: center 40%; }
 .geek-brand-panel__partner { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding-top: 12px; border-top: 1px solid #d5ebec; color: #47666e; font-size: .82rem; font-weight: 900; text-align: center; }
-.geek-brand-panel__partner img { width: 60px; height: 48px; object-fit: cover; object-position: center; border-radius: 8px; }
+.geek-brand-panel__partner img { width: 84px; height: 62px; object-fit: contain; object-position: center; border-radius: 8px; }
 .geek-brand-panel--compact .geek-brand-panel__event { height: 150px; }
 .auth-card .geek-brand-panel--compact { padding: 12px; }
 .auth-card .geek-brand-panel--compact .geek-brand-panel__event { height: 150px; }

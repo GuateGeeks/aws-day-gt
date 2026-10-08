@@ -6,6 +6,7 @@ import {
   getAgendaSpotlight,
   getEventPhase,
   missionTiming,
+  nextAgendaReminder,
   nextSessions,
   pickChallenge,
   quetziLine,
@@ -67,6 +68,15 @@ describe("event clock", () => {
 
   it("returns empty next sessions after the agenda ends", () => {
     expect(nextSessions(new Date("2026-10-10T21:00:00-06:00"))).toEqual([]);
+  });
+
+  it("announces each upcoming block only in its five-minute window", () => {
+    expect(nextAgendaReminder(at("08:24"))).toBeUndefined();
+    expect(nextAgendaReminder(at("08:25"))).toMatchObject({ key: "2026-10-10-08:30", start: "08:30", minutes: 5 });
+    expect(nextAgendaReminder(at("08:26"))?.minutes).toBe(4);
+    expect(nextAgendaReminder(at("08:25"))?.sessions.length).toBeGreaterThan(0);
+    expect(nextAgendaReminder(at("08:30"))).toBeUndefined();
+    expect(nextAgendaReminder(at("10:40"))).toMatchObject({ key: "2026-10-10-10:45", start: "10:45" });
   });
 
   it("counts down to registration", () => {

@@ -23,6 +23,16 @@ export function nextSessions(now: Date, sessions: readonly AgendaSession[] = AGE
   return upcoming.filter((session) => session.start === first);
 }
 
+export function nextAgendaReminder(now: Date): { key: string; start: string; minutes: number; sessions: AgendaSession[] } | undefined {
+  const sessions = nextSessions(now);
+  const first = sessions[0];
+  if (!first) return undefined;
+  const start = first.start;
+  const remaining = sessionDate(start).getTime() - now.getTime();
+  if (remaining <= 0 || remaining > 5 * MINUTE) return undefined;
+  return { key: `${EVENT_DATE}-${start}`, start, minutes: Math.ceil(remaining / MINUTE), sessions };
+}
+
 export type AgendaSpotlight = { status: "preview" | "upcoming" | "live" | "ended"; sessions: AgendaSession[] };
 
 /** Show the registration card immediately, then switch to the real Guatemala schedule. */
@@ -91,9 +101,7 @@ export function quetziLine({ phase, alias, now, tap = 0 }: LineContext): string 
   const name = alias ? `, ${alias}` : "";
   if (tap > 0) return quetziFact(tap - 1);
   if (phase === "pre") {
-    const { days, hours } = countdownTo(now, sessionDate(DAY_START));
-    const when = days > 0 ? `${days} ${days === 1 ? "día" : "días"}` : `${hours} ${hours === 1 ? "hora" : "horas"}`;
-    return `¡Hola${name}! Soy Geek, tu guía GuateGeeks. Faltan ${when} para el Community Day. Elige tus charlas en la agenda oficial y yo te acompaño con retos.`;
+    return `¡Hola${name}! Soy Geek, tu guía GuateGeeks. Explora la agenda oficial y prepárate para vivir el Community Day conmigo.`;
   }
   if (phase === "post") return `¡Gracias por volar conmigo${name}! Fue un día increíble para la comunidad AWS de Guatemala.`;
   const current = sessionsAt(now);

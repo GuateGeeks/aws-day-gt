@@ -2,6 +2,8 @@ import { Award, Bird, CalendarDays, CircleUserRound, ListChecks, Trophy } from "
 import { NavLink, Outlet } from "react-router-dom";
 import { OFFICIAL_AGENDA_URL } from "../../shared/agenda";
 import { FeatherCelebration } from "../features/companion/FeatherCelebration";
+import { AgendaReminderCenter } from "../features/companion/AgendaReminderCenter";
+import { useNow } from "../features/companion/useNow";
 import { GeekEyesLogo } from "../features/auth/GeekEyesLogo";
 
 const tabs = [
@@ -12,6 +14,7 @@ const tabs = [
 ];
 
 export function AppShell() {
+  const now = useNow();
   return <>
     <a className="skip-link" href="#content">Saltar al contenido</a>
     <main className="page">
@@ -24,5 +27,6 @@ export function AppShell() {
       <div id="content" tabIndex={-1}><Outlet /></div>
     </main>
     <FeatherCelebration />
+    <AgendaReminderCenter now={now} />
   </>;
 }

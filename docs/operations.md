@@ -50,6 +50,12 @@ Before a future production release, deploy the new Firestore composite index and
 
 ## Event-day controls
 
+### Local agenda rehearsal
+
+On 8 October 2026, the app running with `VITE_USE_FIREBASE_EMULATORS=true` uses the current Guatemala time of day against the official 10 October agenda. The landing and Hoy screens label this as a local rehearsal. Production keeps the official date. An explicit preview such as `?ahora=2026-10-10T08:25` takes priority; `?ahora=real` returns to the actual clock for that browser tab.
+
+Hoy shows the current block and the next start time, including parallel talks and workshops. The app shell shows one in-app reminder for each block when it is five minutes away. The reminder needs the app to be open. Participants may opt into browser notifications from Hoy; permission is requested only when they choose the control. There is no background push when the app is closed.
+
 Remote Config defaults are conservative. Firestore `config/aws-community-day-gt-2026` owns registration, leaderboard, upload, maintenance, and event-mode switches. Historical mission and replacement fields may remain in existing documents but have no effect in the current application. Use the Firebase console only with a documented operator and record changes.
 
 ## Rollback

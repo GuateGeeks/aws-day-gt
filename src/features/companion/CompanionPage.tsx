@@ -6,9 +6,10 @@ import { Card } from "../../design-system/components";
 import { CreditAmount } from "../../design-system/credits";
 import { useAuth } from "../auth/AuthProvider";
 import { useChallenges } from "../challenges/useChallenges";
-import { AgendaSpotlightCard, CountdownCard, OfficialAgendaLink } from "./CompanionCards";
+import { AgendaSpotlightCard, OfficialAgendaLink } from "./CompanionCards";
+import { BrowserReminderButton } from "./AgendaReminderCenter";
 import { QuetziGuide } from "./QuetziGuide";
-import { useNow } from "./useNow";
+import { isLocalRehearsalActive, useNow } from "./useNow";
 import "./companion.css";
 
 export function CompanionPage() {
@@ -21,10 +22,11 @@ export function CompanionPage() {
 
   return <section className="stack companion">
     <p className="eyebrow">AWS Community Day Guatemala 2026</p>
-    {phase !== "post" && <AgendaSpotlightCard now={now} />}
+    {phase !== "post" && <AgendaSpotlightCard now={now} rehearsal={isLocalRehearsalActive()} />}
+    {phase !== "post" && <BrowserReminderButton />}
     <QuetziGuide completed={completed} line={line} onTap={() => setTaps((count) => count + 1)} />
     {phase !== "post" && <Card className="stack companion-card"><h2>Tu próximo desafío</h2>{nextChallenge ? <Link className="challenge-link" to={`/app/challenges/${nextChallenge.challenge.id}`}><strong>{nextChallenge.challenge.title}</strong><CreditAmount value={nextChallenge.challenge.auraReward} signed /></Link> : <p className="muted">Explora tus desafíos para empezar.</p>}<Link to="/app/challenges">Ver todos mis retos</Link></Card>}
-    {phase === "pre" && <CountdownCard now={now} />}
     {phase === "post" && <Card className="stack companion-card"><h2><PartyPopper aria-hidden size={20} /> ¡Gracias por venir!</h2><p className="muted">Gracias por ser parte de la comunidad AWS de Guatemala. Nos vemos en el próximo Community Day.</p><OfficialAgendaLink>Repasa la agenda oficial</OfficialAgendaLink></Card>}
+    <p className="companion-partner-note">Experiencia creada por GuateGeeks · <Link to="/app/profile#guategeeks">Conoce Sócrates y contacta al equipo</Link></p>
   </section>;
 }
