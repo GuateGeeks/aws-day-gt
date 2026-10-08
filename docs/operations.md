@@ -19,6 +19,21 @@ npx tsx scripts/seed-data.ts --project aws-day-gt --apply --confirm aws-communit
 
 The seed writes one event, one protected config document, 23 public Challenge records, 12 private answer records, and two legacy experience stations. It performs no deletions and no longer writes previous missions or their answer keys. Challenge, secret, and station documents are created only when missing, so repeating the seed preserves administrator edits. The retired VR code has no configuration workflow. Clients, moderators, and administrators cannot read answer keys directly; validation runs only inside Cloud Functions. Legal text is provisional and should be replaced before registration opens.
 
+### Production credit-catalog release
+
+The general seed does not update existing Challenges. For the October 8 credit release, use the guarded catalog script in two phases. It reads the existing public Challenge documents, prints the exact fields that differ, checks their event ID, and applies updates only with matching Firestore update times. It never writes user profiles, scores, progress, or assignments.
+
+```bash
+npx tsx scripts/release-credit-catalog.ts --prepare
+npx tsx scripts/release-credit-catalog.ts --prepare --apply --confirm aws-community-day-gt-2026
+npx firebase deploy --only functions --project aws-day-gt
+npx tsx scripts/release-credit-catalog.ts --retire
+npx tsx scripts/release-credit-catalog.ts --retire --apply --confirm aws-community-day-gt-2026
+npx firebase deploy --only hosting --project aws-day-gt
+```
+
+The prepare phase makes Track Pulse and the 350-credit GuateGeeks post mandatory for the new pack. The retire phase disables removed speaker-code and VR Challenges and updates the selfie descriptions. Run each dry run immediately before its matching apply. The two phases limit disruption while Functions and Hosting are updated.
+
 ## Credit Challenges
 
 New participants receive nine mixed base Challenges at onboarding, six AWS service questions, and two selfie challenges. C15 invites a post about the GuateGeeks stand and its experience, with a screenshot that shows the GuateGeeks tag; staff approval grants 350 credits. Each participant sees a stable personal order mixed across categories. Existing participants receive the updated pack when they next open the app without resetting credits. Previous `missions`, `missionAnswerKeys`, `userMissions`, and mission `submissions` remain stored but are no longer assigned, displayed, readable by clients, or accepted by the active photo and moderation APIs. Their `totalPoints` remain unchanged. `scores.auraTotal` and `completedChallenges` remain the internal fields for credit progress and ranking. Existing `/app/missions` links redirect to `/app/challenges`.
