@@ -56,12 +56,14 @@ describe("Quetzi guide", () => {
 });
 
 describe("simulated clock", () => {
-  it("enables the October 8 rehearsal on the local web host without Firebase emulators", () => {
+  it("enables the October 8 rehearsal on local and production event hosts", () => {
     expect(rehearsalEnabledForHost("127.0.0.1")).toBe(true);
     expect(rehearsalEnabledForHost("localhost")).toBe(true);
-    expect(rehearsalEnabledForHost("aws-day-gt.web.app")).toBe(false);
+    expect(rehearsalEnabledForHost("aws-day-gt.web.app")).toBe(true);
+    expect(rehearsalEnabledForHost("aws-day-gt.firebaseapp.com")).toBe(true);
+    expect(rehearsalEnabledForHost("example.com")).toBe(false);
   });
-  it("runs the October 8 local rehearsal at the matching event time without changing production", () => {
+  it("runs the October 8 rehearsal at the matching event time and ends it automatically", () => {
     const real = new Date("2026-10-08T10:25:00-06:00");
     expect(effectiveEventNow(real, true, 0).toISOString()).toBe("2026-10-10T16:25:00.000Z");
     expect(effectiveEventNow(real, false, 0)).toEqual(real);
@@ -156,7 +158,7 @@ describe("local agenda rehearsal", () => {
 
   it("shows current registration and the following block under the rehearsal date", () => {
     render(<AgendaSpotlightCard now={sessionDate("08:15")} rehearsal />);
-    expect(screen.getByText("Sábado 10 de octubre · simulación local · hora de Guatemala")).toBeInTheDocument();
+    expect(screen.getByText("Sábado 10 de octubre · simulación de hoy · hora de Guatemala")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Registro" })).toBeInTheDocument();
     expect(screen.getByText("A continuación")).toBeInTheDocument();
     expect(screen.getByText(/08:30 · en 15 min/)).toBeInTheDocument();

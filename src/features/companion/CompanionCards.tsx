@@ -107,7 +107,7 @@ export function AgendaSpotlightCard({ now, rehearsal = false }: { now: Date; reh
   return <Card className={`agenda-spotlight agenda-spotlight--${status}`}>
     <div className="agenda-spotlight__masthead"><img src="/brand/aws-cd-2026-blanco.png" alt="AWS Community Day Guatemala" width={1465} height={774} /></div>
     <div className="agenda-spotlight__body stack">
-      <div className="agenda-spotlight__top"><span className={`agenda-spotlight__status agenda-spotlight__status--${status}`}>{label}</span><span>Sábado 10 de octubre{rehearsal ? " · simulación local" : ""} · hora de Guatemala</span></div>
+      <div className="agenda-spotlight__top"><span className={`agenda-spotlight__status agenda-spotlight__status--${status}`}>{label}</span><span>Sábado 10 de octubre{rehearsal ? " · simulación de hoy" : ""} · hora de Guatemala</span></div>
       <AgendaCarousel title={status === "preview" ? "Primera actividad" : status === "live" ? "En este momento" : "Próximas actividades"} label={status === "live" ? "Actividades en vivo" : "Próximas actividades"} sessions={sessions} detail={liveDetail} />
       {nextStart && <AgendaCarousel title="A continuación" label="A continuación" sessions={next} detail={`${nextStart} · en ${untilNext} min`} next />}
       {status === "preview" && <p className="agenda-spotlight__note">Así se verá el bloque en vivo durante el evento. El horario avanza automáticamente el 10 de octubre.</p>}

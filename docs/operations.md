@@ -65,9 +65,9 @@ Before a future production release, deploy the new Firestore composite index and
 
 ## Event-day controls
 
-### Local agenda rehearsal
+### October 8 agenda rehearsal
 
-On 8 October 2026, the app running with `VITE_USE_FIREBASE_EMULATORS=true` uses the current Guatemala time of day against the official 10 October agenda. The landing and Hoy screens label this as a local rehearsal. Production keeps the official date. An explicit preview such as `?ahora=2026-10-10T08:25` takes priority; `?ahora=real` returns to the actual clock for that browser tab.
+On 8 October 2026, the local app and Firebase Hosting use the current Guatemala time of day against the official 10 October agenda. The landing and Hoy screens label this as a simulation of today. The rehearsal ends automatically at midnight Guatemala time; 9 October uses the real date, and 10 October follows the actual event clock. An explicit preview such as `?ahora=2026-10-10T08:25` takes priority; `?ahora=real` returns to the actual clock for that browser tab.
 
 Hoy shows the current block and the next start time, including parallel talks and workshops. The app shell shows one in-app reminder for each block when it is five minutes away. The reminder needs the app to be open. Participants may opt into browser notifications from Hoy; permission is requested only when they choose the control. There is no background push when the app is closed.
 

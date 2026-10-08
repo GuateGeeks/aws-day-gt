@@ -8,12 +8,13 @@ const LOCAL_TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
 const TICK_MS = 20_000;
 
 export function rehearsalEnabledForHost(hostname: string): boolean {
-  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1" || hostname === "[::1]";
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1" || hostname === "[::1]"
+    || hostname === "aws-day-gt.web.app" || hostname === "aws-day-gt.firebaseapp.com";
 }
 
 /**
  * `?ahora=2026-10-10T10:00` (Guatemala time) lets organizers preview the day.
- * `?ahora=real` shows the real date; `?ahora=ensayo` restores the local rehearsal.
+ * `?ahora=real` shows the real date; `?ahora=ensayo` restores the October 8 rehearsal.
  * The offset survives navigation within the tab.
  */
 export function readClockOffset(search: string, storage: Pick<Storage, "getItem" | "setItem" | "removeItem">, realNow = Date.now()): number {
@@ -36,7 +37,7 @@ export function readClockOffset(search: string, storage: Pick<Storage, "getItem"
   }
 }
 
-/** Local rehearsal mirrors October 8 Guatemala time onto the official October 10 schedule. */
+/** The October 8 rehearsal mirrors Guatemala time onto the official October 10 schedule. */
 export function isLocalRehearsal(realNow: Date, enabled: boolean, offset = 0): boolean {
   const guatemalaDay = new Date(realNow.getTime() - 6 * 60 * 60_000).toISOString().slice(0, 10);
   return enabled && offset === 0 && guatemalaDay === "2026-10-08";

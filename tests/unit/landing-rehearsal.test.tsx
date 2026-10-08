@@ -6,10 +6,10 @@ vi.mock("../../src/features/companion/useNow", () => ({ isLocalRehearsalActive: 
 const { LandingPage } = await import("../../src/features/auth/LandingPage");
 afterEach(cleanup);
 
-describe("local landing rehearsal", () => {
+describe("event-day rehearsal landing", () => {
   it("labels the simulated event day without a countdown", () => {
     render(<MemoryRouter><LandingPage /></MemoryRouter>);
-    expect(screen.getByText(/Sábado 10 de octubre · simulación local/)).toBeInTheDocument();
+    expect(screen.getByText(/Sábado 10 de octubre · simulación de hoy/)).toBeInTheDocument();
     expect(screen.getByText(/la agenda avanza contigo hoy/i)).toBeInTheDocument();
     expect(screen.queryByText(/Faltan \d/)).not.toBeInTheDocument();
     expect(screen.getAllByRole("img", { name: "GuateGeeks" })).toHaveLength(2);

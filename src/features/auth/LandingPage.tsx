@@ -14,12 +14,12 @@ const STATS = [["7", "salas en paralelo"], ["7", "áreas temáticas"], ["34", "v
 export function LandingPage() {
   const [taps, setTaps] = useState(0);
   const rehearsal = isLocalRehearsalActive();
-  const line = taps === 0 ? rehearsal ? "¡Hola! Soy Geek, tu guía GuateGeeks. La agenda avanza contigo hoy durante el ensayo local del AWS Community Day Guatemala." : "¡Hola! Soy Geek, tu guía GuateGeeks. El 10 de octubre te acompaño por todo el AWS Community Day Guatemala." : quetziFact(taps - 1);
+  const line = taps === 0 ? rehearsal ? "¡Hola! Soy Geek, tu guía GuateGeeks. La agenda avanza contigo hoy durante la simulación del AWS Community Day Guatemala." : "¡Hola! Soy Geek, tu guía GuateGeeks. El 10 de octubre te acompaño por todo el AWS Community Day Guatemala." : quetziFact(taps - 1);
   return <main className="landing page">
     <header className="landing__nav"><span className="brand-mark"><GuateGeeksLogo className="brand-logo" /><span className="brand-copy"><span className="brand-title__full">AWS Community Day</span><span className="brand-title__short">AWS Day</span><small className="brand-sub">Guatemala · GuateGeeks</small></span></span><Link to="/login">Ingresar</Link></header>
     <section className="hero stack">
       <GeekBrandPanel />
-      <Chip>Sábado 10 de octubre{rehearsal ? " · simulación local" : ""} · Universidad Rafael Landívar, zona 16</Chip>
+      <Chip>Sábado 10 de octubre{rehearsal ? " · simulación de hoy" : ""} · Universidad Rafael Landívar, zona 16</Chip>
       <h1>Vive el evento. Gana créditos.</h1>
       <p>Explora AWS Community Day Guatemala con desafíos rápidos, experiencias y momentos para compartir. Cada logro suma monedas a tu recorrido.</p>
       <div className="cluster">
