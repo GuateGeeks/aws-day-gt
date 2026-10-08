@@ -4,7 +4,7 @@ import type { ChallengeOption } from "../../../shared/challenges/types";
 import { AwsServiceIcon, serviceIconSrc } from "./awsServiceIcons";
 import "./service-decision.css";
 
-type Props = { options: ChallengeOption[]; selected: string | null; onSelect: (id: string) => void };
+type Props = { options: readonly ChallengeOption[]; selected: string | null; onSelect: (id: string) => void; disabled?: boolean };
 
 const iconColors: Record<string, number> = {
   "api-gateway": 0x8c4fff, bedrock: 0x01a88d, cloudfront: 0x8c4fff,
@@ -15,12 +15,14 @@ const iconColors: Record<string, number> = {
   "step-functions": 0xe7157b
 };
 
-export function ServiceDecisionScene({ options, selected, onSelect }: Props) {
+export function ServiceDecisionScene({ options, selected, onSelect, disabled = false }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const selectedRef = useRef(selected);
   const selectRef = useRef(onSelect);
+  const disabledRef = useRef(disabled);
   selectedRef.current = selected;
   selectRef.current = onSelect;
+  disabledRef.current = disabled;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -62,6 +64,7 @@ export function ServiceDecisionScene({ options, selected, onSelect }: Props) {
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
     function chooseFromScene(event: PointerEvent) {
+      if (disabledRef.current) return;
       const bounds = canvas!.getBoundingClientRect();
       pointer.set(((event.clientX - bounds.left) / bounds.width) * 2 - 1, -((event.clientY - bounds.top) / bounds.height) * 2 + 1);
       raycaster.setFromCamera(pointer, camera);
@@ -112,12 +115,12 @@ export function ServiceDecisionScene({ options, selected, onSelect }: Props) {
   }, [options]);
 
   return <div className="service-decision">
-    <div className="service-decision__scene">
+    <div className={`service-decision__scene${disabled ? " is-disabled" : ""}`}>
       <canvas className="service-decision__canvas" ref={canvasRef} aria-hidden="true" />
       <span className="service-decision__hint">{selected ? `Elegiste: ${options.find((option) => option.id === selected)?.label ?? selected}` : "Toca un ícono o elige su nombre"}</span>
     </div>
     <div className="service-decision__options" role="group" aria-label="Servicios AWS">
-      {options.map((option) => <button key={option.id} type="button" className={`service-decision__option${selected === option.id ? " is-selected" : ""}`} onClick={() => onSelect(option.id)} aria-pressed={selected === option.id}>
+      {options.map((option) => <button key={option.id} type="button" className={`service-decision__option${selected === option.id ? " is-selected" : ""}`} onClick={() => onSelect(option.id)} aria-pressed={selected === option.id} disabled={disabled}>
         <AwsServiceIcon id={option.id} />
         {option.label}
       </button>)}

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { formatCredits } from "../../design-system/credits";
-import { ArchitectureScene } from "./ArchitectureScene";
-import { AwsServiceIcon } from "./awsServiceIcons";
+import { ServiceDecisionScene } from "./ServiceDecisionScene";
 import "./architecture.css";
 
 type Result = { status: string; stage?: number; auraAwarded?: number; auraDeducted?: number; solution?: string; incorrectReason?: string };
@@ -25,13 +24,12 @@ export function ArchitectureChallenge({ savedStage, submit }: Props) {
   const [done, setDone] = useState(false);
   const [busy, setBusy] = useState(false);
 
-  async function choose(optionId: string) {
-    if (busy || correct || done) return;
+  async function confirm() {
+    if (busy || correct || done || !selected) return;
     setBusy(true);
-    setSelected(optionId);
     setFeedback("Comprobando tu respuesta…");
     try {
-      const result = await submit(stage, optionId);
+      const result = await submit(stage, selected);
       if (result.status === "failed") {
         setDone(true);
         setFeedback(`Perdiste ${formatCredits(result.auraDeducted ?? 20)}. ${result.incorrectReason ?? ""} ${result.solution ?? "Este reto terminó."} Continúa con otro reto.`);
@@ -61,12 +59,11 @@ export function ArchitectureChallenge({ savedStage, submit }: Props) {
 
   return <div className="architecture">
     <div className="architecture__heading"><span className="eyebrow">Reto {stage + 1} de 2</span><h2>{situations[stage].prompt}</h2><p>Selecciona el servicio que resolvería la falla. Una respuesta incorrecta descuenta 20 créditos, muestra la explicación y cierra el reto.</p></div>
-    <div className="architecture__room">
-      <ArchitectureScene selected={selected} />
-      <div className="architecture__actions"><p className="architecture__feedback" role="status" aria-live="polite">{feedback || "Elige un servicio."}</p>{stage === 0 && <button className="ds-button ds-button--accent" type="button" disabled={!correct} onClick={next}>Siguiente</button>}</div>
-      <div className="architecture__choices" role="group" aria-label="Servicios de la arquitectura">
-        {services.map((service) => <button key={service.id} type="button" className={`architecture__choice${selected === service.id ? " is-selected" : ""}`} disabled={busy || correct || done} onClick={() => void choose(service.id)}><AwsServiceIcon id={service.id} />{service.label}</button>)}
-      </div>
+    <ServiceDecisionScene options={services} selected={selected} disabled={busy || correct || done} onSelect={(optionId) => { setSelected(optionId); setFeedback(""); }} />
+    <div className="architecture__actions">
+      {feedback && <p className="architecture__feedback" role="status" aria-live="polite">{feedback}</p>}
+      {correct && stage === 0 ? <button className="ds-button ds-button--accent" type="button" onClick={next}>Siguiente</button>
+        : !done && <button className="ds-button ds-button--accent" type="button" disabled={!selected || busy} onClick={() => void confirm()}>Confirmar respuesta</button>}
     </div>
   </div>;
 }

@@ -30,7 +30,7 @@ describe("Challenge completion", () => {
     mock.items = [item("C08", "available")];
     render(<MemoryRouter initialEntries={["/app/challenges/C08"]}><Routes><Route path="/app/challenges/:challengeId" element={<ChallengeDetailPage />} /></Routes></MemoryRouter>);
     expect(await screen.findByRole("button", { name: "DynamoDB" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Siguiente" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Confirmar respuesta" })).toBeDisabled();
     expect(screen.queryByRole("button", { name: "Validar Challenge" })).not.toBeInTheDocument();
   });
 
