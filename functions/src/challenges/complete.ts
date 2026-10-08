@@ -10,10 +10,10 @@ import { validateCloudResponse, validateCloudTrio, validateSocialPair, validateT
 import { requireUid } from "../shared/auth";
 import { database, refs } from "../shared/refs";
 
-type CompletionInput = { challengeId: string; operationId: string; response?: ChallengeResponse & { geekToken?: string; stationToken?: string } };
+type CompletionInput = { challengeId: string; operationId: string; response?: ChallengeResponse & { geekToken?: string } };
 
 const digest = (value: string) => createHash("sha256").update(value).digest("hex");
-const socialIds = new Set(["C01", "C02", "C03", "C04", "C05"]);
+const socialIds = new Set(["C01", "C02", "C04"]);
 const cloudIds = new Set(["C06", "C07", "C08", "C09", "C18", "C19", "C20", "C21", "C22", "C23"]);
 const architectureAnswers = ["dynamo", "lambda"] as const;
 
@@ -74,9 +74,7 @@ export async function completeChallengeForUid(uid: string, input: CompletionInpu
   const operationRef = refs.operation(uid, `challenge_${challengeId}_${operationId}`);
   const answerRef = refs.challengeSecret(challengeId);
   const geekToken = typeof response.geekToken === "string" && response.geekToken.length <= 300 ? response.geekToken : "";
-  const stationToken = typeof response.stationToken === "string" && response.stationToken.length <= 300 ? response.stationToken : "";
   const geekRef = database.doc(`geekIdTokens/${digest(geekToken)}`);
-  const stationRef = database.doc(`experienceTokens/${digest(stationToken)}`);
 
   return database.runTransaction(async (transaction) => {
     const [assignment, progress, challengeSnap, score, operation] = await Promise.all([
@@ -84,7 +82,7 @@ export async function completeChallengeForUid(uid: string, input: CompletionInpu
       transaction.get(scoreRef), transaction.get(operationRef)
     ]);
     if (operation.exists) return operation.data()?.result;
-    if (["C03", "C10", "C11", "C14"].includes(challengeId)) throw new HttpsError("failed-precondition", "CHALLENGE_RETIRED");
+    if (["C03", "C05", "C10", "C11", "C13", "C14"].includes(challengeId)) throw new HttpsError("failed-precondition", "CHALLENGE_RETIRED");
     const assigned = assignment.data()?.challengeIds?.includes(challengeId) ||
       (isAwsServiceChallengeId(challengeId) && assignment.data()?.bonusChallengeIds?.includes(challengeId));
     if (!assignment.exists || assignment.data()?.eventId !== EVENT_ID || !assigned || !progress.exists || progress.data()?.eventId !== EVENT_ID || !score.exists || score.data()?.eventId !== EVENT_ID) {
@@ -103,7 +101,6 @@ export async function completeChallengeForUid(uid: string, input: CompletionInpu
 
     let evidence: Record<string, unknown> = {};
     let partialPeerIds: string[] | undefined;
-    let stationTokenDoc: FirebaseFirestore.DocumentReference | undefined;
     let connectionRef: FirebaseFirestore.DocumentReference | undefined;
     let connectedPeerUid: string | undefined;
     let connectionLabel: string | undefined;
@@ -171,30 +168,6 @@ export async function completeChallengeForUid(uid: string, input: CompletionInpu
       }
       connectedPeerUid = peerUid;
       connectionRef = database.doc(`connections/${EVENT_ID}_${uid}_${peerUid}`);
-    } else if (challengeId === "C13" && response.code !== undefined) {
-      if (typeof response.code !== "string" || response.code.trim().length < 4 || response.code.length > 30) throw new HttpsError("invalid-argument", "CODE_REQUIRED");
-      const secret = await transaction.get(answerRef);
-      if (!secret.data()?.sharedCodeHash || !secret.data()?.sharedCodeActive) throw new HttpsError("failed-precondition", "CODE_NOT_CONFIGURED");
-      if ((current.sessionBlockedUntilMillis ?? 0) > Date.now()) throw new HttpsError("resource-exhausted", "SESSION_CODE_COOLDOWN");
-      if (challengeId === "C13") {
-        const station = await transaction.get(refs.experienceStation("cloudforge"));
-        if (!station.exists || !station.data()?.active || station.data()?.challengeId !== "C13") throw new HttpsError("failed-precondition", "STATION_UNAVAILABLE");
-      }
-      if (digest(response.code.trim().toUpperCase()) !== secret.data()?.sharedCodeHash) {
-        const attempts = (current.sessionAttempts ?? 0) + 1;
-        transaction.update(progressRef, { sessionAttempts: attempts >= 10 ? 0 : attempts, sessionBlockedUntilMillis: attempts >= 10 ? Date.now() + 5 * 60_000 : null, updatedAt: FieldValue.serverTimestamp() });
-        return { status: "retry", auraAwarded: 0 };
-      }
-      evidence = { stationId: "cloudforge", validation: "shared_code" };
-    } else if (challengeId === "C13" || challengeId === "C14") {
-      if (!stationToken) throw new HttpsError("invalid-argument", "STATION_TOKEN_REQUIRED");
-      const [station, stationConfig] = await Promise.all([transaction.get(stationRef), transaction.get(refs.experienceStation(challenge.configuration.stationId ?? ""))]);
-      if (!stationConfig.exists || !stationConfig.data()?.active || stationConfig.data()?.challengeId !== challengeId || !station.exists || station.data()?.eventId !== EVENT_ID || station.data()?.usedAt || station.data()?.expiresAtMillis <= Date.now() || station.data()?.stationId !== challenge.configuration.stationId || station.data()?.challengeId !== challengeId) {
-        throw new HttpsError("failed-precondition", "INVALID_STATION_TOKEN");
-      }
-      if (station.data()?.participantUid && station.data()?.participantUid !== uid) throw new HttpsError("permission-denied", "STATION_TOKEN_PARTICIPANT_MISMATCH");
-      stationTokenDoc = stationRef;
-      evidence = { stationId: station.data()?.stationId, issuedBy: station.data()?.issuedBy };
     } else {
       throw new HttpsError("failed-precondition", "VALIDATOR_UNAVAILABLE");
     }
@@ -214,7 +187,6 @@ export async function completeChallengeForUid(uid: string, input: CompletionInpu
       completedChallenges: (Number(score.data()?.completedChallenges) || 0) + 1,
       auraReachedAt: now, updatedAt: now
     }, { merge: true });
-    if (stationTokenDoc) transaction.update(stationTokenDoc, { usedAt: now, usedBy: uid });
     const result = { status: "completed", auraAwarded: challenge.auraReward, ...(connectionLabel ? { connection: connectionLabel } : {}) };
     transaction.create(operationRef, { result, createdAt: now });
     return result;

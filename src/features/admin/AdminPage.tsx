@@ -32,7 +32,7 @@ export function AdminPage() {
 
   return <main className="page stack">
     <p className="eyebrow">Operaciones del evento</p><h1>Consola</h1>
-    <ChallengeOperations role={profile?.role} />
+    {profile?.role === "admin" && <ChallengeOperations role={profile.role} />}
     <Card><div className="row"><div className="grow"><h2>Moderación pendiente</h2><p className="muted">{submissions.length} evidencias esperan revisión</p></div><strong>{profile?.role}</strong></div></Card>
     {loading
       ? <Card><p role="status">Cargando bandeja de moderación…</p></Card>

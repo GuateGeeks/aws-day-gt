@@ -7,24 +7,27 @@ const mock = vi.hoisted(() => ({ items: [] as unknown[], auraTotal: 0 as number 
 vi.mock("../../src/features/challenges/useChallenges", () => ({ useChallenges: () => ({ items: mock.items, auraTotal: mock.auraTotal, auraDeductedTotal: mock.auraDeductedTotal, loading: false, error: mock.error }) }));
 const { ChallengesPage } = await import("../../src/features/challenges/ChallengesPage");
 afterEach(() => { cleanup(); mock.auraTotal = 0; mock.auraDeductedTotal = 0; mock.error = ""; });
+const mainChallenges = ["C01", "C02", "C04", "C06", "C07", "C08", "C09", "C12", "C15"].map((id) => challenges.find((item) => item.id === id)!);
 
 describe("Credit challenges page", () => {
-  it("shows ten assigned cards including the GuateGeeks VR experience", () => {
-    mock.items = [...challenges.slice(0, 9), challenges.find((item) => item.id === "C13")!].map((challenge) => ({ challenge, progress: { status: "available", auraAwarded: 0 } }));
+  it("shows nine main cards including the GuateGeeks stand publication", () => {
+    mock.items = mainChallenges.map((challenge) => ({ challenge, progress: { status: "available", auraAwarded: 0 } }));
     render(<MemoryRouter><ChallengesPage /></MemoryRouter>);
     expect(screen.getByRole("heading", { name: "Tus desafíos" })).toBeInTheDocument();
-    expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(10);
-    expect(screen.getByRole("heading", { name: "Experiencia VR GuateGeeks" })).toBeInTheDocument();
+    expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(9);
+    expect(screen.getByRole("heading", { name: "Comparte la experiencia GuateGeeks" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Experiencia VR GuateGeeks" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Cross Level" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Misiones anteriores" })).not.toBeInTheDocument();
-    expect(screen.getByText("0 de 10 retos completados")).toBeInTheDocument();
+    expect(screen.getByText("0 de 9 retos completados")).toBeInTheDocument();
     expect(screen.getByText("0 créditos")).toBeInTheDocument();
     expect(screen.getByText(/Disponibles/u)).toBeInTheDocument();
   });
 
-  it("shows selfies in the same route as the ten main challenges", () => {
-    mock.items = [...challenges.slice(0, 9), challenges.find((item) => item.id === "C13")!, challenges.find((item) => item.id === "C16")!, challenges.find((item) => item.id === "C17")!].map((challenge) => ({ challenge, progress: { status: "available", auraAwarded: 0 } }));
+  it("shows selfies in the same route as the nine main challenges", () => {
+    mock.items = [...mainChallenges, challenges.find((item) => item.id === "C16")!, challenges.find((item) => item.id === "C17")!].map((challenge) => ({ challenge, progress: { status: "available", auraAwarded: 0 } }));
     render(<MemoryRouter><ChallengesPage /></MemoryRouter>);
-    expect(screen.getByText("0 de 12 retos completados")).toBeInTheDocument();
+    expect(screen.getByText("0 de 11 retos completados")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Todos tus retos" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Selfie con speaker/u })).toHaveAttribute("href", "/app/challenges/C16");
     expect(screen.getByRole("link", { name: /Selfie en un stand/u })).toHaveAttribute("href", "/app/challenges/C17");
@@ -38,7 +41,7 @@ describe("Credit challenges page", () => {
   });
 
   it("shows saved credits after a completed retired challenge leaves the visible pack", () => {
-    mock.items = challenges.filter((item) => item.id !== "C03" && item.id !== "C16" && item.id !== "C17").slice(0, 10).map((challenge) => ({ challenge, progress: { status: "available", auraAwarded: 0 } }));
+    mock.items = mainChallenges.map((challenge) => ({ challenge, progress: { status: "available", auraAwarded: 0 } }));
     mock.auraTotal = 200;
     render(<MemoryRouter><ChallengesPage /></MemoryRouter>);
     expect(screen.queryByRole("heading", { name: "Cloud Trio" })).not.toBeInTheDocument();

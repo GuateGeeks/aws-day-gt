@@ -32,7 +32,7 @@ for (const challenge of challenges) {
   }, { merge: true });
 }
 const station = experienceStations.find((entry) => entry.id === "cloudforge");
-if (station) batch.set(db.doc("experienceStations/cloudforge"), { name: station.name }, { merge: true });
+if (station) batch.set(db.doc("experienceStations/cloudforge"), { name: station.name, active: station.active }, { merge: true });
 batch.set(db.doc("experienceStations/vr-explorer"), { active: false }, { merge: true });
 await batch.commit();
-process.stdout.write(`Catálogo local actualizado: ${bonus.length} preguntas AWS, publicación con 350 créditos y experiencia VR.\n`);
+process.stdout.write(`Catálogo local actualizado: ${bonus.length} preguntas AWS, publicación del stand con 350 créditos y retos VR/Cross Level retirados.\n`);

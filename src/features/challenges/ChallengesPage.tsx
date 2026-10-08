@@ -25,7 +25,7 @@ export function ChallengesPage() {
   const { items, auraTotal, auraDeductedTotal, loading, error } = useChallenges();
   const { main, awsBonus, selfies, totalCompleted, auraPotential, auraInReview } = challengeSummary(items);
   const next = nextAvailableChallenge(items);
-  const total = items.length || 10;
+  const total = items.length || 17;
   const creditLabel = auraTotal === null ? (error ? "Créditos no disponibles" : "Cargando créditos…") : formatCredits(auraTotal);
   return <section className="stack challenges-page">
     <header className="challenge-overview"><div className="challenge-overview__copy"><p className="eyebrow">AWS Community Day Guatemala</p><h1>Tus desafíos</h1><p className="muted">{totalCompleted} de {total} {total === 1 ? "reto completado" : "retos completados"}</p><div className="challenge-overview__balance"><small>Tu saldo actual</small>{auraTotal === null ? <strong>{creditLabel}</strong> : <CreditAmount value={auraTotal} />}</div><p className="challenge-overview__ledger">Ganados <strong>+{auraTotal === null ? "—" : auraTotal + auraDeductedTotal}</strong><span>·</span> Descontados <strong>−{auraDeductedTotal}</strong><span>·</span> Disponibles <strong>+{auraPotential}</strong>{auraInReview > 0 && <> <span>·</span> En revisión <strong>+{auraInReview}</strong></>}</p></div><div className="challenge-overview__progress"><strong>{totalCompleted}/{total}</strong><ProgressBar value={totalCompleted} max={total} label="Retos completados" /></div></header>

@@ -20,7 +20,7 @@ export const challenges: Challenge[] = [
   challenge("C02", "First Timer", "Conecta con alguien que esté viviendo su primer AWS Community Day.", "CONNECT", 150, "participant_first_timer"),
   { ...challenge("C03", "Cloud Trio", "Forma una conexión con dos participantes de áreas diferentes.", "CONNECT", 200, "participant_role_group"), active: false },
   challenge("C04", "Same Cloud Interest", "Encuentra a alguien que comparta uno de tus intereses tecnológicos.", "CONNECT", 100, "participant_shared_interest"),
-  challenge("C05", "Cross Level", "Conecta con alguien que tenga un nivel de experiencia diferente al tuyo.", "CONNECT", 125, "participant_experience_difference"),
+  { ...challenge("C05", "Cross Level", "Actividad retirada del recorrido.", "CONNECT", 125, "participant_experience_difference"), active: false },
   challenge("C06", "Build Serverless", "Construye correctamente una arquitectura serverless.", "CLOUD", 150, "interactive_sequence", { items: services }),
   challenge("C07", "Cloud Match", "Relaciona cada necesidad con el servicio AWS correcto.", "CLOUD", 100, "interactive_matching", {
     prompts: [
@@ -58,9 +58,9 @@ export const challenges: Challenge[] = [
       { id: "finops", label: "FinOps - Operaciones" }
     ]
   }, true),
-  challenge("C13", "Experiencia VR GuateGeeks", "Visita el stand de GuateGeeks, vive la experiencia de realidad virtual e ingresa el código que te entregue el equipo.", "EXPERIENCE", 250, "experience_completion", { stationId: "cloudforge", subtitle: "Stand GuateGeeks · Experiencia VR" }, true),
+  { ...challenge("C13", "Experiencia VR GuateGeeks", "Actividad retirada del recorrido.", "EXPERIENCE", 250, "experience_completion", { stationId: "cloudforge" }), active: false },
   { ...challenge("C14", "VR Explorer", "Actividad retirada del recorrido.", "EXPERIENCE", 150, "experience_completion", { stationId: "vr-explorer" }), active: false },
-  challenge("C15", "Comparte AWS Day", "Publica una historia o post del evento en Facebook, Instagram o LinkedIn, etiqueta a GuateGeeks y sube una captura donde se vean la publicación y la etiqueta. El equipo revisará la imagen antes de acreditar tus créditos.", "COMMUNITY", 350, "community_photo", {}, true),
+  challenge("C15", "Comparte la experiencia GuateGeeks", "Publica una historia o post sobre el stand de GuateGeeks y su experiencia. Etiqueta a GuateGeeks y sube una captura para revisión.", "COMMUNITY", 350, "community_photo", {}, true),
   challenge("C16", "Selfie con speaker", "Sube una selfie en la que aparezcas junto a un speaker del evento. El equipo revisará la foto antes de acreditar tus créditos.", "COMMUNITY", 100, "community_photo"),
   challenge("C17", "Selfie en un stand", "Sube una selfie en la que aparezcas en uno de los stands del evento. El equipo revisará la foto antes de acreditar tus créditos.", "COMMUNITY", 100, "community_photo"),
   challenge("C18", "Pausa el pico", "Las inscripciones llegan de golpe. Elige dónde guardar los trabajos hasta que puedan procesarse.", "CLOUD", 150, "interactive_question", {

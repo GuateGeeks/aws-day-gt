@@ -5,8 +5,7 @@ import { isAwsServiceChallengeId } from "./bonus";
 type Pattern = Record<ChallengeCategory, number>;
 
 const patterns: Pattern[] = [
-  { CONNECT: 3, CLOUD: 4, SESSION: 1, EXPERIENCE: 1, COMMUNITY: 1 },
-  { CONNECT: 4, CLOUD: 3, SESSION: 1, EXPERIENCE: 1, COMMUNITY: 1 }
+  { CONNECT: 3, CLOUD: 4, SESSION: 1, EXPERIENCE: 0, COMMUNITY: 1 }
 ];
 
 const categories: ChallengeCategory[] = ["CONNECT", "CLOUD", "SESSION", "EXPERIENCE", "COMMUNITY"];
@@ -25,8 +24,8 @@ export function challengePackSignature(pack: Challenge[]): string {
 }
 
 export function selectChallengePack(pool: Challenge[], seed: string, recentSignatures: ReadonlySet<string> = new Set()): Challenge[] {
-  const active = pool.filter((item) => item.active && !["C03", "C10", "C11", "C14"].includes(item.id) && !isBonusPhotoChallengeId(item.id) && !isAwsServiceChallengeId(item.id));
-  const required = ["C08", "C12", "C13", "C15"].map((id) => active.find((item) => item.id === id));
+  const active = pool.filter((item) => item.active && !["C03", "C05", "C10", "C11", "C13", "C14"].includes(item.id) && !isBonusPhotoChallengeId(item.id) && !isAwsServiceChallengeId(item.id));
+  const required = ["C08", "C12", "C15"].map((id) => active.find((item) => item.id === id));
   if (required.some((item) => !item) || required.some((item) => !item?.required)) throw new Error("CHALLENGE_POOL_INCOMPATIBLE");
   const requiredChallenges = required as Challenge[];
   const optional = active.filter((item) => !requiredChallenges.some((entry) => entry.id === item.id));
@@ -42,7 +41,7 @@ export function selectChallengePack(pool: Challenge[], seed: string, recentSigna
         const chosen = choices.slice(0, pattern[category] - selected.filter((item) => item.category === category).length);
         selected.push(...chosen);
       }
-      if (selected.length !== 10 || new Set(selected.map((item) => item.id)).size !== 10) continue;
+      if (selected.length !== 9 || new Set(selected.map((item) => item.id)).size !== 9) continue;
       fallback ??= selected;
       if (!recentSignatures.has(challengePackSignature(selected))) return selected;
     }
@@ -54,16 +53,16 @@ export function selectChallengePack(pool: Challenge[], seed: string, recentSigna
 /** Keep completed, still-active challenges visible when an older pack is updated. */
 export function migrateChallengePack(pool: Challenge[], currentIds: string[], completedIds: ReadonlySet<string>, seed: string): Challenge[] {
   const fresh = selectChallengePack(pool, seed);
-  const eligible = new Map(pool.filter((item) => item.active && !["C03", "C10", "C11", "C14"].includes(item.id) && !isBonusPhotoChallengeId(item.id) && !isAwsServiceChallengeId(item.id)).map((item) => [item.id, item]));
+  const eligible = new Map(pool.filter((item) => item.active && !["C03", "C05", "C10", "C11", "C13", "C14"].includes(item.id) && !isBonusPhotoChallengeId(item.id) && !isAwsServiceChallengeId(item.id)).map((item) => [item.id, item]));
   const required = fresh.filter((item) => item.required);
   const chosen = [...required];
   const add = (id: string) => {
     const challenge = eligible.get(id);
-    if (challenge && chosen.length < 10 && !chosen.some((item) => item.id === id)) chosen.push(challenge);
+    if (challenge && chosen.length < 9 && !chosen.some((item) => item.id === id)) chosen.push(challenge);
   };
   currentIds.filter((id) => completedIds.has(id)).forEach(add);
   fresh.forEach((item) => add(item.id));
   currentIds.forEach(add);
-  if (chosen.length !== 10) throw new Error("CHALLENGE_POOL_INCOMPATIBLE");
+  if (chosen.length !== 9) throw new Error("CHALLENGE_POOL_INCOMPATIBLE");
   return chosen;
 }

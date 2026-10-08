@@ -73,6 +73,7 @@ describe("AdminPage moderation queue", () => {
     render(<AdminPage />);
     expect(mocks.where).toHaveBeenCalledWith("kind", "==", "challenge");
     act(() => mocks.snapshotSuccess?.({ docs: [{ id: "submission-1", data: () => pendingSubmission }] }));
+    expect(screen.getByText(/confirma que la captura muestre el stand de GuateGeeks y la experiencia/i)).toBeInTheDocument();
 
     expect(screen.getByRole("button", { name: /Aprobar/u })).toBeDisabled();
     expect(screen.getByRole("button", { name: /Rechazar/u })).toBeDisabled();

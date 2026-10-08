@@ -1,6 +1,6 @@
 import { CalendarDays, Clock3, ExternalLink } from "lucide-react";
-import { OFFICIAL_AGENDA_URL, sessionDate } from "../../../shared/agenda";
-import { countdownTo } from "../../../shared/companion";
+import { OFFICIAL_AGENDA_URL, ROOMS, sessionDate } from "../../../shared/agenda";
+import { countdownTo, getAgendaSpotlight } from "../../../shared/companion";
 import { Card, Chip } from "../../design-system/components";
 
 /** Sessions, rooms and schedule changes live on the official site; the app always links there. */
@@ -28,5 +28,26 @@ export function NextBlockCard({ now, nextStart }: { now: Date; nextStart?: strin
     <h2><Clock3 aria-hidden size={20} /> {nextStart ? <>Siguiente bloque: {nextStart} <Chip>en {minutes} min</Chip></> : "Última parte del día"}</h2>
     <p className="muted">Charlas, salas y cambios de último momento están en la agenda oficial.</p>
     <OfficialAgendaLink />
+  </Card>;
+}
+
+export function AgendaSpotlightCard({ now }: { now: Date }) {
+  const { status, sessions } = getAgendaSpotlight(now);
+  const featured = sessions[0];
+  if (status === "ended" || !featured) return null;
+  const others = sessions.slice(1);
+  const label = status === "preview" ? "Vista previa" : status === "live" ? "En vivo" : "Próximamente";
+  return <Card className={`agenda-spotlight agenda-spotlight--${status}`}>
+    <div className="agenda-spotlight__masthead">
+      <img src="/brand/aws-community-day-guatemala.png" alt="AWS Community Day Guatemala" width={1536} height={1024} />
+      <span className="agenda-spotlight__credit"><img src="/brand/guategeeks.png" alt="" width={800} height={800} />Creado por GuateGeeks</span>
+    </div>
+    <div className="agenda-spotlight__body stack">
+      <div className="agenda-spotlight__top"><span className={`agenda-spotlight__status agenda-spotlight__status--${status}`}>{label}</span><span>Sábado 10 de octubre · hora de Guatemala</span></div>
+      <div className="agenda-spotlight__featured"><span className="agenda-spotlight__time">{featured.start}–{featured.end}</span><h2>{featured.title}</h2><p>{featured.speaker ? `${featured.speaker} · ` : ""}{ROOMS[featured.room].name}</p></div>
+      {others.length > 0 && <div className="agenda-spotlight__other"><strong>También en este horario</strong><ul>{others.map((session) => <li key={session.id}><span>{session.start} · {ROOMS[session.room].short}</span><h3>{session.title}</h3>{session.speaker && <small>{session.speaker}</small>}</li>)}</ul></div>}
+      {status === "preview" && <p className="agenda-spotlight__note">Así se verá el bloque en vivo durante el evento. El horario avanza automáticamente el 10 de octubre.</p>}
+      <OfficialAgendaLink>Ver agenda oficial</OfficialAgendaLink>
+    </div>
   </Card>;
 }

@@ -3,6 +3,7 @@ import { AGENDA, OFFICIAL_AGENDA_URL, ROOMS, sessionDate } from "../../shared/ag
 import {
   countdownTo,
   findSessionForMission,
+  getAgendaSpotlight,
   getEventPhase,
   missionTiming,
   nextSessions,
@@ -33,6 +34,17 @@ describe("agenda integrity", () => {
 });
 
 describe("event clock", () => {
+  it("previews registration before the event and uses the real schedule on event day", () => {
+    const preview = getAgendaSpotlight(new Date("2026-10-07T18:00:00-06:00"));
+    expect(preview.status).toBe("preview");
+    expect(preview.sessions.map((session) => session.title)).toEqual(["Registro"]);
+    const liveRegistration = getAgendaSpotlight(at("07:45"));
+    expect(liveRegistration.status).toBe("live");
+    expect(liveRegistration.sessions.map((session) => session.title)).toEqual(["Registro"]);
+    const liveTalks = getAgendaSpotlight(at("10:00"));
+    expect(liveTalks.status).toBe("live");
+    expect(liveTalks.sessions.some((session) => session.title === "The Event Happened Twice")).toBe(true);
+  });
   it("points to the official agenda", () => {
     expect(OFFICIAL_AGENDA_URL).toBe("https://awscommunitygt.com/agenda/");
   });

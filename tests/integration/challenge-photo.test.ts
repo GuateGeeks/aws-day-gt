@@ -68,7 +68,7 @@ describe.skipIf(!process.env.FIRESTORE_EMULATOR_HOST)("publication and selfie mo
   it.each(["C16", "C17"])("queues %s for manual review and awards Aura only once after approval", async (challengeId) => {
     const uid = `photo-bonus-${challengeId}-${crypto.randomUUID()}`;
     await refs.user(uid).set({ uid, onboardingComplete: true });
-    await refs.challengeAssignment(uid).set({ eventId: EVENT_ID, userId: uid, challengeIds: ["C13"], bonusChallengeIds: ["C16", "C17"] });
+    await refs.challengeAssignment(uid).set({ eventId: EVENT_ID, userId: uid, challengeIds: ["C15"], bonusChallengeIds: ["C16", "C17"] });
     await refs.challengeProgress(uid, challengeId).set({ eventId: EVENT_ID, userId: uid, challengeId, status: "available", auraAwarded: 0 });
     await refs.score(uid).set({ eventId: EVENT_ID, userId: uid, auraTotal: 0, completedChallenges: 0 });
     const path = `evidence/${EVENT_ID}/${uid}/${challengeId}/selfie.png`;
@@ -86,7 +86,7 @@ describe.skipIf(!process.env.FIRESTORE_EMULATOR_HOST)("publication and selfie mo
     const uid = `photo-unregistered-${crypto.randomUUID()}`;
     const path = `evidence/${EVENT_ID}/${uid}/C16/selfie.png`;
     await evidenceBucket().file(path).save(Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/v5kAAAAASUVORK5CYII=", "base64"), { metadata: { contentType: "image/png" } });
-    await refs.challengeAssignment(uid).set({ eventId: EVENT_ID, userId: uid, challengeIds: ["C13"], bonusChallengeIds: ["C16", "C17"] });
+    await refs.challengeAssignment(uid).set({ eventId: EVENT_ID, userId: uid, challengeIds: ["C15"], bonusChallengeIds: ["C16", "C17"] });
     await refs.challengeProgress(uid, "C16").set({ eventId: EVENT_ID, userId: uid, challengeId: "C16", status: "available" });
     await expect(registerPhotoForUid(uid, { missionId: "C16", operationId: "unregistered", storagePath: path })).rejects.toThrow("ONBOARDING_REQUIRED");
   });
@@ -96,7 +96,7 @@ describe.skipIf(!process.env.FIRESTORE_EMULATOR_HOST)("publication and selfie mo
     const path = `evidence/${EVENT_ID}/${uid}/C17/selfie.png`;
     await evidenceBucket().file(path).save(Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/v5kAAAAASUVORK5CYII=", "base64"), { metadata: { contentType: "image/png" } });
     await refs.user(uid).set({ uid, onboardingComplete: true });
-    await refs.challengeAssignment(uid).set({ eventId: EVENT_ID, userId: uid, challengeIds: ["C13"] });
+    await refs.challengeAssignment(uid).set({ eventId: EVENT_ID, userId: uid, challengeIds: ["C15"] });
     await refs.challengeProgress(uid, "C17").set({ eventId: EVENT_ID, userId: uid, challengeId: "C17", status: "available" });
     await expect(registerPhotoForUid(uid, { missionId: "C17", operationId: "no-bonus", storagePath: path })).rejects.toThrow("CHALLENGE_UNAVAILABLE");
   });

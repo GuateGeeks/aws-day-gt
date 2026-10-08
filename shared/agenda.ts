@@ -1,5 +1,5 @@
-// Internal snapshot of https://awscommunitygt.com/agenda/ (2026-10-04), used only to place missions in time
-// and room. It is never shown as a browsable schedule: the official agenda remains the source of truth.
+// Internal snapshot of https://awscommunitygt.com/agenda/ (2026-10-07), used to show the current
+// event block. The official agenda remains the source of truth for last-minute changes.
 // Times are local America/Guatemala (UTC-6, no daylight saving).
 
 export const EVENT_DATE = "2026-10-10";
@@ -76,7 +76,7 @@ const rows: Row[] = [
   ["10:45", "11:35", "agua", "talk", "Cómo la IA está cambiando el trabajo del analista (y por qué no da miedo)", "Carrera & Comunidad", "Luciano Tom", "Guatemala", "CCDatos"],
   ["10:45", "11:35", "fuego", "talk", "Seguridad comprobable: tests que tu aplicación web en AWS debe pasar antes de producción", "Seguridad", "Byron Laínez", "Guatemala"],
 
-  ["11:40", "12:30", "tajumulco", "talk", "Tema por confirmar", undefined, "Por confirmar", undefined, "Banco Industrial"],
+  ["11:40", "12:30", "tajumulco", "talk", "El futuro no es promptear, es gobernar: Cómo navegar la era de la IA agéntica", "IA & Agentes", "Marlon Paredes", undefined, "Banco Industrial"],
   ["11:40", "12:30", "tacana", "talk", "Serverless sin miedo: arquitectura event-driven para tu primer proyecto real", "Arquitectura & Serverless", "Fernanda Osorio", "México"],
   ["11:40", "12:30", "acatenango", "talk", "De pipelines a agentes: Data Engineering autónomo con Claude Code en AWS", "IA & Agentes", "Joseph Arriola", "Guatemala"],
   ["11:40", "12:30", "santa-maria", "talk", "De VMware a EC2 en tiempo récord: la ruta rápida con AWS Transform", "DevOps & Operaciones", "Blanca Navarro", "Costa Rica", "AWS"],
@@ -84,10 +84,11 @@ const rows: Row[] = [
   ["11:40", "12:30", "fuego", "talk", "Reu-X: resumen automático de reuniones a partir de audio, video y texto utilizando AWS", "IA & Agentes", "Erick Pineda", "Guatemala"],
   ["11:40", "16:50", "kiro", "activity", "Actividad con Bárbara Gaspar", "IA & Agentes", "Bárbara Gaspar"],
 
-  ["12:35", "13:25", "tajumulco", "talk", "Foro de Mujeres", "Carrera & Comunidad", "Panel (3 panelistas)"],
+  ["12:35", "13:25", "tajumulco", "talk", "Liderazgo sin filtros: lo que funcionó, lo que no y qué sigue", "Carrera & Comunidad", "Maria José Paiz, Magali Pinto y Rosseth Bautista"],
   ["12:35", "13:25", "tacana", "talk", "Construye tu primer Agente de IA usando herramientas Open Source", "IA & Agentes", "Ramsés Mata", "México", "AWS"],
   ["12:35", "13:25", "acatenango", "talk", "Más allá del diagrama: cómo pensar como arquitecto en AWS", "Arquitectura & Serverless", "Lucas Vera", "Colombia", "sls.guru"],
   ["12:35", "13:25", "santa-maria", "talk", "De Legacy a Cloud Native: trazabilidad y refactorización con AWS Transform", "DevOps & Operaciones", "Victor Reyes", "Guatemala", "GMB"],
+  ["12:35", "13:25", "agua", "talk", "Valor Tecnológico con Estrategia Financiera: FinOps + Tokenomics", "FinOps - Operaciones", "Hugo Estrada", "Guatemala", "SGS Analytics"],
 
   ["13:25", "14:10", "plenaria", "break", "Almuerzo"],
 
@@ -100,7 +101,7 @@ const rows: Row[] = [
 
   ["15:05", "15:55", "tajumulco", "talk", "Primeros pasos con Amazon Bedrock: inicio en la IA Generativa", "IA & Agentes", "Odilia Marisol Choc Cac", "Guatemala", "Escala 24x7", "Cupo limitado a 100 personas"],
   ["15:05", "15:55", "tacana", "talk", "Códigos de Éxito: Human.exe", "Carrera & Comunidad", "Mar García", "Perú", "HOPE Consulting Group"],
-  ["15:05", "15:55", "acatenango", "talk", "Análisis predictivo del mercado eléctrico guatemalteco con AWS", "Datos & Analítica", "Samuel Palacios", "Guatemala", "JB Analytica"],
+  ["15:05", "15:55", "acatenango", "talk", "Cloud Computing 101: Tus Primeros Pasos en AWS", "Datos & Analítica", "Samuel Palacios", "Guatemala", "Tech Engineer"],
   ["15:05", "15:55", "santa-maria", "talk", "Prompt Injection, Tool Poisoning y MCP Rug Pulls", "Seguridad", "Alex Archibold", "Panamá", "SoftwareOne"],
   ["15:05", "15:55", "agua", "talk", "De Arduino a la nube: construyendo un ecosistema IoT con AWS", "Arquitectura & Serverless", "Jorge Romero", "Guatemala"],
   ["15:05", "15:55", "fuego", "talk", "Convierte tus scripts y CLI en herramientas AI-Native usando Skills", "IA & Agentes", "Jonathan Búcaro", "Guatemala", "HTEC"],

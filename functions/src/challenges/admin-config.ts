@@ -1,4 +1,3 @@
-import { createHash } from "node:crypto";
 import { FieldValue } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { z } from "zod";
@@ -21,20 +20,10 @@ const eventCodeSchema = z.object({
   active: z.boolean()
 });
 
-export async function configureEventCodeForAdmin(actorUid: string, raw: unknown) {
+export async function configureEventCodeForAdmin(_actorUid: string, raw: unknown) {
   const parsed = eventCodeSchema.safeParse(raw);
   if (!parsed.success) throw new HttpsError("invalid-argument", "INVALID_EVENT_CODE_CONFIGURATION");
-  const { challengeId, code, active } = parsed.data;
-  const sharedCodeHash = createHash("sha256").update(code.toUpperCase()).digest("hex");
-  await database.runTransaction(async (transaction) => {
-    if (!(await transaction.get(refs.challenge(challengeId))).exists) throw new HttpsError("not-found", "CHALLENGE_NOT_FOUND");
-    transaction.set(refs.challengeSecret(challengeId), { challengeId, sharedCodeHash, sharedCodeActive: active }, { merge: true });
-    transaction.create(database.collection("auditLogs").doc(), {
-      actorUid, action: "EVENT_CODE_CONFIGURED", targetType: "challenge", targetId: challengeId,
-      active, timestamp: FieldValue.serverTimestamp()
-    });
-  });
-  return { configured: true, challengeId };
+  throw new HttpsError("failed-precondition", "CHALLENGE_RETIRED");
 }
 
 export const configureEventCode = onCall({ region: "us-central1", enforceAppCheck: false }, async (request) => {
@@ -52,8 +41,7 @@ export async function updateChallengeSettingsForAdmin(actorUid: string, raw: unk
   const parsed = settingsSchema.safeParse(raw);
   if (!parsed.success) throw new HttpsError("invalid-argument", "INVALID_CHALLENGE_SETTINGS");
   const { challengeId, active, auraReward, description } = parsed.data;
-  if (["C03", "C10", "C11", "C14"].includes(challengeId)) throw new HttpsError("failed-precondition", "CHALLENGE_RETIRED");
-  if (challengeId === "C13" && !active) throw new HttpsError("failed-precondition", "CLOUDFORGE_REQUIRED");
+  if (["C03", "C05", "C10", "C11", "C13", "C14"].includes(challengeId)) throw new HttpsError("failed-precondition", "CHALLENGE_RETIRED");
   await database.runTransaction(async (transaction) => {
     const ref = refs.challenge(challengeId);
     const [challenge, catalog] = await Promise.all([transaction.get(ref), transaction.get(database.collection("challenges"))]);

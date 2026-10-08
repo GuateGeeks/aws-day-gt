@@ -16,7 +16,7 @@ vi.mock("../../src/features/missions/useMissions", () => ({
     { id: "a2", missionId: "M01", status: "approved", points: 15, mission: { id: "M01", title: "Llegué al Community Day", evidenceType: "photo" } }
   ] })
 }));
-vi.mock("../../src/features/challenges/useChallenges", () => ({ useChallenges: () => ({ items: [{ challenge: { id: "C13", title: "Experiencia VR GuateGeeks", auraReward: 250 }, progress: { status: "available" } }] }) }));
+vi.mock("../../src/features/challenges/useChallenges", () => ({ useChallenges: () => ({ items: [{ challenge: { id: "C15", title: "Comparte la experiencia GuateGeeks", auraReward: 350 }, progress: { status: "available" } }] }) }));
 vi.mock("../../src/features/companion/useNow", async (original) => ({ ...await original<object>(), useNow: () => clock.now }));
 
 const { CompanionPage } = await import("../../src/features/companion/CompanionPage");
@@ -76,6 +76,22 @@ describe("simulated clock", () => {
 describe("CompanionPage", () => {
   function renderPage() { return render(<MemoryRouter><CompanionPage /></MemoryRouter>); }
 
+  it("shows a clearly labelled registration preview before the event", () => {
+    clock.now = new Date("2026-10-07T18:00:00-06:00");
+    renderPage();
+    expect(screen.getByText("Vista previa")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Registro" })).toBeInTheDocument();
+    expect(screen.getByText(/07:30/)).toBeInTheDocument();
+  });
+
+  it("switches the same agenda area to real concurrent sessions during the event", () => {
+    clock.now = sessionDate("10:00");
+    renderPage();
+    expect(screen.getByText("En vivo")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "The Event Happened Twice" })).toBeInTheDocument();
+    expect(screen.queryByText("Vista previa")).not.toBeInTheDocument();
+  });
+
   it("counts down before the event", () => {
     clock.now = new Date("2026-10-08T09:00:00-06:00");
     renderPage();
@@ -83,21 +99,21 @@ describe("CompanionPage", () => {
     expect(screen.getByRole("heading", { name: /Cuenta regresiva/ })).toBeInTheDocument();
   });
 
-  it("shows the next Aura Challenge and the official agenda without a historical mission", () => {
+  it("shows the next credit challenge and the active talks without historical missions", () => {
     clock.now = sessionDate("10:00");
     renderPage();
-    expect(screen.getByRole("link", { name: /Experiencia VR GuateGeeks/ })).toHaveAttribute("href", "/app/challenges/C13");
+    expect(screen.getByRole("link", { name: /Comparte la experiencia GuateGeeks/ })).toHaveAttribute("href", "/app/challenges/C15");
     expect(screen.queryByRole("link", { name: /Agentes con Bedrock/ })).not.toBeInTheDocument();
-    expect(screen.queryByText(/The Event Happened Twice/)).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "The Event Happened Twice" })).toBeInTheDocument();
     const official = screen.getAllByRole("link", { name: /agenda oficial/i });
     expect(official[0]).toHaveAttribute("href", "https://awscommunitygt.com/agenda/");
-    expect(screen.getByText(/Siguiente bloque: 10:45/)).toBeInTheDocument();
+    expect(screen.getByText("En vivo")).toBeInTheDocument();
   });
 
   it("sends people to the official agenda before the event", () => {
     clock.now = new Date("2026-10-08T09:00:00-06:00");
     renderPage();
-    expect(screen.getByRole("link", { name: /agenda oficial/i })).toHaveAttribute("target", "_blank");
+    expect(screen.getAllByRole("link", { name: /agenda oficial/i })[0]).toHaveAttribute("target", "_blank");
   });
 
   it("offers the main Aura Challenges from the home screen", () => {

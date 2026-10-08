@@ -1,4 +1,4 @@
-import { AGENDA, ROOMS, sessionDate, type AgendaSession } from "./agenda";
+import { AGENDA, EVENT_DATE, EVENT_UTC_OFFSET, ROOMS, sessionDate, type AgendaSession } from "./agenda";
 import { QUETZI_FACTS } from "./companion-lines";
 
 export type EventPhase = "pre" | "live" | "post";
@@ -21,6 +21,19 @@ export function nextSessions(now: Date, sessions: readonly AgendaSession[] = AGE
   if (!upcoming.length) return [];
   const first = upcoming.map((session) => session.start).sort()[0];
   return upcoming.filter((session) => session.start === first);
+}
+
+export type AgendaSpotlight = { status: "preview" | "upcoming" | "live" | "ended"; sessions: AgendaSession[] };
+
+/** Show the registration card immediately, then switch to the real Guatemala schedule. */
+export function getAgendaSpotlight(now: Date): AgendaSpotlight {
+  if (now < new Date(`${EVENT_DATE}T00:00:00${EVENT_UTC_OFFSET}`)) {
+    return { status: "preview", sessions: AGENDA.filter((session) => session.title === "Registro") };
+  }
+  const current = sessionsAt(now);
+  if (current.length) return { status: "live", sessions: current };
+  const upcoming = nextSessions(now);
+  return upcoming.length ? { status: "upcoming", sessions: upcoming } : { status: "ended", sessions: [] };
 }
 
 export function countdownTo(now: Date, target: Date) {

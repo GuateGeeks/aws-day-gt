@@ -55,8 +55,8 @@ export async function ensureBonusChallengesForUid(uid: string): Promise<Challeng
       throw new HttpsError("failed-precondition", "CHALLENGE_POOL_CHANGED");
     }
     const current = assignment.data() as ChallengeAssignment;
-    const requiredIds = ["C08", "C12", "C13", "C15"] as const;
-    const retiredIds = new Set(["C03", "C10", "C11", "C14"]);
+    const requiredIds = ["C08", "C12", "C15"] as const;
+    const retiredIds = new Set(["C03", "C05", "C10", "C11", "C13", "C14"]);
     const needsMigration = current.challengeIds.some((id) => retiredIds.has(id)) || requiredIds.some((id) => !current.challengeIds.includes(id));
     let challengeIds = [...current.challengeIds];
     let migratedProgress: FirebaseFirestore.DocumentSnapshot[] = [];

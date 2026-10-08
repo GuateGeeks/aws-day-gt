@@ -8,7 +8,7 @@ describe.skipIf(!process.env.FIRESTORE_EMULATOR_HOST)("new participant onboardin
     await Promise.all(challenges.map((challenge) => database.doc(`challenges/${challenge.id}`).set(challenge)));
   });
 
-  it("assigns ten Aura Challenges without creating historical missions", async () => {
+  it("assigns nine credit Challenges without creating historical missions", async () => {
     const uid = `onboard-${crypto.randomUUID()}`;
     const alias = `onboard${crypto.randomUUID().replaceAll("-", "").slice(0, 16)}`;
     const result = await completeOnboardingForUid(uid, "onboard@example.com", {
@@ -16,8 +16,10 @@ describe.skipIf(!process.env.FIRESTORE_EMULATOR_HOST)("new participant onboardin
       challengeProfile: { primaryRole: "Development", experienceLevel: "Junior", firstAwsCommunityDay: true, awsInterest: ["Serverless"] },
       consent: { termsVersion: "2026-10-04", accepted: true, photoPublication: false, marketing: false }
     });
-    expect(result.challengeIds).toHaveLength(10);
-    expect(result.challengeIds).toContain("C13");
+    expect(result.challengeIds).toHaveLength(9);
+    expect(result.challengeIds).toContain("C15");
+    expect(result.challengeIds).not.toContain("C05");
+    expect(result.challengeIds).not.toContain("C13");
     expect(result.challengeIds).not.toContain("C16");
     expect(result.challengeIds).not.toContain("C17");
     expect((await refs.challengeAssignment(uid).get()).data()?.bonusChallengeIds).toEqual(["C16", "C17", "C18", "C19", "C20", "C21", "C22", "C23"]);

@@ -24,9 +24,7 @@
     "configure:auth": "tsx scripts/configure-auth.ts --project aws-day-gt",
     "configure:storage": "tsx scripts/configure-storage.ts --project aws-day-gt --location US-CENTRAL1",
     "deploy": "npm run build && npm --prefix functions run build && npx firebase deploy --project aws-day-gt",
-    "configure:event-codes:emulator": "tsx scripts/configure-local-event-codes.ts",
-    "sync:challenges:emulator": "tsx scripts/sync-local-challenges.ts",
-    "configure:event-codes:production": "tsx scripts/configure-production-event-codes.ts"
+    "sync:challenges:emulator": "tsx scripts/sync-local-challenges.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

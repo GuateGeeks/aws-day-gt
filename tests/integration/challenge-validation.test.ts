@@ -1,5 +1,4 @@
 // @vitest-environment node
-import { createHash } from "node:crypto";
 import { beforeAll, describe, expect, it } from "vitest";
 import { challenges } from "../../shared/challenges/catalog";
 import { EVENT_ID } from "../../shared/constants";
@@ -7,7 +6,7 @@ import { challengeSecrets } from "../../scripts/data/challenge-secrets";
 import { experienceStations } from "../../shared/challenges/stations";
 import { completeChallengeForUid } from "../../functions/src/challenges/complete";
 import { configureEventCodeForAdmin, configureSessionForAdmin } from "../../functions/src/challenges/admin-config";
-import { issueGeekIdForUid } from "../../functions/src/challenges/tokens";
+import { issueGeekIdForUid, issueStationTokenForStaff } from "../../functions/src/challenges/tokens";
 import { refs } from "../../functions/src/shared/refs";
 
 async function participant(ids: string[], primaryRole = "Cloud") {
@@ -97,13 +96,17 @@ describe.skipIf(!process.env.FIRESTORE_EMULATOR_HOST)("credit challenge validati
     await expect(configureEventCodeForAdmin("admin", { challengeId: "C10", code: "EXAMPLE", active: true })).rejects.toThrow("INVALID_EVENT_CODE_CONFIGURATION");
   });
 
-  it("keeps the GuateGeeks VR code active and credits it once", async () => {
-    const uid = await participant(["C13"]);
-    await configureEventCodeForAdmin("admin", { challengeId: "C13", code: "STANDPRUEBA03", active: true });
-    expect((await refs.challengeSecret("C13").get()).data()?.sharedCodeHash).toBe(createHash("sha256").update("STANDPRUEBA03").digest("hex"));
-    expect(await completeChallengeForUid(uid, { challengeId: "C13", operationId: "wrong", response: { code: "NOPE" } })).toMatchObject({ status: "retry", auraAwarded: 0 });
-    expect(await completeChallengeForUid(uid, { challengeId: "C13", operationId: "correct", response: { code: "standprueba03" } })).toMatchObject({ status: "completed", auraAwarded: 250 });
-    expect((await refs.score(uid).get()).data()).toMatchObject({ auraTotal: 250, completedChallenges: 1 });
+  it("rejects Cross Level and the VR code even for an older assigned participant", async () => {
+    const uid = await participant(["C05", "C13"]);
+    for (const id of ["C05", "C13"]) {
+      await expect(completeChallengeForUid(uid, { challengeId: id, operationId: `retired-${id}`, response: { code: "EXAMPLE" } })).rejects.toThrow("CHALLENGE_RETIRED");
+    }
+    expect((await refs.score(uid).get()).data()?.auraTotal).toBe(0);
+  });
+
+  it("does not allow staff to reactivate the retired stand code", async () => {
+    await expect(configureEventCodeForAdmin("admin", { challengeId: "C13", code: "STANDPRUEBA03", active: true })).rejects.toThrow("CHALLENGE_RETIRED");
+    await expect(issueStationTokenForStaff("staff", "cloudforge")).rejects.toThrow("CHALLENGE_RETIRED");
   });
 
   it("still connects two participants through Geek ID", async () => {

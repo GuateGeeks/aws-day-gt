@@ -12,8 +12,8 @@ export default defineConfig({
         name: "AWS Community Day Guatemala 2026",
         short_name: "AWS Day GT",
         description: "Desafíos, comunidad y créditos en AWS Community Day Guatemala 2026, con GuateGeeks",
-        theme_color: "#075c69",
-        background_color: "#f6fbf8",
+        theme_color: "#15546b",
+        background_color: "#f7faf9",
         display: "standalone",
         start_url: "/",
         icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any maskable" }]

@@ -113,12 +113,12 @@ describe("useChallenges subscriptions", () => {
     unmount();
   });
 
-  it("waits through a cached C03 assignment until the migrated ten-Challenge pack arrives", async () => {
+  it("waits through cached retired challenges until the nine-Challenge pack arrives", async () => {
     const { result, unmount } = renderHook(() => useChallenges());
     await act(async () => mock.ensures.shift()!());
     const assignmentPath = "challengeAssignments/owner-1";
     const oldIds = Array.from({ length: 10 }, (_, index) => `C${String(index + 1).padStart(2, "0")}`);
-    const migratedIds = ["C01", "C02", "C04", "C05", "C06", "C07", "C08", "C12", "C13", "C15"];
+    const migratedIds = ["C01", "C02", "C04", "C06", "C07", "C08", "C09", "C12", "C15"];
     const assignmentSnapshot = (challengeIds: string[]) => ({ exists: () => true, data: () => ({ challengeIds, bonusChallengeIds: [] }) });
     const emitRelatedSnapshots = (challengeIds: string[]) => {
       mock.listeners.get("challenges")?.({ docs: challengeIds.map((id) => ({ id, data: () => ({ title: id }) })) });

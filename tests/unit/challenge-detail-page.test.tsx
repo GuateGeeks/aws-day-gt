@@ -39,12 +39,11 @@ describe("Challenge completion", () => {
     expect(screen.queryByRole("button", { name: "Validar Challenge" })).not.toBeInTheDocument();
   });
 
-  it("keeps one simple code field for the VR experience", () => {
+  it("does not expose the retired VR code even through a saved link", () => {
     mock.items = [item("C13", "available")];
     render(<MemoryRouter initialEntries={["/app/challenges/C13"]}><Routes><Route path="/app/challenges/:challengeId" element={<ChallengeDetailPage />} /></Routes></MemoryRouter>);
-    expect(screen.getByRole("textbox", { name: "Código de la experiencia VR" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Confirmar código" })).toBeInTheDocument();
-    expect(screen.queryByRole("combobox", { name: "Sesión" })).not.toBeInTheDocument();
+    expect(screen.getByText("Este desafío ya no forma parte del recorrido.")).toBeInTheDocument();
+    expect(screen.queryByRole("textbox", { name: "Código de la experiencia VR" })).not.toBeInTheDocument();
   });
 
   it("shows a simple 3D AWS selection before confirmation", async () => {
@@ -66,7 +65,9 @@ describe("Challenge completion", () => {
   it("explains the 350-credit publication and asks for a screenshot", () => {
     mock.items = [item("C15", "available")];
     render(<MemoryRouter initialEntries={["/app/challenges/C15"]}><Routes><Route path="/app/challenges/:challengeId" element={<ChallengeDetailPage />} /></Routes></MemoryRouter>);
-    expect(screen.getByText(/la etiqueta a GuateGeeks/u)).toBeInTheDocument();
+    expect(screen.getByText(/Visita el stand y conoce la experiencia de GuateGeeks/u)).toBeInTheDocument();
+    expect(screen.getAllByText(/Etiqueta a GuateGeeks/u).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Sube una captura donde se vean tu publicación y la etiqueta/u)).toBeInTheDocument();
     expect(screen.getAllByText(/Facebook, Instagram o LinkedIn/u).length).toBeGreaterThan(0);
     expect(screen.getByText("Selecciona la captura de tu publicación")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Enviar imagen para revisión" })).toBeDisabled();

@@ -29,8 +29,8 @@ export function ModerationCard({ submission, onReview }: ModerationCardProps) {
   }
 
   const reviewDisabled = !imageReady || reviewing !== null;
-  const challengeLabel: Record<string, string> = { C15: "Comparte AWS Day", C16: "Selfie con speaker", C17: "Selfie en un stand" };
-  const reviewHint: Record<string, string> = { C15: "Confirma que la captura muestre una historia o publicación sobre el evento y la etiqueta a GuateGeeks antes de aprobar.", C16: "Confirma que aparezcan el participante y un speaker del evento.", C17: "Confirma que aparezcan el participante y un stand del evento." };
+  const challengeLabel: Record<string, string> = { C15: "Comparte la experiencia GuateGeeks", C16: "Selfie con speaker", C17: "Selfie en un stand" };
+  const reviewHint: Record<string, string> = { C15: "Confirma que la captura muestre el stand de GuateGeeks y la experiencia que ofrece, además de la etiqueta a GuateGeeks, antes de aprobar.", C16: "Confirma que aparezcan el participante y un speaker del evento.", C17: "Confirma que aparezcan el participante y un stand del evento." };
 
   return <Card className="stack">
     <div className="row"><strong className="grow">{challengeLabel[submission.missionId] ?? submission.missionId}</strong><CreditAmount value={submission.provisionalPoints} signed /></div>
