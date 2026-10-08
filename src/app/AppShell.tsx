@@ -4,7 +4,7 @@ import { OFFICIAL_AGENDA_URL } from "../../shared/agenda";
 import { FeatherCelebration } from "../features/companion/FeatherCelebration";
 import { AgendaReminderCenter } from "../features/companion/AgendaReminderCenter";
 import { useNow } from "../features/companion/useNow";
-import { GeekEyesLogo } from "../features/auth/GeekEyesLogo";
+import { GuateGeeksLogo } from "../features/auth/GeekEyesLogo";
 
 const tabs = [
   { to: "/app/hoy", label: "Hoy", icon: Bird },
@@ -19,7 +19,7 @@ export function AppShell() {
     <a className="skip-link" href="#content">Saltar al contenido</a>
     <main className="page">
       <header className="app-header">
-        <NavLink className="brand-mark" to="/app/hoy"><span className="brand-eyes"><GeekEyesLogo /></span><span>AWS Community Day <small className="brand-sub">Guatemala · creado por GuateGeeks</small></span></NavLink>
+        <NavLink className="brand-mark" to="/app/hoy" aria-label="AWS Community Day Guatemala, creado por GuateGeeks"><GuateGeeksLogo className="brand-logo" /><span className="brand-copy"><span className="brand-title__full">AWS Community Day</span><span className="brand-title__short">AWS Day</span><small className="brand-sub">Guatemala · por GuateGeeks</small></span></NavLink>
         <a className="header-agenda" href={OFFICIAL_AGENDA_URL} target="_blank" rel="noreferrer" aria-label="Agenda oficial (abre awscommunitygt.com)"><CalendarDays aria-hidden size={18} /><span className="header-agenda__text">Agenda oficial</span></a>
         <NavLink className="header-profile" to="/app/profile" aria-label="Perfil"><CircleUserRound aria-hidden size={26} /></NavLink>
       </header>

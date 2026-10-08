@@ -19,9 +19,9 @@ describe("AppShell skip link", () => {
     expect(destination!.contains(nav)).toBe(false);
   });
 
-  it("uses the supplied GuateGeeks eyes as the application mark", () => {
+  it("uses the full GuateGeeks logo as the application mark", () => {
     render(<MemoryRouter initialEntries={["/app/challenges"]}><Routes><Route path="/app" element={<AppShell />}><Route path="challenges" element={<h1>Challenges</h1>} /></Route></Routes></MemoryRouter>);
-    const brand = screen.getByRole("link", { name: /AWS Community Day Guatemala · creado por GuateGeeks/u });
-    expect(brand.querySelector("img")).toHaveAttribute("src", "/brand/geek-eyes.png");
+    const brand = screen.getByRole("link", { name: /AWS Community Day Guatemala, creado por GuateGeeks/u });
+    expect(brand.querySelector("img")).toHaveAttribute("src", "/brand/guategeeks.png");
   });
 });

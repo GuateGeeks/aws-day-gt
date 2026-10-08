@@ -7,7 +7,6 @@ import { QuetziGuide } from "../../src/features/companion/QuetziGuide";
 import { AgendaSpotlightCard } from "../../src/features/companion/CompanionCards";
 import { QuetziSprite } from "../../src/features/companion/QuetziSprite";
 import { effectiveEventNow, readClockOffset } from "../../src/features/companion/useNow";
-import { rowsToPixels, tailPixels } from "../../src/features/companion/quetzi-pixels";
 
 const clock = vi.hoisted(() => ({ now: new Date("2026-10-08T09:00:00-06:00") }));
 vi.mock("../../src/features/auth/AuthProvider", () => ({ useAuth: () => ({ profile: { alias: "ana", interests: ["IA & Agentes"] } }) }));
@@ -32,17 +31,12 @@ describe("Quetzi sprite", () => {
     expect(screen.getByRole("img")).toHaveAccessibleName("Geek, etapa Quetzal resplandeciente");
   });
 
-  it("grows its tail one feather per mission", () => {
-    expect(tailPixels(11).length).toBeGreaterThan(tailPixels(1).length);
-    expect(tailPixels(99)).toEqual(tailPixels(11));
+  it("uses smooth vector shapes for the event guide", () => {
+    const { container } = render(<QuetziSprite completed={3} />);
+    expect(container.querySelector("svg")).not.toHaveAttribute("shape-rendering", "crispEdges");
+    expect(container.querySelectorAll("path").length).toBeGreaterThan(2);
   });
 
-  it("merges pixel runs", () => {
-    expect(rowsToPixels([".GG.L"])).toEqual([
-      { x: 1, y: 0, width: 2, color: "#1f9d55", part: "body" },
-      { x: 4, y: 0, width: 1, color: "#8ee05a", part: "wing" }
-    ]);
-  });
 });
 
 describe("Quetzi guide", () => {
@@ -146,5 +140,12 @@ describe("local agenda rehearsal", () => {
     expect(screen.getByRole("heading", { name: "Registro" })).toBeInTheDocument();
     expect(screen.getByText("A continuación")).toBeInTheDocument();
     expect(screen.getByText(/08:30 · en 15 min/)).toBeInTheDocument();
+  });
+
+  it("lets a single upcoming activity fill its row", () => {
+    const { container } = render(<AgendaSpotlightCard now={sessionDate("08:38")} rehearsal />);
+    const next = container.querySelector(".agenda-spotlight__next");
+    expect(next?.querySelectorAll("li")).toHaveLength(1);
+    expect(next).toHaveClass("agenda-spotlight__next--single");
   });
 });

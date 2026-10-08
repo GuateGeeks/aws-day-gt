@@ -12,6 +12,6 @@ describe("local landing rehearsal", () => {
     expect(screen.getByText(/Ensayo local · 8 de octubre/)).toBeInTheDocument();
     expect(screen.getByText(/la agenda avanza contigo hoy/i)).toBeInTheDocument();
     expect(screen.queryByText(/Faltan \d/)).not.toBeInTheDocument();
-    expect(screen.getByRole("img", { name: "GuateGeeks" })).toBeInTheDocument();
+    expect(screen.getAllByRole("img", { name: "GuateGeeks" })).toHaveLength(2);
   });
 });

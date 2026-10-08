@@ -6,7 +6,7 @@ import { quetziFact } from "../../../shared/companion";
 import { Card, Chip } from "../../design-system/components";
 import { QuetziGuide } from "../companion/QuetziGuide";
 import { isLocalRehearsalActive } from "../companion/useNow";
-import { GeekBrandPanel, GeekEyesLogo } from "./GeekEyesLogo";
+import { GeekBrandPanel, GuateGeeksLogo } from "./GeekEyesLogo";
 import "./landing.css";
 
 const STATS = [["7", "salas en paralelo"], ["7", "áreas temáticas"], ["34", "voces de la comunidad"], ["10", "Challenges por persona"]] as const;
@@ -16,7 +16,7 @@ export function LandingPage() {
   const rehearsal = isLocalRehearsalActive();
   const line = taps === 0 ? rehearsal ? "¡Hola! Soy Geek, tu guía GuateGeeks. La agenda avanza contigo hoy durante el ensayo local del AWS Community Day Guatemala." : "¡Hola! Soy Geek, tu guía GuateGeeks. El 10 de octubre te acompaño por todo el AWS Community Day Guatemala." : quetziFact(taps - 1);
   return <main className="landing page">
-    <header className="landing__nav"><span className="brand-mark"><span className="brand-eyes"><GeekEyesLogo /></span><span>AWS Community Day<small className="brand-sub">Guatemala · GuateGeeks</small></span></span><Link to="/login">Ingresar</Link></header>
+    <header className="landing__nav"><span className="brand-mark"><GuateGeeksLogo className="brand-logo" /><span className="brand-copy"><span className="brand-title__full">AWS Community Day</span><span className="brand-title__short">AWS Day</span><small className="brand-sub">Guatemala · GuateGeeks</small></span></span><Link to="/login">Ingresar</Link></header>
     <section className="hero stack">
       <GeekBrandPanel />
       <Chip>{rehearsal ? "Ensayo local · 8 de octubre" : "Sábado 10 de octubre"} · Universidad Rafael Landívar, zona 16</Chip>
