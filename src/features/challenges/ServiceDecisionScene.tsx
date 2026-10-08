@@ -6,7 +6,14 @@ import "./service-decision.css";
 
 type Props = { options: ChallengeOption[]; selected: string | null; onSelect: (id: string) => void };
 
-const colors = [0x39c6e5, 0x94dc75, 0xffc35a];
+const iconColors: Record<string, number> = {
+  "api-gateway": 0x8c4fff, bedrock: 0x01a88d, cloudfront: 0x8c4fff,
+  cloudwatch: 0xe7157b, dynamodb: 0xc925d1, ebs: 0x7aa116,
+  ec2: 0xed7100, eventbridge: 0xe7157b, iam: 0xdd344c,
+  lambda: 0xed7100, rds: 0xc925d1, route53: 0x8c4fff,
+  s3: 0x7aa116, sns: 0xe7157b, sqs: 0xe7157b,
+  "step-functions": 0xe7157b
+};
 
 export function ServiceDecisionScene({ options, selected, onSelect }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -23,47 +30,34 @@ export function ServiceDecisionScene({ options, selected, onSelect }: Props) {
     catch { return; }
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 40);
-    camera.position.set(0, 2.9, 6.8);
-    camera.lookAt(0, 0.55, 0);
-    scene.add(new THREE.HemisphereLight(0xe6faff, 0x176077, 3));
-    const keyLight = new THREE.PointLight(0xffffff, 75, 18);
-    keyLight.position.set(-2, 5, 4);
+    camera.position.set(0, 0.3, 7);
+    camera.lookAt(0, 0, 0);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x286078, 2.4));
+    const keyLight = new THREE.PointLight(0xffffff, 32, 14);
+    keyLight.position.set(-3, 3, 5);
     scene.add(keyLight);
-    const floor = new THREE.Mesh(new THREE.CylinderGeometry(5.2, 5.4, 0.22, 48), new THREE.MeshStandardMaterial({ color: 0x0c536d, roughness: 0.8 }));
-    floor.position.y = -0.2;
-    scene.add(floor);
-    const pickable: THREE.Object3D[] = [];
+    const pickable: THREE.Mesh[] = [];
     const textures: THREE.Texture[] = [];
     const textureLoader = new THREE.TextureLoader();
-    const tokens = options.map((option, index) => {
+    const icons = options.map((option, index) => {
       const group = new THREE.Group();
-      group.position.set((index - (options.length - 1) / 2) * 2.15, 0.65, 0);
-      const base = new THREE.Mesh(new THREE.CylinderGeometry(0.83, 0.94, 0.2, 32), new THREE.MeshStandardMaterial({ color: 0x155a74, metalness: 0.2 }));
-      base.position.y = -0.55;
-      group.add(base);
-      const material = new THREE.MeshStandardMaterial({ color: colors[index % colors.length], emissive: colors[index % colors.length], emissiveIntensity: 0.16, metalness: 0.18, roughness: 0.27 });
-      const core = new THREE.Mesh(index === 1 ? new THREE.DodecahedronGeometry(0.67) : new THREE.IcosahedronGeometry(0.67, 0), material);
-      core.userData.optionId = option.id;
-      group.add(core);
-      pickable.push(core);
+      group.position.set((index - (options.length - 1) / 2) * 2.45, 0, 0);
       const iconSrc = serviceIconSrc(option.id);
+      const sideColor = new THREE.Color(iconColors[option.id] ?? 0x236c83).multiplyScalar(0.55);
+      const side = new THREE.MeshStandardMaterial({ color: sideColor, metalness: 0.3, roughness: 0.38 });
+      const face = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.38 });
       if (iconSrc) {
         const texture = textureLoader.load(iconSrc);
         texture.colorSpace = THREE.SRGBColorSpace;
         textures.push(texture);
-        const icon = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true, depthWrite: false }));
-        icon.position.set(0, 0.08, 0.72);
-        icon.scale.set(0.82, 0.82, 1);
-        icon.userData.optionId = option.id;
-        group.add(icon);
-        pickable.push(icon);
+        face.map = texture;
       }
-      const halo = new THREE.Mesh(new THREE.TorusGeometry(0.9, 0.045, 10, 42), new THREE.MeshStandardMaterial({ color: 0xa8eaf6, emissive: 0x288eb5, emissiveIntensity: 0.3 }));
-      halo.rotation.x = Math.PI / 2;
-      halo.position.y = -0.4;
-      group.add(halo);
+      const badge = new THREE.Mesh(new THREE.BoxGeometry(1.95, 1.95, 0.4), [side, side, side, side, face, side]);
+      badge.userData.optionId = option.id;
+      group.add(badge);
+      pickable.push(badge);
       scene.add(group);
-      return { option, group, core, material };
+      return { option, group, badge };
     });
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
@@ -88,13 +82,14 @@ export function ServiceDecisionScene({ options, selected, onSelect }: Props) {
     observer.observe(canvas);
     resize();
     let frameId = 0;
+    const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
     function frame(time: number) {
-      tokens.forEach(({ option, group, core, material }, index) => {
+      icons.forEach(({ option, group, badge }, index) => {
         const active = option.id === selectedRef.current;
-        core.rotation.y = time * 0.00045 + index;
-        group.position.y = 0.65 + Math.sin(time * 0.0014 + index) * 0.08 + (active ? 0.18 : 0);
-        material.emissiveIntensity = active ? 0.68 : 0.16;
-        group.scale.setScalar(active ? 1.12 : 1);
+        badge.rotation.y = (index % 2 === 0 ? -0.3 : 0.3) + (reduceMotion ? 0 : Math.sin(time * 0.0009 + index) * 0.07);
+        badge.rotation.x = -0.1 + (reduceMotion ? 0 : Math.sin(time * 0.0007 + index * 1.4) * 0.04);
+        group.position.y = (reduceMotion ? 0 : Math.sin(time * 0.0012 + index) * 0.07) + (active ? 0.15 : 0);
+        group.scale.setScalar(active ? 1.14 : 1);
       });
       renderer.render(scene, camera);
       frameId = requestAnimationFrame(frame);
@@ -108,8 +103,8 @@ export function ServiceDecisionScene({ options, selected, onSelect }: Props) {
         if (object instanceof THREE.Mesh) {
           object.geometry.dispose();
           const materials = Array.isArray(object.material) ? object.material : [object.material];
-          materials.forEach((material) => material.dispose());
-        } else if (object instanceof THREE.Sprite) object.material.dispose();
+          new Set(materials).forEach((material) => material.dispose());
+        }
       });
       textures.forEach((texture) => texture.dispose());
       renderer.dispose();
@@ -119,7 +114,7 @@ export function ServiceDecisionScene({ options, selected, onSelect }: Props) {
   return <div className="service-decision">
     <div className="service-decision__scene">
       <canvas className="service-decision__canvas" ref={canvasRef} aria-hidden="true" />
-      <span className="service-decision__hint">{selected ? `Elegiste: ${options.find((option) => option.id === selected)?.label ?? selected}` : "Toca un objeto o elige su nombre"}</span>
+      <span className="service-decision__hint">{selected ? `Elegiste: ${options.find((option) => option.id === selected)?.label ?? selected}` : "Toca un ícono o elige su nombre"}</span>
     </div>
     <div className="service-decision__options" role="group" aria-label="Servicios AWS">
       {options.map((option) => <button key={option.id} type="button" className={`service-decision__option${selected === option.id ? " is-selected" : ""}`} onClick={() => onSelect(option.id)} aria-pressed={selected === option.id}>

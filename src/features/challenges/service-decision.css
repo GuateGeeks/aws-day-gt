@@ -1,5 +1,5 @@
 .service-decision { display: grid; gap: 14px; }
-.service-decision__scene { position: relative; overflow: hidden; height: clamp(190px, 34vw, 270px); border: 1px solid #6bd1e9; border-radius: 20px; background: radial-gradient(circle at 50% 15%, #198eae, #0b4a65 60%, #092f46); }
+.service-decision__scene { position: relative; overflow: hidden; height: clamp(220px, 34vw, 280px); border: 1px solid #6bd1e9; border-radius: 20px; background: radial-gradient(circle at 50% 35%, #287f9f, #124761 68%, #0d344e); }
 .service-decision__canvas { display: block; width: 100%; height: 100%; cursor: pointer; }
 .service-decision__hint { position: absolute; left: 12px; bottom: 10px; padding: 5px 9px; border-radius: 999px; background: #073047d9; color: white; font-size: .8rem; pointer-events: none; }
 .service-decision__options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
