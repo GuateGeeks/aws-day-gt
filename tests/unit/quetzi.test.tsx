@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { sessionDate } from "../../shared/agenda";
@@ -78,6 +78,8 @@ describe("simulated clock", () => {
     expect(readClockOffset("", fake, real)).toBe(offset);
     expect(readClockOffset("?ahora=real", fake, real)).toBe(0);
     expect(storage.has("quetzi.use-manual-clock")).toBe(false);
+    expect(readClockOffset("?ahora=ensayo", fake, real)).toBe(0);
+    expect(storage.has("quetzi.use-real-clock")).toBe(false);
     expect(readClockOffset("?ahora=nope", fake, real)).toBe(0);
   });
 });
@@ -165,5 +167,34 @@ describe("local agenda rehearsal", () => {
     const next = container.querySelector(".agenda-carousel--next");
     expect(next?.querySelectorAll("li")).toHaveLength(1);
     expect(next?.querySelector("li a")).toHaveAttribute("href", "https://awscommunitygt.com/agenda/");
+  });
+
+  it("shows every parallel session in the next block during the short schedule gap", () => {
+    const { container } = render(<AgendaSpotlightCard now={sessionDate("11:36")} rehearsal />);
+    expect(container.querySelectorAll(".agenda-carousel:not(.agenda-carousel--next) li")).toHaveLength(1);
+    expect(container.querySelectorAll(".agenda-carousel--next li")).toHaveLength(7);
+    expect(screen.getByText(/7 actividades empiezan a las 11:40/)).toBeInTheDocument();
+  });
+
+  it("automatically advances through parallel sessions and still allows manual navigation", () => {
+    vi.useFakeTimers();
+    const scrollTo = vi.fn();
+    const originalScrollTo = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "scrollTo");
+    Object.defineProperty(HTMLElement.prototype, "scrollTo", { configurable: true, value: scrollTo });
+    try {
+      render(<AgendaSpotlightCard now={sessionDate("11:41")} rehearsal />);
+      const current = screen.getByRole("list", { name: "Actividades en vivo" });
+      const section = current.closest("section");
+      expect(section).toHaveTextContent("1 de 8");
+      act(() => vi.advanceTimersByTime(6000));
+      expect(section).toHaveTextContent("2 de 8");
+      expect(scrollTo).toHaveBeenCalled();
+      fireEvent.click(screen.getByRole("button", { name: "Ver más actividades: Actividades en vivo" }));
+      expect(section).toHaveTextContent("3 de 8");
+    } finally {
+      vi.useRealTimers();
+      if (originalScrollTo) Object.defineProperty(HTMLElement.prototype, "scrollTo", originalScrollTo);
+      else Reflect.deleteProperty(HTMLElement.prototype, "scrollTo");
+    }
   });
 });

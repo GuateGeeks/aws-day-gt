@@ -13,12 +13,14 @@ export function rehearsalEnabledForHost(hostname: string): boolean {
 
 /**
  * `?ahora=2026-10-10T10:00` (Guatemala time) lets organizers preview the day.
- * `?ahora=real` clears the simulation. The offset survives navigation within the tab.
+ * `?ahora=real` shows the real date; `?ahora=ensayo` restores the local rehearsal.
+ * The offset survives navigation within the tab.
  */
 export function readClockOffset(search: string, storage: Pick<Storage, "getItem" | "setItem" | "removeItem">, realNow = Date.now()): number {
   const param = new URLSearchParams(search).get("ahora");
   try {
     if (param === "real") { storage.removeItem(OFFSET_KEY); storage.removeItem(MANUAL_KEY); storage.setItem(REAL_KEY, "true"); return 0; }
+    if (param === "ensayo") { storage.removeItem(OFFSET_KEY); storage.removeItem(MANUAL_KEY); storage.removeItem(REAL_KEY); return 0; }
     if (param && LOCAL_TIME.test(param)) {
       const target = new Date(`${param}:00${EVENT_UTC_OFFSET}`).getTime();
       const offset = target - realNow;
