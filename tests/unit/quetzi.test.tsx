@@ -100,7 +100,7 @@ describe("CompanionPage", () => {
     expect(screen.getByRole("heading", { name: "The Event Happened Twice" })).toBeInTheDocument();
     expect(screen.queryByText("Vista previa")).not.toBeInTheDocument();
     expect(screen.getByText("A continuación")).toBeInTheDocument();
-    expect(screen.getByText(/10:45/)).toBeInTheDocument();
+    expect(screen.getAllByText(/10:45/).length).toBeGreaterThan(0);
     expect(screen.getAllByRole("listitem").length).toBeGreaterThan(5);
     expect(screen.queryByText("Creado por GuateGeeks")).not.toBeInTheDocument();
   });
@@ -140,6 +140,18 @@ describe("CompanionPage", () => {
 });
 
 describe("local agenda rehearsal", () => {
+  it("shows current and upcoming activities as horizontal links to the official agenda", () => {
+    render(<AgendaSpotlightCard now={sessionDate("10:00")} rehearsal />);
+    const current = screen.getByRole("list", { name: "Actividades en vivo" });
+    const upcoming = screen.getByRole("list", { name: "A continuación" });
+    expect(current.querySelectorAll("li").length).toBeGreaterThan(1);
+    expect(upcoming.querySelectorAll("li").length).toBeGreaterThan(1);
+    for (const item of [...current.querySelectorAll("li"), ...upcoming.querySelectorAll("li")]) {
+      expect(item.querySelector("a")).toHaveAttribute("href", "https://awscommunitygt.com/agenda/");
+      expect(item.querySelector("a")).toHaveAttribute("target", "_blank");
+    }
+  });
+
   it("shows current registration and the following block under the rehearsal date", () => {
     render(<AgendaSpotlightCard now={sessionDate("08:15")} rehearsal />);
     expect(screen.getByText("Sábado 10 de octubre · simulación local · hora de Guatemala")).toBeInTheDocument();
@@ -148,10 +160,10 @@ describe("local agenda rehearsal", () => {
     expect(screen.getByText(/08:30 · en 15 min/)).toBeInTheDocument();
   });
 
-  it("lets a single upcoming activity fill its row", () => {
+  it("keeps a single upcoming activity as one clickable carousel card", () => {
     const { container } = render(<AgendaSpotlightCard now={sessionDate("08:38")} rehearsal />);
-    const next = container.querySelector(".agenda-spotlight__next");
+    const next = container.querySelector(".agenda-carousel--next");
     expect(next?.querySelectorAll("li")).toHaveLength(1);
-    expect(next).toHaveClass("agenda-spotlight__next--single");
+    expect(next?.querySelector("li a")).toHaveAttribute("href", "https://awscommunitygt.com/agenda/");
   });
 });
