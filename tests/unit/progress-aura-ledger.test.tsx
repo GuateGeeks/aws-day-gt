@@ -16,11 +16,10 @@ describe("Credit ledger", () => {
     ];
     render(<MemoryRouter><ProgressPage /></MemoryRouter>);
     expect(screen.getByText("Tu saldo de créditos")).toBeInTheDocument();
-    expect(screen.getByText("-20")).toBeInTheDocument();
+    expect(screen.getAllByText("−20 créditos")).toHaveLength(3);
     expect(screen.getByText("Ganados")).toBeInTheDocument();
     expect(screen.getAllByText("Descontados").length).toBeGreaterThan(0);
     expect(screen.getByText("Por conseguir")).toBeInTheDocument();
-    expect(screen.getAllByText("−20 créditos")).toHaveLength(2);
     expect(screen.getAllByText("+100 créditos")).toHaveLength(2);
     expect(screen.getByText("Respuesta incorrecta · cerrado")).toBeInTheDocument();
   });

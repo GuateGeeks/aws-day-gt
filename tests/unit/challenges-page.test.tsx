@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { challenges } from "../../shared/challenges/catalog";
@@ -20,8 +20,8 @@ describe("Credit challenges page", () => {
     expect(screen.queryByRole("heading", { name: "Cross Level" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Misiones anteriores" })).not.toBeInTheDocument();
     expect(screen.getByText("0 de 9 retos completados")).toBeInTheDocument();
-    expect(screen.getByText("0 créditos")).toBeInTheDocument();
-    expect(screen.getByText(/Disponibles/u)).toBeInTheDocument();
+    expect(within(screen.getByLabelText("Resumen de créditos")).getAllByText("0 créditos").length).toBeGreaterThan(0);
+    expect(screen.getByText("Por conseguir")).toBeInTheDocument();
   });
 
   it("shows selfies in the same route as the nine main challenges", () => {
@@ -53,7 +53,7 @@ describe("Credit challenges page", () => {
     mock.auraTotal = -20;
     mock.auraDeductedTotal = 20;
     render(<MemoryRouter><ChallengesPage /></MemoryRouter>);
-    expect(screen.getAllByText("−20 créditos")).toHaveLength(2);
+    expect(screen.getAllByText("−20 créditos")).toHaveLength(3);
     expect(screen.getByText(/Descontados/u)).toBeInTheDocument();
     expect(screen.getByText("Fallado · solución disponible")).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /CONTINÚA TU RECORRIDO/u })).not.toBeInTheDocument();

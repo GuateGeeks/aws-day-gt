@@ -2,6 +2,8 @@ import { cleanup, render, screen, within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+const auth = vi.hoisted(() => ({ alias: "Jose" }));
+vi.mock("../../src/features/auth/AuthProvider", () => ({ useAuth: () => ({ profile: { alias: auth.alias } }) }));
 vi.mock("../../src/features/companion/FeatherCelebration", () => ({ FeatherCelebration: () => null }));
 const { AppShell } = await import("../../src/app/AppShell");
 afterEach(cleanup);
@@ -23,5 +25,12 @@ describe("AppShell skip link", () => {
     render(<MemoryRouter initialEntries={["/app/challenges"]}><Routes><Route path="/app" element={<AppShell />}><Route path="challenges" element={<h1>Challenges</h1>} /></Route></Routes></MemoryRouter>);
     const brand = screen.getByRole("link", { name: /AWS Community Day Guatemala, creado por GuateGeeks/u });
     expect(brand.querySelector("img")).toHaveAttribute("src", "/brand/guategeeks.png");
+  });
+
+  it("shows the participant initial in a clearly named profile shortcut", () => {
+    render(<MemoryRouter initialEntries={["/app/challenges"]}><Routes><Route path="/app" element={<AppShell />}><Route path="challenges" element={<h1>Challenges</h1>} /></Route></Routes></MemoryRouter>);
+    const profile = screen.getByRole("link", { name: "Mi perfil" });
+    expect(profile).toHaveAttribute("href", "/app/profile");
+    expect(profile.querySelector(".header-profile__avatar")).toHaveTextContent("J");
   });
 });

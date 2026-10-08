@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Card, ProgressBar, StatusNotice } from "../../design-system/components";
 import { CreditAmount, formatCredits } from "../../design-system/credits";
+import { CreditDashboard } from "../../design-system/CreditDashboard";
 import { incorrectAnswerPenalty } from "../../../shared/challenges/credit-policy";
 import { useChallenges } from "../challenges/useChallenges";
 import { challengeSummary, nextAvailableChallenge } from "../challenges/challenge-view";
@@ -13,20 +14,10 @@ export function ProgressPage() {
   if (loading) return <section className="stack progress-page"><h1>Progreso</h1><p role="status">Cargando tu progreso…</p></section>;
 
   return <section className="stack progress-page">
-    <p className="eyebrow">Tu recorrido</p><h1>Progreso</h1>
+    <header className="progress-intro"><p className="eyebrow">Tu recorrido</p><h1>Tu progreso</h1><p className="muted">Cada reto cuenta. Aquí puedes ver lo que ganaste, lo que se descontó y lo que te falta por descubrir.</p></header>
     {error && <StatusNotice tone="error">{error}</StatusNotice>}
-    <Card className="score-hero stack">
-      <span>Tu saldo de créditos</span><strong className="score-hero__balance"><span className="credit-coin" aria-hidden="true">✦</span>{auraTotal ?? "—"}</strong>
-      <span>Gana créditos en los retos y recupera tu saldo si te equivocaste.</span>
-      <span>{totalCompleted} de {total} retos completados · {mainCompleted} base · {bonusCompleted} preguntas AWS</span>
-      <ProgressBar value={totalCompleted} max={total} label="Retos completados" />
-    </Card>
-    <div className="aura-ledger" aria-label="Detalle de tus créditos">
-      <Card className="aura-ledger__item"><span>Ganados</span><strong><CreditAmount value={auraTotal === null ? 0 : auraTotal + auraDeductedTotal} signed /></strong><small>Créditos ya obtenidos</small></Card>
-      <Card className="aura-ledger__item aura-ledger__item--lost"><span>Descontados</span><strong><CreditAmount value={-auraDeductedTotal} /></strong><small>Por respuestas incorrectas</small></Card>
-      <Card className="aura-ledger__item"><span>Por conseguir</span><strong><CreditAmount value={auraPotential} signed /></strong><small>En retos disponibles</small></Card>
-      <Card className="aura-ledger__item"><span>En revisión</span><strong><CreditAmount value={auraInReview} signed /></strong><small>Créditos aún no acreditados</small></Card>
-    </div>
+    <CreditDashboard balance={auraTotal} balanceFallback={error ? "Créditos no disponibles" : "Cargando créditos…"} deducted={auraDeductedTotal} available={auraPotential} inReview={auraInReview} />
+    <div className="progress-completion"><div className="progress-completion__top"><span>Retos completados</span><strong>{totalCompleted} / {total}</strong></div><ProgressBar value={totalCompleted} max={total} label="Retos completados" /><p>{mainCompleted} retos base · {bonusCompleted} preguntas AWS</p></div>
     {next && <Link className="challenge-next" to={`/app/challenges/${next.challenge.id}`}><span><small>TU SIGUIENTE DESAFÍO</small><strong>{next.challenge.title}</strong><span>Continúa y suma {formatCredits(next.challenge.auraReward)}</span></span><span className="challenge-next__arrow" aria-hidden>→</span></Link>}
     <section className="stack" aria-labelledby="progress-list-title">
       <div className="challenge-section__heading"><h2 id="progress-list-title">Todos tus retos</h2><span className="muted">{totalCompleted}/{total}</span></div>

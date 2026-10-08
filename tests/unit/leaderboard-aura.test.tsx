@@ -24,6 +24,8 @@ describe("Aura ranking", () => {
     expect(screen.getByText(/cargando ranking/i)).toBeInTheDocument();
     expect(await screen.findByText("Nueva")).toBeInTheDocument();
     expect(screen.getByText("Histórico (tú)")).toBeInTheDocument();
+    expect(screen.getByText("Tu posición")).toBeInTheDocument();
+    expect(screen.getByText("#2")).toBeInTheDocument();
     expect(screen.getByText("200 créditos")).toBeInTheDocument();
     expect(screen.getByText("0 créditos")).toBeInTheDocument();
     expect(mock.callable).toHaveBeenCalledWith({}, "getLeaderboardSnapshot");

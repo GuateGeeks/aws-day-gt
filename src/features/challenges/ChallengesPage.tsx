@@ -1,10 +1,11 @@
-import { CheckCircle2, CircleDashed, LockKeyhole, Sparkles, XCircle } from "lucide-react";
+import { CheckCircle2, CircleDashed, IdCard, LockKeyhole, Sparkles, XCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { isAwsServiceChallengeId } from "../../../shared/challenges/bonus";
 import { incorrectAnswerPenalty } from "../../../shared/challenges/credit-policy";
 import type { ChallengeState } from "../../../shared/challenges/types";
 import { Card, Chip, EmptyState, ProgressBar, StatusNotice } from "../../design-system/components";
 import { CreditAmount, formatCredits } from "../../design-system/credits";
+import { CreditDashboard } from "../../design-system/CreditDashboard";
 import { challengeSummary, nextAvailableChallenge } from "./challenge-view";
 import { useChallenges, type AssignedChallenge } from "./useChallenges";
 
@@ -26,14 +27,12 @@ export function ChallengesPage() {
   const { main, awsBonus, selfies, totalCompleted, auraPotential, auraInReview } = challengeSummary(items);
   const next = nextAvailableChallenge(items);
   const total = items.length || 17;
-  const creditLabel = auraTotal === null ? (error ? "Créditos no disponibles" : "Cargando créditos…") : formatCredits(auraTotal);
   return <section className="stack challenges-page">
-    <header className="challenge-overview"><div className="challenge-overview__copy"><p className="eyebrow">AWS Community Day Guatemala</p><h1>Tus desafíos</h1><p className="muted">{totalCompleted} de {total} {total === 1 ? "reto completado" : "retos completados"}</p><div className="challenge-overview__balance"><small>Tu saldo actual</small>{auraTotal === null ? <strong>{creditLabel}</strong> : <CreditAmount value={auraTotal} />}</div><p className="challenge-overview__ledger">Ganados <strong>+{auraTotal === null ? "—" : auraTotal + auraDeductedTotal}</strong><span>·</span> Descontados <strong>−{auraDeductedTotal}</strong><span>·</span> Disponibles <strong>+{auraPotential}</strong>{auraInReview > 0 && <> <span>·</span> En revisión <strong>+{auraInReview}</strong></>}</p></div><div className="challenge-overview__progress"><strong>{totalCompleted}/{total}</strong><ProgressBar value={totalCompleted} max={total} label="Retos completados" /></div></header>
+    <header className="journey-overview"><div className="journey-overview__heading"><div><p className="eyebrow">AWS Community Day Guatemala</p><h1>Tus desafíos</h1><p className="muted">Elige un reto y suma créditos a tu recorrido.</p></div><div className="journey-overview__progress"><strong>{totalCompleted} de {total} {total === 1 ? "reto completado" : "retos completados"}</strong><ProgressBar value={totalCompleted} max={total} label="Retos completados" /></div></div><CreditDashboard balance={auraTotal} balanceFallback={error ? "Créditos no disponibles" : "Cargando créditos…"} deducted={auraDeductedTotal} available={auraPotential} inReview={auraInReview} /></header>
     {next && <Link className="challenge-next" to={`/app/challenges/${next.challenge.id}`}><span><small>CONTINÚA TU RECORRIDO</small><strong>{next.challenge.title}</strong><span>{next.challenge.id === "C08" && next.progress.architectureStep === 1 ? "Paso 2 de 2 listo" : `Gana ${formatCredits(next.challenge.auraReward)} al completarlo`}</span></span><span className="challenge-next__arrow" aria-hidden>→</span></Link>}
-    <Link className="ds-button ds-button--secondary geek-shortcut" to="/app/geek-id">Mi Geek ID</Link>
     {error && <StatusNotice tone="error">{error}</StatusNotice>}
     {loading ? <p role="status">Cargando Challenges…</p> : items.length ? <section className="challenge-section" aria-labelledby="all-challenges">
-      <div className="challenge-section__heading"><div><p className="eyebrow">Tu recorrido personal</p><h2 id="all-challenges">Todos tus retos</h2></div><span className="muted">{totalCompleted} completados</span></div>
+      <div className="challenge-section__heading"><div><p className="eyebrow">Tu recorrido personal</p><h2 id="all-challenges">Todos tus retos</h2></div><div className="challenge-section__tools"><span className="muted">{totalCompleted} completados</span><Link className="ds-button ds-button--secondary geek-shortcut" to="/app/geek-id"><IdCard aria-hidden size={18} />Mi Geek ID</Link></div></div>
       <p className="muted">Puedes elegir cualquier reto disponible. Las preguntas, conexiones y experiencias están mezcladas para que explores a tu ritmo.</p>
       <div className="mission-list">{items.map((item) => <ChallengeCard key={item.challenge.id} {...item} />)}</div>
     </section> : <EmptyState title="Tus retos están en camino">Estamos preparando tu recorrido.</EmptyState>}
