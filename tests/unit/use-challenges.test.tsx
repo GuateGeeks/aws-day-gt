@@ -34,6 +34,29 @@ const { useChallenges } = await import("../../src/features/challenges/useChallen
 afterEach(() => { mock.user = { uid: "owner-1" }; mock.listeners.clear(); mock.listenerErrors.clear(); mock.stopped.length = 0; mock.ensures.length = 0; mock.failures.length = 0; });
 
 describe("useChallenges subscriptions", () => {
+  it("shows the updated C18 wording even when Firestore still has the old copy", async () => {
+    const { result, unmount } = renderHook(() => useChallenges());
+    await act(async () => mock.ensures.shift()!());
+    act(() => mock.listeners.get("challengeAssignments/owner-1")!({
+      exists: () => true,
+      data: () => ({ challengeIds: ["C08", "C12", "C15"], bonusChallengeIds: ["C18"] })
+    }));
+    act(() => {
+      mock.listeners.get("challenges")!({ docs: [{ id: "C18", data: () => ({
+        title: "Pausa el pico",
+        description: "Las inscripciones llegan de golpe.",
+        configuration: { scenario: "Llegan miles de inscripciones en minutos.", options: [{ id: "sqs", label: "Amazon SQS" }] }
+      }) }] });
+      mock.listeners.get("challengeProgress")!({ docs: [{ data: () => ({ challengeId: "C18", eventId: EVENT_ID, status: "available" }) }] });
+    });
+    const challenge = result.current.items.find((item) => item.challenge.id === "C18")?.challenge;
+    expect(challenge?.title).toBe("Inscripciones sin perder el ritmo");
+    expect(challenge?.description).toContain("mantenga en espera");
+    expect(challenge?.configuration.scenario).toContain("conservar cada solicitud");
+    expect(challenge?.configuration.options).toEqual([{ id: "sqs", label: "Amazon SQS" }]);
+    unmount();
+  });
+
   it("waits for migration before reading the owner's assignment and score", async () => {
     const { result, unmount } = renderHook(() => useChallenges());
     const scorePath = `scores/${EVENT_ID}_owner-1`;

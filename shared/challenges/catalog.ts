@@ -63,8 +63,8 @@ export const challenges: Challenge[] = [
   challenge("C15", "Comparte la experiencia GuateGeeks", "Publica una historia o post sobre el stand de GuateGeeks y su experiencia. Etiqueta a GuateGeeks y sube una captura para revisión.", "COMMUNITY", 350, "community_photo", {}, true),
   challenge("C16", "Selfie con speaker", "Sube una selfie en la que aparezcas junto a un speaker del evento. El equipo revisará la foto antes de acreditar tus créditos.", "COMMUNITY", 100, "community_photo"),
   challenge("C17", "Selfie en un stand", "Sube una selfie en la que aparezcas en uno de los stands del evento. El equipo revisará la foto antes de acreditar tus créditos.", "COMMUNITY", 100, "community_photo"),
-  challenge("C18", "Pausa el pico", "Las inscripciones llegan de golpe. Elige dónde guardar los trabajos hasta que puedan procesarse.", "CLOUD", 150, "interactive_question", {
-    scenario: "Llegan miles de inscripciones en minutos. El proceso de confirmación necesita atenderlas a su ritmo, incluso si se detiene temporalmente.",
+  challenge("C18", "Inscripciones sin perder el ritmo", "Llegan muchas inscripciones al mismo tiempo. Elige un servicio que las mantenga en espera mientras el sistema las procesa.", "CLOUD", 150, "interactive_question", {
+    scenario: "Miles de personas se inscriben en pocos minutos. Necesitas conservar cada solicitud y procesarla de forma ordenada, aun si el sistema de confirmación se detiene temporalmente.",
     options: [{ id: "sqs", label: "Amazon SQS" }, { id: "sns", label: "Amazon SNS" }, { id: "cloudwatch", label: "Amazon CloudWatch" }]
   }),
   challenge("C19", "Un aviso, muchos destinos", "Publica una confirmación para varios destinatarios a la vez.", "CLOUD", 150, "interactive_question", {

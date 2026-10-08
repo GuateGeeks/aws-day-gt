@@ -2,6 +2,7 @@ import { collection, doc, documentId, onSnapshot, query, where } from "firebase/
 import { httpsCallable } from "firebase/functions";
 import { useEffect, useState } from "react";
 import { EVENT_ID } from "../../../shared/constants";
+import { challenges } from "../../../shared/challenges/catalog";
 import type { Challenge, ChallengeAssignment, ChallengeProgress } from "../../../shared/challenges/types";
 import { db } from "../../firebase/data";
 import { functions } from "../../firebase/functions";
@@ -9,6 +10,19 @@ import { useAuth } from "../auth/AuthProvider";
 import { orderChallengesForUser } from "./challenge-view";
 
 export type AssignedChallenge = { challenge: Challenge; progress: ChallengeProgress };
+
+const currentC18 = challenges.find((challenge) => challenge.id === "C18")!;
+
+function withCurrentCopy(challenge: Challenge): Challenge {
+  if (challenge.id === "C08") return { ...challenge, title: "Rescata la señal", description: "Selecciona el servicio que resolvería cada falla de la arquitectura." };
+  if (challenge.id === "C18") return {
+    ...challenge,
+    title: currentC18.title,
+    description: currentC18.description,
+    configuration: { ...challenge.configuration, scenario: currentC18.configuration.scenario }
+  };
+  return challenge;
+}
 
 export function useChallenges() {
   const { user } = useAuth();
@@ -56,7 +70,7 @@ export function useChallenges() {
   const allIds = [...(assignment?.challengeIds ?? []), ...(assignment?.bonusChallengeIds ?? [])].filter((id) => !["C03", "C05", "C10", "C11", "C13", "C14"].includes(id));
   const items = orderChallengesForUser(allIds.flatMap((id) => {
     const challenge = byChallenge.get(id), state = byProgress.get(id);
-    return challenge && state ? [{ challenge: challenge.id === "C08" ? { ...challenge, title: "Rescata la señal", description: "Selecciona el servicio que resolvería cada falla de la arquitectura." } : challenge, progress: state }] : [];
+    return challenge && state ? [{ challenge: withCurrentCopy(challenge), progress: state }] : [];
   }), userId ?? "");
   return { items, auraTotal, auraDeductedTotal, loading, error };
 }
