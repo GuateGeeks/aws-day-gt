@@ -112,6 +112,7 @@ describe("CompanionPage", () => {
     clock.now = sessionDate("10:00");
     renderPage();
     expect(screen.getByRole("link", { name: /Comparte la experiencia GuateGeeks/ })).toHaveAttribute("href", "/app/challenges/C15");
+    expect(screen.getByRole("link", { name: /Empezar desafío/ })).toHaveAttribute("href", "/app/challenges/C15");
     expect(screen.queryByRole("link", { name: /Agentes con Bedrock/ })).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "The Event Happened Twice" })).toBeInTheDocument();
     const official = screen.getAllByRole("link", { name: /agenda oficial/i });
