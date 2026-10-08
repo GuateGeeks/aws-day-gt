@@ -30,7 +30,7 @@ export function LoginPage() {
     catch { setError("No pudimos iniciar la demo local. Comprueba que el emulador esté activo."); }
     finally { setBusy(false); }
   }
-  return <main className="auth-page page"><Card className="auth-card stack"><Link to="/" className="eyebrow">← Inicio</Link><GeekBrandPanel compact /><h1>{useFirebaseEmulators ? "Prueba local de Aura Challenges" : sent ? "Revisa tu correo" : "Entra a la experiencia"}</h1>
+  return <main className="auth-page page"><Card className="auth-card stack"><Link to="/" className="eyebrow">← Inicio</Link><GeekBrandPanel compact /><h1>{useFirebaseEmulators ? "Prueba local de desafíos" : sent ? "Revisa tu correo" : "Entra a la experiencia"}</h1>
     {useFirebaseEmulators ? <div className="stack"><p className="muted">Accede con una cuenta temporal para recorrer los Challenges. Los datos de esta prueba quedan solo en tu computadora.</p><Button type="button" variant="accent" block loading={busy} onClick={enterLocalDemo}>Entrar en demo local</Button>{error && <StatusNotice tone="error">{error}</StatusNotice>}</div>
       : sent ? <div className="auth-delivery" role="status">
           <span className="auth-delivery__icon" aria-hidden="true"><MailCheck size={24} strokeWidth={2.2} /></span>

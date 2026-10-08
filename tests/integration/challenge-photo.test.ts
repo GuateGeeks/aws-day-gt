@@ -9,10 +9,10 @@ import { refs } from "../../functions/src/shared/refs";
 async function pendingPhoto(uid: string) {
   await refs.challengeProgress(uid, "C15").set({ eventId: EVENT_ID, userId: uid, challengeId: "C15", status: "processing", auraAwarded: 0 });
   await refs.score(uid).set({ eventId: EVENT_ID, userId: uid, alias: uid, auraTotal: 0, completedChallenges: 0, totalPoints: 20 });
-  await refs.submission(uid, "C15").set({ eventId: EVENT_ID, userId: uid, missionId: "C15", kind: "challenge", status: "pending", provisionalPoints: 100, finalPoints: 0, image: { storagePath: `evidence/${EVENT_ID}/${uid}/C15/photo.webp` } });
+  await refs.submission(uid, "C15").set({ eventId: EVENT_ID, userId: uid, missionId: "C15", kind: "challenge", status: "pending", provisionalPoints: 350, finalPoints: 0, image: { storagePath: `evidence/${EVENT_ID}/${uid}/C15/photo.webp` } });
 }
 
-describe.skipIf(!process.env.FIRESTORE_EMULATOR_HOST)("Community Aura moderation", () => {
+describe.skipIf(!process.env.FIRESTORE_EMULATOR_HOST)("publication and selfie moderation", () => {
   beforeAll(async () => { await Promise.all(challenges.filter((item) => ["C15", "C16", "C17"].includes(item.id)).map((item) => refs.challenge(item.id).set(item))); });
   it("rejects archived mission photo registration before opening storage", async () => {
     await expect(registerPhotoForUid("photo-legacy", { missionId: "M01", operationId: "legacy", storagePath: `evidence/${EVENT_ID}/photo-legacy/M01/old.webp` })).rejects.toThrow("CHALLENGE_REQUIRED");
@@ -43,19 +43,20 @@ describe.skipIf(!process.env.FIRESTORE_EMULATOR_HOST)("Community Aura moderation
     expect(await registerPhotoForUid(uid, { missionId: "C15", operationId: "good", storagePath: goodPath })).toMatchObject({ status: "pending", scoreDelta: 0 });
     expect((await refs.challengeProgress(uid, "C15").get()).data()?.status).toBe("processing");
     expect((await refs.submission(uid, "C15").get()).data()?.moderationStatus).toBe("manual_review");
+    expect((await refs.submission(uid, "C15").get()).data()?.provisionalPoints).toBe(350);
   });
   it("awards only once after approval and leaves historical points alone", async () => {
     await pendingPhoto("photo-approved");
     expect(await reviewSubmissionForStaff("staff", { userId: "photo-approved", missionId: "C15", decision: "approved" })).toMatchObject({ status: "approved" });
     await expect(reviewSubmissionForStaff("staff", { userId: "photo-approved", missionId: "C15", decision: "approved" })).rejects.toThrow("ALREADY_REVIEWED");
-    expect((await refs.score("photo-approved").get()).data()).toMatchObject({ auraTotal: 100, completedChallenges: 1, totalPoints: 20 });
+    expect((await refs.score("photo-approved").get()).data()).toMatchObject({ auraTotal: 350, completedChallenges: 1, totalPoints: 20 });
   });
   it("awards zero for rejection", async () => {
     await pendingPhoto("photo-rejected");
     expect(await reviewSubmissionForStaff("staff", { userId: "photo-rejected", missionId: "C15", decision: "rejected" })).toMatchObject({ status: "rejected" });
     expect((await refs.score("photo-rejected").get()).data()).toMatchObject({ auraTotal: 0, completedChallenges: 0 });
   });
-  it("uses the Aura reward captured when a photo was submitted", async () => {
+  it("uses the credit reward captured when a photo was submitted", async () => {
     await pendingPhoto("photo-custom-reward");
     await refs.submission("photo-custom-reward", "C15").update({ provisionalPoints: 125 });
     await reviewSubmissionForStaff("staff", { userId: "photo-custom-reward", missionId: "C15", decision: "approved" });

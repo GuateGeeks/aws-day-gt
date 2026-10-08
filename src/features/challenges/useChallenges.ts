@@ -36,11 +36,11 @@ export function useChallenges() {
       stopScore = onSnapshot(doc(db, "scores", `${EVENT_ID}_${userId}`), (snapshot) => {
         setAuraTotal(snapshot.exists() ? (snapshot.data().auraTotal ?? 0) : 0);
         setAuraDeductedTotal(snapshot.exists() ? (snapshot.data().auraDeductedTotal ?? 0) : 0);
-      }, () => setError("No pudimos cargar tu Aura."));
+      }, () => setError("No pudimos cargar tus créditos."));
       stopAssignment = onSnapshot(doc(db, "challengeAssignments", userId), (snapshot) => {
         if (!snapshot.exists()) return;
         const next = snapshot.data() as ChallengeAssignment;
-        if (next.challengeIds.includes("C03") || ["C08", "C10", "C11", "C12", "C13"].some((id) => !next.challengeIds.includes(id))) return;
+        if (next.challengeIds.some((id) => ["C03", "C10", "C11", "C14"].includes(id)) || ["C08", "C12", "C13", "C15"].some((id) => !next.challengeIds.includes(id))) return;
         stopCatalog(); stopProgress();
         setAssignment(next);
         let catalogReady = false, progressReady = false;
@@ -53,7 +53,7 @@ export function useChallenges() {
   }, [userId]);
   const byChallenge = new Map(catalog.map((challenge) => [challenge.id, challenge]));
   const byProgress = new Map(progress.map((item) => [item.challengeId, item]));
-  const allIds = [...(assignment?.challengeIds ?? []), ...(assignment?.bonusChallengeIds ?? [])].filter((id) => id !== "C03");
+  const allIds = [...(assignment?.challengeIds ?? []), ...(assignment?.bonusChallengeIds ?? [])].filter((id) => !["C03", "C10", "C11", "C14"].includes(id));
   const items = orderChallengesForUser(allIds.flatMap((id) => {
     const challenge = byChallenge.get(id), state = byProgress.get(id);
     return challenge && state ? [{ challenge: challenge.id === "C08" ? { ...challenge, title: "Rescata la señal", description: "Selecciona el servicio que resolvería cada falla de la arquitectura." } : challenge, progress: state }] : [];

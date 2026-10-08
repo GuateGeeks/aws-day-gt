@@ -17,7 +17,7 @@ export async function issueGeekIdForUid(uid: string) {
 }
 
 export async function issueStationTokenForStaff(actorUid: string, stationId: string, participantUid?: string) {
-  if (!["cloudforge", "vr-explorer"].includes(stationId)) throw new HttpsError("invalid-argument", "INVALID_STATION");
+  if (stationId !== "cloudforge") throw new HttpsError("invalid-argument", "INVALID_STATION");
   if (participantUid !== undefined && (typeof participantUid !== "string" || participantUid.length > 128)) throw new HttpsError("invalid-argument", "INVALID_PARTICIPANT");
   const station = await refs.experienceStation(stationId).get();
   if (!station.exists || !station.data()?.active || station.data()?.eventId !== EVENT_ID || station.data()?.completionMethod !== "staff_verified_token") {

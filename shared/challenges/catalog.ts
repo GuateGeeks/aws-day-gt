@@ -48,8 +48,8 @@ export const challenges: Challenge[] = [
       { id: "ec2", label: "Amazon EC2" }, { id: "cloudfront", label: "Amazon CloudFront" }
     ]
   }),
-  challenge("C10", "Código del speaker · taller", "El speaker puede compartir un código con quienes considere, especialmente si participaron en el taller. Si te lo dio, ingrésalo para sumar Aura.", "SESSION", 100, "session_code"),
-  challenge("C11", "Código del speaker · charla", "El speaker puede compartir un código con quienes considere, especialmente si participaron en la charla. Si te lo dio, ingrésalo para sumar Aura.", "SESSION", 150, "session_code"),
+  { ...challenge("C10", "Código del speaker · taller", "Actividad retirada del recorrido.", "SESSION", 100, "session_code"), active: false },
+  { ...challenge("C11", "Código del speaker · charla", "Actividad retirada del recorrido.", "SESSION", 150, "session_code"), active: false },
   challenge("C12", "Track Pulse", "¿Qué track te aportó más durante el evento?", "SESSION", 50, "survey", {
     tracks: [
       { id: "ai", label: "IA & Agentes" }, { id: "data", label: "Datos & Analítica" },
@@ -57,12 +57,12 @@ export const challenges: Challenge[] = [
       { id: "devops", label: "DevOps & Operaciones" }, { id: "community", label: "Carrera & Comunidad" },
       { id: "finops", label: "FinOps - Operaciones" }
     ]
-  }),
+  }, true),
   challenge("C13", "Experiencia VR GuateGeeks", "Visita el stand de GuateGeeks, vive la experiencia de realidad virtual e ingresa el código que te entregue el equipo.", "EXPERIENCE", 250, "experience_completion", { stationId: "cloudforge", subtitle: "Stand GuateGeeks · Experiencia VR" }, true),
-  challenge("C14", "VR Explorer", "Completa otra experiencia inmersiva de GuateGeeks.", "EXPERIENCE", 150, "experience_completion", { stationId: "vr-explorer" }),
-  challenge("C15", "Community Aura", "Comparte un momento de tu experiencia en AWS Community Day.", "COMMUNITY", 100, "community_photo"),
-  challenge("C16", "Selfie con speaker", "Sube una selfie en la que aparezcas junto a un speaker del evento. El equipo revisará la foto antes de acreditar tu Aura.", "COMMUNITY", 100, "community_photo"),
-  challenge("C17", "Selfie en un stand", "Sube una selfie en la que aparezcas en uno de los stands del evento. El equipo revisará la foto antes de acreditar tu Aura.", "COMMUNITY", 100, "community_photo"),
+  { ...challenge("C14", "VR Explorer", "Actividad retirada del recorrido.", "EXPERIENCE", 150, "experience_completion", { stationId: "vr-explorer" }), active: false },
+  challenge("C15", "Comparte AWS Day", "Publica una historia o post del evento en Facebook, Instagram o LinkedIn, etiqueta a GuateGeeks y sube una captura donde se vean la publicación y la etiqueta. El equipo revisará la imagen antes de acreditar tus créditos.", "COMMUNITY", 350, "community_photo", {}, true),
+  challenge("C16", "Selfie con speaker", "Sube una selfie en la que aparezcas junto a un speaker del evento. El equipo revisará la foto antes de acreditar tus créditos.", "COMMUNITY", 100, "community_photo"),
+  challenge("C17", "Selfie en un stand", "Sube una selfie en la que aparezcas en uno de los stands del evento. El equipo revisará la foto antes de acreditar tus créditos.", "COMMUNITY", 100, "community_photo"),
   challenge("C18", "Pausa el pico", "Las inscripciones llegan de golpe. Elige dónde guardar los trabajos hasta que puedan procesarse.", "CLOUD", 150, "interactive_question", {
     scenario: "Llegan miles de inscripciones en minutos. El proceso de confirmación necesita atenderlas a su ritmo, incluso si se detiene temporalmente.",
     options: [{ id: "sqs", label: "Amazon SQS" }, { id: "sns", label: "Amazon SNS" }, { id: "cloudwatch", label: "Amazon CloudWatch" }]

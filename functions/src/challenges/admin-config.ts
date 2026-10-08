@@ -7,38 +7,8 @@ import type { Challenge } from "../../../shared/challenges/types";
 import { requireRole } from "../shared/auth";
 import { database, refs } from "../shared/refs";
 
-const sessionSchema = z.object({
-  sessionId: z.string().regex(/^[a-zA-Z0-9_-]{1,80}$/),
-  label: z.string().min(3).max(120),
-  code: z.string().trim().min(4).max(30),
-  question: z.string().min(5).max(240),
-  options: z.array(z.object({ id: z.string().regex(/^[a-zA-Z0-9_-]{1,40}$/), label: z.string().min(1).max(160) })).min(2).max(6),
-  correctOptionId: z.string(),
-  startAt: z.iso.datetime().optional(), endAt: z.iso.datetime().optional(), active: z.boolean().default(true)
-}).refine((value) => value.options.some((option) => option.id === value.correctOptionId)
-  && new Set(value.options.map((option) => option.id)).size === value.options.length
-  && (!value.startAt || !value.endAt || Date.parse(value.startAt) < Date.parse(value.endAt)));
-
-export async function configureSessionForAdmin(actorUid: string, raw: unknown) {
-  const parsed = sessionSchema.safeParse(raw);
-  if (!parsed.success) throw new HttpsError("invalid-argument", "INVALID_SESSION_CONFIGURATION");
-  const input = parsed.data;
-  const codeHash = createHash("sha256").update(input.code.trim().toUpperCase()).digest("hex");
-  await database.runTransaction(async (transaction) => {
-    const c10Ref = refs.challengeSecret("C10"), c11Ref = refs.challengeSecret("C11"), publicRef = refs.challenge("C11"), unlockRef = refs.challenge("C10");
-    const [c10, c11, publicChallenge, unlockChallenge] = await Promise.all([transaction.get(c10Ref), transaction.get(c11Ref), transaction.get(publicRef), transaction.get(unlockRef)]);
-    if (!publicChallenge.exists) throw new HttpsError("failed-precondition", "CHALLENGE_NOT_SEEDED");
-    const sessionCodes = { ...(c10.data()?.sessionCodes ?? {}), [input.sessionId]: { codeHash, active: input.active, startAt: input.startAt ?? null, endAt: input.endAt ?? null } };
-    const sessionQuestions = { ...(c11.data()?.sessionQuestions ?? {}), [input.sessionId]: { correctOptionId: input.correctOptionId } };
-    const prior = publicChallenge.data()?.configuration?.sessions ?? [];
-    const sessions = [...prior.filter((session: { id: string }) => session.id !== input.sessionId), { id: input.sessionId, label: input.label, question: input.question, options: input.options }];
-    transaction.set(c10Ref, { challengeId: "C10", sessionCodes }, { merge: true });
-    transaction.set(c11Ref, { challengeId: "C11", sessionQuestions }, { merge: true });
-    transaction.update(publicRef, { "configuration.sessions": sessions });
-    if (unlockChallenge.exists) transaction.update(unlockRef, { "configuration.sessions": sessions.map(({ id, label }: { id: string; label: string }) => ({ id, label, question: "", options: [] })) });
-    transaction.create(database.collection("auditLogs").doc(), { actorUid, action: "SESSION_CHALLENGE_CONFIGURED", targetType: "session", targetId: input.sessionId, timestamp: FieldValue.serverTimestamp() });
-  });
-  return { configured: true, sessionId: input.sessionId };
+export async function configureSessionForAdmin(_actorUid: string, _raw: unknown) {
+  throw new HttpsError("failed-precondition", "CHALLENGE_RETIRED");
 }
 
 export const configureChallengeSession = onCall({ region: "us-central1", enforceAppCheck: false }, async (request) => {
@@ -46,7 +16,7 @@ export const configureChallengeSession = onCall({ region: "us-central1", enforce
 });
 
 const eventCodeSchema = z.object({
-  challengeId: z.enum(["C10", "C11", "C13"]),
+  challengeId: z.literal("C13"),
   code: z.string().trim().min(4).max(30),
   active: z.boolean()
 });
@@ -82,6 +52,7 @@ export async function updateChallengeSettingsForAdmin(actorUid: string, raw: unk
   const parsed = settingsSchema.safeParse(raw);
   if (!parsed.success) throw new HttpsError("invalid-argument", "INVALID_CHALLENGE_SETTINGS");
   const { challengeId, active, auraReward, description } = parsed.data;
+  if (["C03", "C10", "C11", "C14"].includes(challengeId)) throw new HttpsError("failed-precondition", "CHALLENGE_RETIRED");
   if (challengeId === "C13" && !active) throw new HttpsError("failed-precondition", "CLOUDFORGE_REQUIRED");
   await database.runTransaction(async (transaction) => {
     const ref = refs.challenge(challengeId);
@@ -104,7 +75,7 @@ export const updateChallengeSettings = onCall({ region: "us-central1", enforceAp
   return updateChallengeSettingsForAdmin(requireRole(request, ["admin"]), request.data);
 });
 
-const stationSchema = z.object({ stationId: z.enum(["cloudforge", "vr-explorer"]), name: z.string().min(3).max(120), active: z.boolean() });
+const stationSchema = z.object({ stationId: z.literal("cloudforge"), name: z.string().min(3).max(120), active: z.boolean() });
 
 export async function updateExperienceStationForAdmin(actorUid: string, raw: unknown) {
   const parsed = stationSchema.safeParse(raw);

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatCredits } from "../../design-system/credits";
 import { ArchitectureScene } from "./ArchitectureScene";
 import "./architecture.css";
 
@@ -32,13 +33,13 @@ export function ArchitectureChallenge({ savedStage, submit }: Props) {
       const result = await submit(stage, optionId);
       if (result.status === "failed") {
         setDone(true);
-        setFeedback(`Perdiste ${result.auraDeducted ?? 150} Aura. ${result.incorrectReason ?? ""} ${result.solution ?? "Este reto terminó."} Continúa con otro reto.`);
+        setFeedback(`Perdiste ${formatCredits(result.auraDeducted ?? 20)}. ${result.incorrectReason ?? ""} ${result.solution ?? "Este reto terminó."} Continúa con otro reto.`);
       } else if (stage === 0 && result.status === "in_progress" && result.stage === 1) {
         setCorrect(true);
         setFeedback("¡Respuesta correcta! Pulsa Siguiente para la última situación.");
       } else if (stage === 1 && result.status === "completed") {
         setDone(true);
-        setFeedback(`¡Reto completado! Ganaste ${result.auraAwarded ?? 150} Aura.`);
+        setFeedback(`¡Reto completado! Ganaste ${formatCredits(result.auraAwarded ?? 150)}.`);
       } else {
         setFeedback("No pudimos guardar el resultado. Intenta de nuevo.");
       }
@@ -58,7 +59,7 @@ export function ArchitectureChallenge({ savedStage, submit }: Props) {
   }
 
   return <div className="architecture">
-    <div className="architecture__heading"><span className="eyebrow">Reto {stage + 1} de 2</span><h2>{situations[stage].prompt}</h2><p>Selecciona el servicio que resolvería la falla. Una respuesta incorrecta descuenta 150 Aura y cierra el reto.</p></div>
+    <div className="architecture__heading"><span className="eyebrow">Reto {stage + 1} de 2</span><h2>{situations[stage].prompt}</h2><p>Selecciona el servicio que resolvería la falla. Una respuesta incorrecta descuenta 20 créditos, muestra la explicación y cierra el reto.</p></div>
     <div className="architecture__room">
       <ArchitectureScene selected={selected} />
       <div className="architecture__actions"><p className="architecture__feedback" role="status" aria-live="polite">{feedback || "Elige un servicio."}</p>{stage === 0 && <button className="ds-button ds-button--accent" type="button" disabled={!correct} onClick={next}>Siguiente</button>}</div>

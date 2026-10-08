@@ -21,7 +21,7 @@ describe("AppShell skip link", () => {
 
   it("uses the supplied GuateGeeks eyes as the application mark", () => {
     render(<MemoryRouter initialEntries={["/app/challenges"]}><Routes><Route path="/app" element={<AppShell />}><Route path="challenges" element={<h1>Challenges</h1>} /></Route></Routes></MemoryRouter>);
-    const brand = screen.getByRole("link", { name: /GuateGeeks Aura/u });
+    const brand = screen.getByRole("link", { name: /AWS Community Day Guatemala · con GuateGeeks/u });
     expect(brand.querySelector("img")).toHaveAttribute("src", "/brand/geek-eyes.png");
   });
 });

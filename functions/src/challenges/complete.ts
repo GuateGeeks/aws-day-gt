@@ -3,6 +3,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { EVENT_ID } from "../../../shared/constants";
 import { isAwsServiceChallengeId } from "../../../shared/challenges/bonus";
+import { incorrectAnswerPenalty } from "../../../shared/challenges/credit-policy";
 import { challengeProfileSchema } from "../../../shared/challenges/profile";
 import type { Challenge, ChallengeProgress } from "../../../shared/challenges/types";
 import { validateCloudResponse, validateCloudTrio, validateSocialPair, validateTrack, type ChallengeResponse } from "../../../shared/challenges/validators";
@@ -15,7 +16,6 @@ const digest = (value: string) => createHash("sha256").update(value).digest("hex
 const socialIds = new Set(["C01", "C02", "C03", "C04", "C05"]);
 const cloudIds = new Set(["C06", "C07", "C08", "C09", "C18", "C19", "C20", "C21", "C22", "C23"]);
 const architectureAnswers = ["dynamo", "lambda"] as const;
-const wrongAnswerCost = 150;
 
 function validCloudChoice(challenge: Challenge, response: ChallengeResponse, expected: Record<string, unknown>) {
   const { items, prompts, options } = challenge.configuration;
@@ -84,7 +84,7 @@ export async function completeChallengeForUid(uid: string, input: CompletionInpu
       transaction.get(scoreRef), transaction.get(operationRef)
     ]);
     if (operation.exists) return operation.data()?.result;
-    if (challengeId === "C03") throw new HttpsError("failed-precondition", "CHALLENGE_RETIRED");
+    if (["C03", "C10", "C11", "C14"].includes(challengeId)) throw new HttpsError("failed-precondition", "CHALLENGE_RETIRED");
     const assigned = assignment.data()?.challengeIds?.includes(challengeId) ||
       (isAwsServiceChallengeId(challengeId) && assignment.data()?.bonusChallengeIds?.includes(challengeId));
     if (!assignment.exists || assignment.data()?.eventId !== EVENT_ID || !assigned || !progress.exists || progress.data()?.eventId !== EVENT_ID || !score.exists || score.data()?.eventId !== EVENT_ID) {
@@ -94,6 +94,7 @@ export async function completeChallengeForUid(uid: string, input: CompletionInpu
       throw new HttpsError("failed-precondition", "CHALLENGE_INACTIVE");
     }
     const challenge = challengeSnap.data() as Challenge;
+    const wrongAnswerCost = incorrectAnswerPenalty(challenge);
     const current = progress.data() as ChallengeProgress;
     if (current.status === "completed") return { status: "completed", auraAwarded: current.auraAwarded ?? challenge.auraReward };
     if (current.status === "failed") return { status: "failed", auraAwarded: 0, auraDeducted: current.auraDeducted ?? wrongAnswerCost, solution: current.solution ?? "Consulta la solución con el equipo del evento.", ...(current.incorrectReason ? { incorrectReason: current.incorrectReason } : {}) };
@@ -170,7 +171,7 @@ export async function completeChallengeForUid(uid: string, input: CompletionInpu
       }
       connectedPeerUid = peerUid;
       connectionRef = database.doc(`connections/${EVENT_ID}_${uid}_${peerUid}`);
-    } else if (challengeId === "C10" || challengeId === "C11" || (challengeId === "C13" && response.code !== undefined)) {
+    } else if (challengeId === "C13" && response.code !== undefined) {
       if (typeof response.code !== "string" || response.code.trim().length < 4 || response.code.length > 30) throw new HttpsError("invalid-argument", "CODE_REQUIRED");
       const secret = await transaction.get(answerRef);
       if (!secret.data()?.sharedCodeHash || !secret.data()?.sharedCodeActive) throw new HttpsError("failed-precondition", "CODE_NOT_CONFIGURED");
@@ -184,7 +185,7 @@ export async function completeChallengeForUid(uid: string, input: CompletionInpu
         transaction.update(progressRef, { sessionAttempts: attempts >= 10 ? 0 : attempts, sessionBlockedUntilMillis: attempts >= 10 ? Date.now() + 5 * 60_000 : null, updatedAt: FieldValue.serverTimestamp() });
         return { status: "retry", auraAwarded: 0 };
       }
-      evidence = challengeId === "C13" ? { stationId: "cloudforge", validation: "shared_code" } : { validation: "shared_code", activity: challengeId === "C10" ? "workshop" : "talk" };
+      evidence = { stationId: "cloudforge", validation: "shared_code" };
     } else if (challengeId === "C13" || challengeId === "C14") {
       if (!stationToken) throw new HttpsError("invalid-argument", "STATION_TOKEN_REQUIRED");
       const [station, stationConfig] = await Promise.all([transaction.get(stationRef), transaction.get(refs.experienceStation(challenge.configuration.stationId ?? ""))]);

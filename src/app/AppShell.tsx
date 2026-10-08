@@ -16,7 +16,7 @@ export function AppShell() {
     <a className="skip-link" href="#content">Saltar al contenido</a>
     <main className="page">
       <header className="app-header">
-        <NavLink className="brand-mark" to="/app/hoy"><span className="brand-eyes"><GeekEyesLogo /></span><span>GuateGeeks <small className="brand-sub">Aura · AWS Day GT</small></span></NavLink>
+        <NavLink className="brand-mark" to="/app/hoy"><span className="brand-eyes"><GeekEyesLogo /></span><span>AWS Community Day <small className="brand-sub">Guatemala · con GuateGeeks</small></span></NavLink>
         <a className="header-agenda" href={OFFICIAL_AGENDA_URL} target="_blank" rel="noreferrer" aria-label="Agenda oficial (abre awscommunitygt.com)"><CalendarDays aria-hidden size={18} /><span className="header-agenda__text">Agenda oficial</span></a>
         <NavLink className="header-profile" to="/app/profile" aria-label="Perfil"><CircleUserRound aria-hidden size={26} /></NavLink>
       </header>

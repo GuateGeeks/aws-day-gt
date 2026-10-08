@@ -27,11 +27,11 @@ describe("Rescata la señal", () => {
   });
 
   it("shows the solution and closes the stage after a wrong service", async () => {
-    const submit = vi.fn(async () => ({ status: "failed", auraAwarded: 0, auraDeducted: 150, solution: "Amazon DynamoDB" }));
+    const submit = vi.fn(async () => ({ status: "failed", auraAwarded: 0, auraDeducted: 20, solution: "Amazon DynamoDB" }));
     const user = userEvent.setup();
     render(<ArchitectureChallenge savedStage={0} submit={submit} />);
     await user.click(screen.getByRole("button", { name: "SQS" }));
-    expect(await screen.findByText(/Perdiste 150 Aura/u)).toBeInTheDocument();
+    expect(await screen.findByText(/Perdiste 20 créditos/u)).toBeInTheDocument();
     expect(screen.getByText(/Amazon DynamoDB/u)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Siguiente" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "DynamoDB" })).toBeDisabled();

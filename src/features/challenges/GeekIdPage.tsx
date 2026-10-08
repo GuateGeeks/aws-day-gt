@@ -56,7 +56,7 @@ export function GeekIdPage() {
       </Card>
       <section className="challenge-section geek-selfies" aria-labelledby="geek-selfies">
         <div className="challenge-section__heading"><div><p className="eyebrow"><Camera aria-hidden size={15} /> Bonus del evento</p><h2 id="geek-selfies">Selfies del evento</h2></div></div>
-        <p className="muted">Sube cada selfie por separado. El equipo confirmará las imágenes antes de acreditar Aura.</p>
+        <p className="muted">Sube cada selfie por separado. El equipo confirmará las imágenes antes de acreditar créditos.</p>
         <div className="selfie-shortcuts">{selfieChallenges.map(({ id, title, icon: Icon, instruction }) => {
           const current = items.find(({ challenge }) => challenge.id === id);
           const status = current?.progress.status;

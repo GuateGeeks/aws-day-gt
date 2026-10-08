@@ -23,11 +23,13 @@ describe("initial Aura Challenge bank", () => {
     expect(challenges.find((challenge) => challenge.id === "C17")).toMatchObject({ validationType: "community_photo", category: "COMMUNITY" });
   });
 
-  it("marks the immersive experience and the simple architecture challenge as required", () => {
+  it("requires the immersive experience, architecture and verified social publication", () => {
     expect(challenges.find((challenge) => challenge.id === "C13")).toMatchObject({
       title: "Experiencia VR GuateGeeks", category: "EXPERIENCE", required: true, auraReward: 250
     });
-    expect(challenges.filter((challenge) => challenge.required).map((challenge) => challenge.id)).toEqual(["C08", "C13"]);
+    expect(challenges.filter((challenge) => challenge.required).map((challenge) => challenge.id)).toEqual(["C08", "C12", "C13", "C15"]);
+    expect(challenges.find((challenge) => challenge.id === "C15")).toMatchObject({ title: "Comparte AWS Day", auraReward: 350, validationType: "community_photo" });
+    expect(challenges.filter((challenge) => ["C10", "C11", "C14"].includes(challenge.id)).every((challenge) => !challenge.active)).toBe(true);
     expect(challenges.find((challenge) => challenge.id === "C08")?.configuration.options?.map((option) => option.id)).toEqual(["sqs", "lambda", "dynamo"]);
     expect(challenges.some((challenge) => /hidden|secret|escondid/i.test(challenge.title))).toBe(false);
   });

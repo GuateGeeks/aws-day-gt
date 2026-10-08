@@ -11,5 +11,5 @@ export interface ExperienceStation {
 
 export const experienceStations: ExperienceStation[] = [
   { id: "cloudforge", eventId: EVENT_ID, name: "Experiencia VR GuateGeeks", challengeId: "C13", completionMethod: "staff_verified_token", active: true },
-  { id: "vr-explorer", eventId: EVENT_ID, name: "GuateGeeks VR Explorer", challengeId: "C14", completionMethod: "staff_verified_token", active: true }
+  { id: "vr-explorer", eventId: EVENT_ID, name: "GuateGeeks VR Explorer", challengeId: "C14", completionMethod: "staff_verified_token", active: false }
 ];

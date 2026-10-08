@@ -108,7 +108,7 @@ describe("useChallenges subscriptions", () => {
     await act(async () => mock.ensures.shift()!());
     const scorePath = `scores/${EVENT_ID}_owner-1`;
     act(() => mock.listenerErrors.get(scorePath)!());
-    expect(result.current.error).toBe("No pudimos cargar tu Aura.");
+    expect(result.current.error).toBe("No pudimos cargar tus créditos.");
     expect(result.current.auraTotal).toBeNull();
     unmount();
   });
@@ -118,7 +118,7 @@ describe("useChallenges subscriptions", () => {
     await act(async () => mock.ensures.shift()!());
     const assignmentPath = "challengeAssignments/owner-1";
     const oldIds = Array.from({ length: 10 }, (_, index) => `C${String(index + 1).padStart(2, "0")}`);
-    const migratedIds = ["C01", "C02", "C14", "C04", "C05", "C08", "C10", "C11", "C12", "C13"];
+    const migratedIds = ["C01", "C02", "C04", "C05", "C06", "C07", "C08", "C12", "C13", "C15"];
     const assignmentSnapshot = (challengeIds: string[]) => ({ exists: () => true, data: () => ({ challengeIds, bonusChallengeIds: [] }) });
     const emitRelatedSnapshots = (challengeIds: string[]) => {
       mock.listeners.get("challenges")?.({ docs: challengeIds.map((id) => ({ id, data: () => ({ title: id }) })) });

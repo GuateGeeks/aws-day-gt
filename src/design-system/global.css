@@ -2,7 +2,7 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 html { min-width: 320px; background: var(--color-bg); -webkit-text-size-adjust: 100%; }
-body { margin: 0; min-height: 100dvh; background: radial-gradient(circle at 90% 0%, #d7f5fc 0, transparent 370px), radial-gradient(circle at 0% 45%, #e7f9fd 0, transparent 460px), var(--color-bg); color: var(--color-ink); font-family: var(--font-body); font-size: var(--text-md); line-height: 1.55; font-weight: 600; -webkit-font-smoothing: antialiased; }
+body { margin: 0; min-height: 100dvh; background: radial-gradient(circle at 90% 0%, #d8f4f5 0, transparent 430px), radial-gradient(circle at 0% 45%, #fff5da 0, transparent 480px), var(--color-bg); color: var(--color-ink); font-family: var(--font-body); font-size: var(--text-md); line-height: 1.55; font-weight: 600; -webkit-font-smoothing: antialiased; }
 button, input, textarea, select { font: inherit; color: inherit; }
 button, a, input, textarea, select { touch-action: manipulation; }
 button { cursor: pointer; }
@@ -35,6 +35,8 @@ p { margin: 0; }
 .ds-card--interactive:hover { border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-border)); }
 .ds-card--interactive:active { transform: scale(.985); }
 .ds-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 3px 10px; border: 1.5px solid color-mix(in srgb, var(--chip-color, var(--color-primary)) 35%, transparent); border-radius: var(--radius-pill); background: color-mix(in srgb, var(--chip-color, var(--color-primary)) 12%, var(--color-surface)); color: color-mix(in srgb, var(--chip-color, var(--color-primary)) 76%, var(--color-ink)); font-size: var(--text-xs); font-weight: 900; }
+.credit-amount { display: inline-flex; align-items: center; gap: 7px; color: #704209; font-weight: 900; white-space: nowrap; }
+.credit-coin { display: inline-grid; place-items: center; flex: 0 0 25px; width: 25px; height: 25px; border: 2px solid #d89425; border-radius: 50%; background: radial-gradient(circle at 32% 24%, #fff5b8 0%, #f7c55f 44%, #d88c1f 100%); box-shadow: inset 0 0 0 2px #ffe49a, 0 2px 0 #a76617; color: #855111; font-size: 15px; line-height: 1; }
 .ds-field { display: grid; gap: var(--space-2); }
 .ds-label { font-size: var(--text-sm); font-weight: 900; }
 .ds-input { width: 100%; min-height: var(--tap); border: 2px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); background: var(--color-surface); }
@@ -102,6 +104,7 @@ textarea.ds-input { min-height: 132px; resize: vertical; }
 .photo-picker { min-height: 230px; overflow: hidden; display: grid; place-items: center; border: 2px dashed var(--color-primary); border-radius: var(--radius-lg); background: var(--color-info-soft); color: var(--color-primary); font-weight: 900; cursor: pointer; }
 .photo-picker:focus-within { outline: 3px solid var(--color-accent-fill); outline-offset: 3px; }
 .photo-picker img { width: 100%; height: 300px; object-fit: cover; }
+.photo-picker--screenshot img { object-fit: contain; background: #fff; }
 .moderation-photo { overflow: hidden; display: grid; place-items: center; min-height: 220px; border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface-2); }
 .moderation-photo__loading { color: var(--color-ink-muted); }
 .moderation-photo__image { display: block; width: 100%; max-height: 70vh; object-fit: contain; }
@@ -109,6 +112,8 @@ textarea.ds-input { min-height: 132px; resize: vertical; }
 .score-hero::after { position: absolute; right: -36px; top: -58px; width: 170px; height: 170px; border: 24px solid #ffffffa8; border-radius: 50%; content: ""; pointer-events: none; }
 .score-hero > * { position: relative; z-index: 1; }
 .score-hero strong { font: 900 clamp(4rem, 16vw, 7rem)/.9 var(--font-display); color: #08779a; }
+.score-hero__balance { display: inline-flex; align-items: center; justify-content: center; gap: 14px; }
+.score-hero__balance .credit-coin { width: clamp(42px, 10vw, 68px); height: clamp(42px, 10vw, 68px); flex-basis: auto; font-size: clamp(22px, 5vw, 36px); }
 .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2); text-align: center; }
 .stats-grid .ds-card { display: grid; padding: var(--space-3); }
 .stats-grid strong { font-size: var(--text-xl); color: var(--color-primary); }
@@ -145,6 +150,10 @@ textarea.ds-input { min-height: 132px; resize: vertical; }
 .challenge-overview__progress strong { color: var(--color-primary); font-size: var(--text-xl); }
 .challenge-overview__ledger { display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px; color: var(--color-ink-muted); font-size: var(--text-sm); }
 .challenge-overview__ledger strong { color: var(--color-ink); }
+.challenge-overview__balance { display: grid; justify-items: start; gap: 2px; width: fit-content; margin-top: 6px; padding: 10px 16px; border: 1px solid #e8d39d; border-radius: 16px; background: #fff7e1; }
+.challenge-overview__balance small { color: #74522b; font-size: var(--text-xs); font-weight: 900; }
+.challenge-overview__balance .credit-amount { font-size: clamp(1.2rem, 3vw, 1.65rem); }
+.challenge-overview__balance .credit-coin { width: 31px; height: 31px; flex-basis: 31px; }
 .aura-ledger { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
 .aura-ledger__item { display: grid; gap: 2px; min-width: 0; }
 .aura-ledger__item span { color: var(--color-ink-muted); font-size: var(--text-sm); }
@@ -182,7 +191,10 @@ textarea.ds-input { min-height: 132px; resize: vertical; }
 .challenge-card::before { position: absolute; inset: 0 auto 0 0; width: 5px; background: linear-gradient(#22b8dc, #72e0ef); content: ""; }
 .challenge-link:hover .challenge-card, .challenge-link:focus-visible .challenge-card { border-color: var(--color-primary); transform: translateY(-3px); box-shadow: 0 18px 32px #0e89af1d; }
 .challenge-link:active .challenge-card { transform: translateY(2px); }
-.challenge-card__top { display: flex; justify-content: space-between; align-items: center; gap: var(--space-2); }
+.challenge-card__top { display: flex; justify-content: space-between; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+.challenge-card__top .ds-chip { max-width: 100%; }
+.challenge-card__top .credit-amount { font-size: .83rem; }
+.challenge-card__top .credit-coin { width: 20px; height: 20px; flex-basis: 20px; font-size: 12px; }
 .challenge-card__body { display: grid; gap: var(--space-2); }
 .challenge-card__body h3 { font-size: var(--text-xl); }
 .challenge-card__body p { line-height: 1.4; }
@@ -215,13 +227,14 @@ textarea.ds-input { min-height: 132px; resize: vertical; }
 .leaderboard li strong { min-width: 0; overflow-wrap: anywhere; }
 .leaderboard li > span:last-child { flex: 0 0 auto; white-space: nowrap; }
 @media (max-width: 559px) {
-  .aura-ledger { gap: var(--space-2); }
+  .aura-ledger { grid-template-columns: 1fr; gap: var(--space-2); }
   .aura-ledger__item { padding: var(--space-3); }
   .challenge-overview__progress { width: 100%; text-align: left; }
   .challenge-card { min-height: 0; }
   .selfie-shortcut { flex-wrap: wrap; }
   .selfie-shortcut__status { width: 100%; padding-left: 60px; }
-  .leaderboard li { padding-inline: var(--space-2); }
+  .leaderboard li { padding-inline: var(--space-2); flex-wrap: wrap; }
+  .leaderboard li > .credit-amount { margin-left: 44px; }
 }
 @media (max-width: 420px) {
   .brand-mark { gap: var(--space-2); }

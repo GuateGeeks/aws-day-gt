@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { useChallenges } from "../challenges/useChallenges";
+import { CreditAmount } from "../../design-system/credits";
 import { QuetziSprite } from "./QuetziSprite";
 import "./companion.css";
 
@@ -14,7 +15,7 @@ function writeSeen(uid: string, count: number) {
   try { localStorage.setItem(`${SEEN_KEY}.${uid}`, String(count)); } catch { /* blocked storage: celebrate again next time */ }
 }
 
-/** Shows the newly awarded Aura after a Challenge completes. */
+/** Shows newly awarded credits after a challenge completes. */
 export function FeatherCelebration() {
   const { user } = useAuth(); const { items, loading } = useChallenges();
   const [celebrating, setCelebrating] = useState<number | null>(null);
@@ -36,7 +37,7 @@ export function FeatherCelebration() {
   if (celebrating === null) return null;
   return <div className="feather-toast" role="status">
     <QuetziSprite completed={Math.min(10, items.filter((item) => item.progress.status === "completed").length)} mood="celebrate" crop="head" label="Geek celebrando" />
-    <p className="grow"><strong>CHALLENGE COMPLETE</strong><br /><span className="muted">+{celebrating} Aura</span></p>
+    <p className="grow"><strong>¡DESAFÍO COMPLETADO!</strong><br /><CreditAmount value={celebrating} signed /></p>
     <button type="button" onClick={() => setCelebrating(null)} aria-label="Cerrar celebración">✕</button>
   </div>;
 }

@@ -17,8 +17,6 @@ export const challengeSecrets: ChallengeSecret[] = [
   { challengeId: "C07", expectedMatches: { files: "s3", code: "lambda", nosql: "dynamodb", genai: "bedrock" } },
   { challengeId: "C08", correctOptionId: "dynamodb" },
   { challengeId: "C09", correctOptionId: "lambda" },
-  { challengeId: "C10" },
-  { challengeId: "C11" },
   { challengeId: "C18", correctOptionId: "sqs", correctExplanation: "Amazon SQS mantiene los trabajos en una cola; el consumidor puede procesarlos a su ritmo.", wrongReasons: {
     sns: "Amazon SNS distribuye avisos a suscriptores, pero no es la cola donde un consumidor conserva trabajos pendientes.",
     cloudwatch: "Amazon CloudWatch observa métricas y genera alertas; no guarda inscripciones pendientes de procesar."

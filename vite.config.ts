@@ -7,13 +7,13 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "prompt",
-      includeAssets: ["icon.svg", "brand/geek-eyes.png", "brand/aws-cd-2026-blanco.png"],
+      includeAssets: ["icon.svg", "brand/geek-eyes.png", "brand/aws-community-day-guatemala.png", "brand/guategeeks.png"],
       manifest: {
         name: "AWS Community Day Guatemala 2026",
         short_name: "AWS Day GT",
-        description: "GuateGeeks Aura para AWS Community Day Guatemala 2026: Challenges, comunidad y progreso",
-        theme_color: "#0e89af",
-        background_color: "#f3f9fb",
+        description: "Desafíos, comunidad y créditos en AWS Community Day Guatemala 2026, con GuateGeeks",
+        theme_color: "#075c69",
+        background_color: "#f6fbf8",
         display: "standalone",
         start_url: "/",
         icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any maskable" }]

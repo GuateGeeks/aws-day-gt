@@ -9,8 +9,6 @@ if (projectId !== "aws-day-gt" || process.env.FIRESTORE_EMULATOR_HOST) {
   throw new Error("This command only targets the aws-day-gt production project.");
 }
 const codes = {
-  C10: process.env.EVENT_WORKSHOP_CODE ?? "",
-  C11: process.env.EVENT_TALK_CODE ?? "",
   C13: process.env.EVENT_STAND_CODE ?? ""
 };
 const writes = eventCodeCommitWrites(projectId, codes);
@@ -26,7 +24,7 @@ if (!tokenStore?.refresh_token) throw new Error("Firebase CLI is not signed in")
 const { getAccessToken } = require("firebase-tools/lib/auth") as { getAccessToken(refreshToken: string, scopes: string[]): Promise<{ access_token: string }> };
 const { access_token } = await getAccessToken(tokenStore.refresh_token, ["https://www.googleapis.com/auth/cloud-platform"]);
 const documentBase = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents`;
-for (const id of ["C10", "C11", "C13"]) {
+for (const id of ["C13"]) {
   const result = await fetch(`${documentBase}/challenges/${id}`, { headers: { Authorization: `Bearer ${access_token}` } });
   if (!result.ok) throw new Error(`Public challenge ${id} is unavailable: HTTP ${result.status}`);
 }

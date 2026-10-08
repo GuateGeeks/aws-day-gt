@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
 
-export type EventCodes = { C10: string; C11: string; C13: string };
+export type EventCodes = { C13: string };
 
 export function eventCodeUpdates(codes: EventCodes) {
-  return (["C10", "C11", "C13"] as const).map((challengeId) => {
+  return (["C13"] as const).map((challengeId) => {
     const code = codes[challengeId].trim().toUpperCase();
     if (code.length < 4 || code.length > 30) throw new Error(`EVENT_CODE_REQUIRED:${challengeId}`);
     return {

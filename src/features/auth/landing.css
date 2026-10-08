@@ -50,3 +50,32 @@
   .landing .hero .quetzi-guide__bird { width: 104px; height: 176px; }
 }
 @media (max-width: 380px) { .geek-brand-panel { min-height: 160px; padding: var(--space-4); } .geek-brand-panel__text { font-size: 1.65rem; } .geek-brand-panel__text > small { font-size: .6rem; letter-spacing: .04em; } .auth-card .geek-brand-panel--compact { grid-template-columns: 78px minmax(0, 1fr); gap: var(--space-3); } .auth-card .geek-brand-panel--compact .geek-brand-panel__text { font-size: 1.5rem; } .auth-delivery { grid-template-columns: 1fr; } .auth-delivery__change { grid-column: 1; } }
+
+/* AWS Community Day takes the lead; GuateGeeks remains the experience partner. */
+.event-logo { background: #fff; border: 1px solid var(--color-border); box-shadow: var(--shadow-1); }
+.geek-brand-panel,
+.auth-card .geek-brand-panel--compact {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-content: center;
+  justify-items: center;
+  gap: 12px;
+  min-height: 0;
+  padding: clamp(14px, 3vw, 24px);
+  border: 1px solid #c4e3e7;
+  background: linear-gradient(145deg, #fff 0%, #f0fcfb 100%);
+  box-shadow: 0 16px 40px #0c66741a;
+  transform: none;
+}
+.geek-brand-panel::after { display: none; }
+.geek-brand-panel__event { display: block; width: min(100%, 520px); height: auto; max-height: 320px; object-fit: contain; }
+.geek-brand-panel__event { height: 220px; object-fit: cover; object-position: center 40%; }
+.geek-brand-panel__partner { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding-top: 12px; border-top: 1px solid #d5ebec; color: #47666e; font-size: .82rem; font-weight: 900; text-align: center; }
+.geek-brand-panel__partner img { width: 60px; height: 48px; object-fit: cover; object-position: center; border-radius: 8px; }
+.geek-brand-panel--compact .geek-brand-panel__event { height: 150px; }
+.auth-card .geek-brand-panel--compact { padding: 12px; }
+.auth-card .geek-brand-panel--compact .geek-brand-panel__event { height: 150px; }
+.landing-event__partner { color: var(--color-primary); font-weight: 900; }
+@media (min-width: 900px) {
+  .landing .hero .geek-brand-panel { grid-column: 2; grid-row: 1 / span 5; min-height: 430px; display: grid; align-content: center; justify-items: center; gap: 16px; }
+}
