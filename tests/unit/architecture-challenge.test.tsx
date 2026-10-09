@@ -14,7 +14,7 @@ describe("Rescata la señal", () => {
     );
     const user = userEvent.setup();
     render(<ArchitectureChallenge savedStage={0} submit={submit} />);
-    expect(document.querySelector(".service-decision__scene canvas")).toBeInTheDocument();
+    expect(document.querySelector("canvas")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "DynamoDB" }).querySelector("img")).toHaveAttribute("src", "/aws-services/dynamodb.svg");
     expect(screen.getByText(/La misma inscripción apareció dos veces/u)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Confirmar respuesta" })).toBeDisabled();
@@ -34,13 +34,13 @@ describe("Rescata la señal", () => {
   });
 
   it("shows the solution and closes the stage after a wrong service", async () => {
-    const submit = vi.fn(async () => ({ status: "failed", auraAwarded: 0, auraDeducted: 20, solution: "Amazon DynamoDB" }));
+    const submit = vi.fn(async () => ({ status: "failed", auraAwarded: 0, solution: "Amazon DynamoDB" }));
     const user = userEvent.setup();
     render(<ArchitectureChallenge savedStage={0} submit={submit} />);
     await user.click(screen.getByRole("button", { name: "SQS" }));
     expect(submit).not.toHaveBeenCalled();
     await user.click(screen.getByRole("button", { name: "Confirmar respuesta" }));
-    expect(await screen.findByText(/Perdiste 20 créditos/u)).toBeInTheDocument();
+    expect(await screen.findByText(/Perdiste 10 créditos/u)).toBeInTheDocument();
     expect(screen.getByText(/Amazon DynamoDB/u)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Confirmar respuesta" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "DynamoDB" })).toBeDisabled();

@@ -65,11 +65,11 @@ export function missionTiming(mission: { slot?: string; room?: string }, now: Da
 }
 
 const STAGES = [
-  { level: 0, min: 0, name: "Huevo", description: "Geek está por nacer. Completa tu primer Challenge." },
-  { level: 1, min: 1, name: "Polluelo", description: "¡Geek salió del cascarón! Sigue completando Challenges." },
-  { level: 2, min: 4, name: "Quetzal joven", description: "Ya tiene cresta y su cola empieza a brillar." },
-  { level: 3, min: 8, name: "Quetzal", description: "Plumas largas y orgullo chapín. Ya casi vuela libre." },
-  { level: 4, min: 10, name: "Quetzal resplandeciente", description: "Completaste todos tus Challenges. ¡Geek vuela libre!" }
+  { level: 0, min: 0, name: "Primer pulso", description: "Geek está listo para tu primer Challenge." },
+  { level: 1, min: 1, name: "Conexión activa", description: "Geek encendió su primera conexión. Sigue completando Challenges." },
+  { level: 2, min: 4, name: "Circuito brillante", description: "Tu recorrido activa nuevos circuitos en Geek." },
+  { level: 3, min: 8, name: "Núcleo avanzado", description: "Geek ya procesa casi todos tus logros." },
+  { level: 4, min: 10, name: "Núcleo radiante", description: "Completaste todos tus Challenges. ¡Geek brilla contigo!" }
 ] as const;
 
 export type QuetziStage = { level: 0 | 1 | 2 | 3 | 4; name: string; description: string; nextAt?: number };
@@ -103,13 +103,13 @@ export function quetziLine({ phase, alias, now, tap = 0 }: LineContext): string 
   if (phase === "pre") {
     return `¡Hola${name}! Soy Geek, tu guía GuateGeeks. Explora la agenda oficial y prepárate para vivir el Community Day conmigo.`;
   }
-  if (phase === "post") return `¡Gracias por volar conmigo${name}! Fue un día increíble para la comunidad AWS de Guatemala.`;
+  if (phase === "post") return `¡Gracias por recorrer el evento conmigo${name}! Fue un día increíble para la comunidad AWS de Guatemala.`;
   const current = sessionsAt(now);
   if (current.some((session) => session.title === "Almuerzo")) return `¡Hora del almuerzo${name}! Recarga energía y aprovecha para conocer a alguien nuevo.`;
   if (current.some((session) => session.title === "Registro")) return `¡Bienvenido${name}! Pasa por registro y luego busca tu primera sesión.`;
   if (current.some((session) => session.kind === "social")) return `La cena de la comunidad ya empezó${name}. ¡A celebrar lo aprendido!`;
   const next = nextSessions(now);
   const minutes = next[0] ? countdownTo(now, sessionDate(next[0].start)).totalMinutes : undefined;
-  if (minutes !== undefined && minutes <= 10) return `¡Vuela${name}! En ${minutes} min empieza el siguiente bloque. Revisa la agenda oficial para ver a dónde ir.`;
+  if (minutes !== undefined && minutes <= 10) return `¡Vamos${name}! En ${minutes} min empieza el siguiente bloque. Revisa la agenda oficial para ver a dónde ir.`;
   return `Estoy contigo${name}. Te aviso qué reto tienes cerca; horarios y salas están en la agenda oficial.`;
 }

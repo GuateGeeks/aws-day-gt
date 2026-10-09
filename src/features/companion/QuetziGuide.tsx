@@ -3,7 +3,7 @@ import { QuetziSprite, type QuetziMood } from "./QuetziSprite";
 
 type Props = { completed: number; line: string; onTap?: () => void; mood?: QuetziMood };
 
-/** Interactive Quetzi with a speech bubble. Tapping makes Quetzi flap and say something new. */
+/** Interactive Geek assistant with a speech bubble. */
 export function QuetziGuide({ completed, line, onTap, mood }: Props) {
   const [reacting, setReacting] = useState(false);
   useEffect(() => {

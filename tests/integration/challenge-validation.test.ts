@@ -25,14 +25,14 @@ describe.skipIf(!process.env.FIRESTORE_EMULATOR_HOST)("credit challenge validati
     await Promise.all(experienceStations.map((station) => refs.experienceStation(station.id).set(station)));
   });
 
-  it("deducts 20 credits once for a wrong architecture sequence and explains the error", async () => {
+  it("deducts 10 credits once for a wrong architecture sequence and explains the error", async () => {
     const uid = await participant(["C06"]);
     const first = await completeChallengeForUid(uid, { challengeId: "C06", operationId: "wrong", response: { sequence: ["lambda", "api-gateway", "dynamodb"] } });
-    expect(first).toMatchObject({ status: "failed", auraAwarded: 0, auraDeducted: 20 });
+    expect(first).toMatchObject({ status: "failed", auraAwarded: 0, auraDeducted: 10 });
     expect(first.incorrectReason).toContain("En el paso 1");
     expect(first.solution).toContain("Amazon API Gateway");
     expect(await completeChallengeForUid(uid, { challengeId: "C06", operationId: "later-correct", response: { sequence: ["api-gateway", "lambda", "dynamodb"] } })).toEqual(first);
-    expect((await refs.score(uid).get()).data()).toMatchObject({ auraTotal: -20, auraDeductedTotal: 20 });
+    expect((await refs.score(uid).get()).data()).toMatchObject({ auraTotal: -10, auraDeductedTotal: 10 });
   });
 
   it("deducts 10 credits for a wrong AWS matching answer, not for an incomplete answer", async () => {
@@ -70,14 +70,14 @@ describe.skipIf(!process.env.FIRESTORE_EMULATOR_HOST)("credit challenge validati
     expect((await refs.score(uid).get()).data()?.auraTotal).toBe(-10);
   });
 
-  it("deducts 20 credits for a wrong architecture selection at either step", async () => {
+  it("deducts 10 credits for a wrong architecture selection at either step", async () => {
     for (const stage of [0, 1]) {
       const uid = await participant(["C08"]);
       if (stage === 1) await completeChallengeForUid(uid, { challengeId: "C08", operationId: "first", response: { stage: 0, optionId: "dynamo" } });
       const result = await completeChallengeForUid(uid, { challengeId: "C08", operationId: `wrong-${stage}`, response: { stage, optionId: stage === 0 ? "sqs" : "dynamo" } });
-      expect(result).toMatchObject({ status: "failed", auraDeducted: 20 });
+      expect(result).toMatchObject({ status: "failed", auraDeducted: 10 });
       expect(result.incorrectReason).toBeTruthy();
-      expect((await refs.score(uid).get()).data()).toMatchObject({ auraTotal: -20, auraDeductedTotal: 20 });
+      expect((await refs.score(uid).get()).data()).toMatchObject({ auraTotal: -10, auraDeductedTotal: 10 });
     }
   });
 

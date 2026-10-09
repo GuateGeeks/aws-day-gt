@@ -24,17 +24,19 @@ const { CompanionPage } = await import("../../src/features/companion/CompanionPa
 afterEach(cleanup);
 
 describe("Quetzi sprite", () => {
-  it("starts as an egg and evolves with completed missions", () => {
+  it("shows an abstract assistant that gains energy with completed missions", () => {
     const { rerender } = render(<QuetziSprite completed={0} />);
-    expect(screen.getByRole("img")).toHaveAccessibleName("Geek, etapa Huevo");
+    expect(screen.getByRole("img")).toHaveAccessibleName("Geek, etapa Primer pulso");
     rerender(<QuetziSprite completed={10} />);
-    expect(screen.getByRole("img")).toHaveAccessibleName("Geek, etapa Quetzal resplandeciente");
+    expect(screen.getByRole("img")).toHaveAccessibleName("Geek, etapa Núcleo radiante");
   });
 
-  it("uses smooth vector shapes for the event guide", () => {
+  it("uses concentric circuits and no bird silhouette for the event guide", () => {
     const { container } = render(<QuetziSprite completed={3} />);
     expect(container.querySelector("svg")).not.toHaveAttribute("shape-rendering", "crispEdges");
     expect(container.querySelectorAll("path").length).toBeGreaterThan(2);
+    expect(container.querySelector(".quetzi__core")).toBeInTheDocument();
+    expect(container.querySelector(".quetzi__wing")).not.toBeInTheDocument();
   });
 
 });
@@ -52,6 +54,14 @@ describe("Quetzi guide", () => {
 
   it("introduces the guide as Geek before the event", () => {
     expect(quetziLine({ phase: "pre", alias: "Ana", now: new Date("2026-10-08T09:00:00-06:00") })).toContain("Soy Geek");
+  });
+});
+
+describe("welcome after sign in", () => {
+  it("leads with the event logo and a direct challenge button", () => {
+    render(<MemoryRouter><CompanionPage /></MemoryRouter>);
+    expect(screen.getAllByRole("img", { name: "AWS Community Day Guatemala" }).length).toBeGreaterThan(0);
+    expect(screen.getByRole("link", { name: /Vamos al challenge/i })).toHaveAttribute("href", "/app/challenges");
   });
 });
 

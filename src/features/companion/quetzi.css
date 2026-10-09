@@ -1,13 +1,8 @@
-.quetzi { display: block; width: 100%; height: 100%; overflow: visible; }
-.quetzi__body { transform-box: fill-box; transform-origin: center; transition: transform var(--duration-base) var(--ease); }
-.quetzi__wing, .quetzi__tail { transform-box: fill-box; transform-origin: center; }
-.quetzi--happy .quetzi__body, .quetzi--celebrate .quetzi__body { transform: rotate(-7deg) translateY(-2px); }
-.quetzi--celebrate .quetzi__wing { animation: geek-wave .55s ease-in-out infinite alternate; }
-.quetzi__sparkles { opacity: .9; }
-@keyframes geek-wave { from { transform: rotate(0); } to { transform: rotate(8deg); } }
+.quetzi { display: block; width: 100%; height: 100%; object-fit: contain; overflow: visible; transition: transform var(--duration-base) var(--ease); }
+.quetzi--happy, .quetzi--celebrate { transform: scale(1.06); }
 
 .quetzi-guide { display: flex; align-items: center; gap: var(--space-3); min-width: 0; padding: var(--space-3) var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); box-shadow: var(--shadow-1); }
-.quetzi-guide__bird { display: grid; place-items: center; flex: 0 0 64px; width: 64px; height: 64px; padding: 0; border: 0; border-radius: 20px; background: #e9f5f3; }
+.quetzi-guide__bird { display: grid; place-items: center; flex: 0 0 64px; width: 64px; height: 64px; padding: 0; border: 0; border-radius: 20px; background: transparent; }
 .quetzi-guide__bird .quetzi { width: 58px; height: 58px; }
 .quetzi-guide__bird:focus-visible { outline-offset: 3px; }
 .quetzi-guide__bird:active .quetzi { transform: scale(.94); }
@@ -15,4 +10,3 @@
 .speech-bubble__name { display: block; margin-bottom: 2px; color: var(--color-primary); font-size: var(--text-xs); font-weight: 900; text-transform: uppercase; letter-spacing: .08em; }
 .speech-bubble__hint { display: block; margin-top: 4px; color: var(--color-ink-muted); font-size: var(--text-xs); }
 @media (max-width: 420px) { .quetzi-guide { padding: var(--space-3); gap: var(--space-2); } .quetzi-guide__bird { flex-basis: 52px; width: 52px; height: 52px; border-radius: 16px; } .quetzi-guide__bird .quetzi { width: 48px; height: 48px; } }
-@media (prefers-reduced-motion: reduce) { .quetzi--celebrate .quetzi__wing { animation: none; } }

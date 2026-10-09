@@ -5,6 +5,7 @@ import { getEventPhase, quetziLine } from "../../../shared/companion";
 import { Card } from "../../design-system/components";
 import { CreditAmount } from "../../design-system/credits";
 import { useAuth } from "../auth/AuthProvider";
+import { GeekBrandPanel } from "../auth/GeekEyesLogo";
 import { useChallenges } from "../challenges/useChallenges";
 import { AgendaSpotlightCard, OfficialAgendaLink } from "./CompanionCards";
 import { BrowserReminderButton } from "./AgendaReminderCenter";
@@ -21,7 +22,10 @@ export function CompanionPage() {
   const line = quetziLine({ phase, alias: profile?.alias, now, tap: taps });
 
   return <section className="stack companion">
-    <p className="eyebrow">AWS Community Day Guatemala 2026</p>
+    <div className="companion-welcome">
+      <GeekBrandPanel />
+      <div className="companion-welcome__body"><p className="eyebrow">AWS Community Day Guatemala 2026</p><h1>¡Bienvenido{profile?.alias ? `, ${profile.alias}` : ""}!</h1><p>Explora la experiencia y elige tu primer desafío. Cada reto completado suma créditos a tu recorrido.</p><Link className="ds-button ds-button--accent" to="/app/challenges">Vamos al challenge <ArrowRight aria-hidden size={20} /></Link></div>
+    </div>
     {phase !== "post" && <AgendaSpotlightCard now={now} rehearsal={isLocalRehearsalActive()} />}
     {phase !== "post" && <BrowserReminderButton />}
     <QuetziGuide completed={completed} line={line} onTap={() => setTaps((count) => count + 1)} />

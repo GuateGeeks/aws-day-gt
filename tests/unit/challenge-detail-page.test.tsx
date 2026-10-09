@@ -31,7 +31,33 @@ describe("Challenge completion", () => {
     render(<MemoryRouter initialEntries={["/app/challenges/C08"]}><Routes><Route path="/app/challenges/:challengeId" element={<ChallengeDetailPage />} /></Routes></MemoryRouter>);
     expect(await screen.findByRole("button", { name: "DynamoDB" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Confirmar respuesta" })).toBeDisabled();
+    expect(screen.getByText(/Tienes una oportunidad.*10 créditos/u)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Validar Challenge" })).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ["C01", "Different Stack", "otra área tecnológica"],
+    ["C02", "First Timer", "primer Community Day"],
+    ["C04", "Same Cloud Interest", "interés tecnológico"],
+    ["C06", "Build Serverless", "solicitud de registro"],
+    ["C07", "Cloud Match", "cuatro necesidades"],
+    ["C08", "Rescata la señal", "dos fallas"],
+    ["C09", "Who Am I?", "tres pistas"],
+    ["C12", "Track Pulse", "track que más te aportó"],
+    ["C15", "Comparte la experiencia GuateGeeks", "captura de tu publicación"],
+    ["C16", "Selfie con speaker", "speaker del evento"],
+    ["C17", "Selfie en un stand", "stand del evento"],
+    ["C18", "Inscripciones sin perder el ritmo", "conservar cada inscripción"],
+    ["C19", "Un aviso, muchos destinos", "varios destinatarios"],
+    ["C20", "Cada evento a su lugar", "destino adecuado"],
+    ["C21", "Tres pasos, un flujo", "tres pasos"],
+    ["C22", "Alerta antes del caos", "umbral de errores"],
+    ["C23", "Permiso justo", "solo pueda guardar fotos"]
+  ])("explains the specific task for %s in the white card", (id, title, objective) => {
+    mock.items = [item(id, "available")];
+    render(<MemoryRouter initialEntries={[`/app/challenges/${id}`]}><Routes><Route path="/app/challenges/:challengeId" element={<ChallengeDetailPage />} /></Routes></MemoryRouter>);
+    const task = screen.getByRole("region", { name: `Tu reto: ${title}` });
+    expect(task).toHaveTextContent(objective);
   });
 
   it("shows one Spanish credit confirmation and routes to the next available challenge", () => {
@@ -58,12 +84,22 @@ describe("Challenge completion", () => {
     expect(screen.queryByRole("textbox", { name: "Código de la experiencia VR" })).not.toBeInTheDocument();
   });
 
-  it("shows a simple 3D AWS selection before confirmation", async () => {
+  it("shows a clear AWS question and flat choices before confirmation", async () => {
     mock.items = [item("C18", "available")];
     render(<MemoryRouter initialEntries={["/app/challenges/C18"]}><Routes><Route path="/app/challenges/:challengeId" element={<ChallengeDetailPage />} /></Routes></MemoryRouter>);
     expect(await screen.findByRole("button", { name: "Amazon SQS" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "¿Qué servicio AWS resuelve este reto?" })).toBeInTheDocument();
+    expect(document.querySelector("canvas")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Confirmar respuesta" })).toBeDisabled();
-    expect(screen.getByText(/Si fallas, se descuentan 10 créditos/u)).toBeInTheDocument();
+    expect(screen.getByText(/Si no resuelves correctamente el reto, pierdes 10 créditos/u)).toBeInTheDocument();
+  });
+
+  it("presents Who Am I clues as a numbered list with choices", () => {
+    mock.items = [item("C09", "available")];
+    render(<MemoryRouter initialEntries={["/app/challenges/C09"]}><Routes><Route path="/app/challenges/:challengeId" element={<ChallengeDetailPage />} /></Routes></MemoryRouter>);
+    expect(screen.getByRole("heading", { name: "Pistas" })).toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "Pistas del servicio AWS" })).toHaveTextContent("Puedo ejecutar código cuando ocurre un evento.");
+    expect(screen.getByRole("group", { name: "Elige un servicio AWS" })).toBeInTheDocument();
   });
 
   it("explains the wrong choice after a failed AWS bonus", () => {

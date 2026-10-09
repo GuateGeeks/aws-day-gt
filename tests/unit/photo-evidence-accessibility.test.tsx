@@ -15,21 +15,31 @@ describe("PhotoEvidence preview and keyboard access", () => {
 
   it("releases old photo previews on reselection and the current preview on unmount", () => {
     const view = render(<PhotoEvidence challengeId="C16" />);
-    const input = screen.getByLabelText("Seleccionar fotografía para revisión") as HTMLInputElement;
-    fireEvent.change(input, { target: { files: [new File(["first"], "first.jpg", { type: "image/jpeg" })] } });
+    const gallery = screen.getByLabelText("Elegir de la galería") as HTMLInputElement;
+    const camera = screen.getByLabelText("Tomar selfie con la cámara") as HTMLInputElement;
+    expect(gallery).not.toHaveAttribute("capture");
+    expect(camera).toHaveAttribute("capture", "user");
+    fireEvent.change(gallery, { target: { files: [new File(["first"], "first.jpg", { type: "image/jpeg" })] } });
     expect(screen.getByRole("img", { name: "Vista previa de la foto seleccionada" })).toHaveAttribute("src", "blob:first.jpg");
-    fireEvent.change(input, { target: { files: [new File(["second"], "second.jpg", { type: "image/jpeg" })] } });
+    fireEvent.change(camera, { target: { files: [new File(["second"], "second.jpg", { type: "image/jpeg" })] } });
     expect(revokeObjectURL).toHaveBeenCalledWith("blob:first.jpg");
     view.unmount();
     expect(revokeObjectURL).toHaveBeenCalledWith("blob:second.jpg");
   });
 
-  it("keeps the photo picker keyboard focusable with focus on its visible label", () => {
+  it("keeps camera and gallery actions keyboard focusable", () => {
     render(<PhotoEvidence challengeId="C17" />);
-    const input = screen.getByLabelText("Seleccionar fotografía para revisión");
-    input.focus();
-    expect(document.activeElement).toBe(input);
-    expect(input.closest(".photo-picker")).toMatchObject({ className: "photo-picker" });
-    expect(input.closest(".photo-picker")?.matches(":focus-within")).toBe(true);
+    const camera = screen.getByLabelText("Tomar selfie con la cámara");
+    camera.focus();
+    expect(document.activeElement).toBe(camera);
+    expect(camera.closest(".photo-picker__action")?.matches(":focus-within")).toBe(true);
+    expect(screen.getByLabelText("Elegir de la galería")).toBeInTheDocument();
+  });
+
+  it("uses gallery only for publication screenshots", () => {
+    render(<PhotoEvidence challengeId="C15" />);
+    expect(screen.getByText("Selecciona la captura de tu publicación")).toBeInTheDocument();
+    expect(screen.getByLabelText("Seleccionar captura para revisión")).not.toHaveAttribute("capture");
+    expect(screen.queryByLabelText("Tomar selfie con la cámara")).not.toBeInTheDocument();
   });
 });

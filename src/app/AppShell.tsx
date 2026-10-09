@@ -1,4 +1,4 @@
-import { Award, Bird, CalendarDays, ListChecks, Trophy, UserRound } from "lucide-react";
+import { Award, Bot, CalendarDays, ListChecks, Trophy, UserRound } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 import { OFFICIAL_AGENDA_URL } from "../../shared/agenda";
 import { FeatherCelebration } from "../features/companion/FeatherCelebration";
@@ -8,7 +8,7 @@ import { GuateGeeksLogo } from "../features/auth/GeekEyesLogo";
 import { useAuth } from "../features/auth/AuthProvider";
 
 const tabs = [
-  { to: "/app/hoy", label: "Hoy", icon: Bird },
+  { to: "/app/hoy", label: "Hoy", icon: Bot },
   { to: "/app/challenges", label: "Challenges", icon: ListChecks },
   { to: "/app/progress", label: "Progreso", icon: Award },
   { to: "/app/leaderboard", label: "Ranking", icon: Trophy }

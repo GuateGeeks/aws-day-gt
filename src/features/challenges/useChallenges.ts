@@ -14,14 +14,16 @@ export type AssignedChallenge = { challenge: Challenge; progress: ChallengeProgr
 const currentC18 = challenges.find((challenge) => challenge.id === "C18")!;
 
 function withCurrentCopy(challenge: Challenge): Challenge {
-  if (challenge.id === "C08") return { ...challenge, title: "Rescata la señal", description: "Selecciona el servicio que resolvería cada falla de la arquitectura." };
+  const currentCopy = challenges.find((entry) => entry.id === challenge.id);
+  if (!currentCopy) return challenge;
+  if (challenge.id === "C08") return { ...challenge, title: currentCopy.title, description: currentCopy.description };
   if (challenge.id === "C18") return {
     ...challenge,
     title: currentC18.title,
     description: currentC18.description,
     configuration: { ...challenge.configuration, scenario: currentC18.configuration.scenario }
   };
-  return challenge;
+  return { ...challenge, description: currentCopy.description };
 }
 
 export function useChallenges() {

@@ -1,7 +1,7 @@
 .aws-service-icon { display: block; width: 34px; height: 34px; flex: 0 0 auto; object-fit: contain; border-radius: 8px; pointer-events: none; }
 .cloud-sequence__option, .cloud-answer__option { display: inline-flex; align-items: center; gap: 10px; }
 .cloud-match__question { display: grid; gap: 12px; }
-.cloud-match__question h2 { margin: 0; font-size: 1.08rem; }
+.cloud-match__question h3 { margin: 0; font-size: 1.08rem; }
 .cloud-match__options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
 .cloud-match__option { display: flex; align-items: center; gap: 10px; min-height: 58px; padding: 8px 10px; border: 2px solid var(--color-border); border-radius: 12px; background: var(--color-surface); color: var(--color-ink); text-align: left; font-weight: 800; }
 .cloud-match__option:hover, .cloud-match__option:focus-visible { border-color: var(--color-primary); }
@@ -9,3 +9,11 @@
 .cloud-answer__option { width: 100%; min-height: 55px; padding: 8px 10px; border: 2px solid var(--color-border); border-radius: 12px; }
 .cloud-answer__option:has(input:checked) { border-color: var(--color-primary); background: var(--color-info-soft); }
 @media (max-width: 560px) { .cloud-match__options { grid-template-columns: 1fr; } }
+.cloud-question h2 { font-size: clamp(1.3rem, 3vw, 1.7rem); }
+.cloud-question__scenario { padding: 16px 18px; border-left: 4px solid #087b87; border-radius: 10px; background: #eef8f8; line-height: 1.5; }
+.cloud-question__clues { display: grid; gap: 12px; }
+.cloud-question__clues h3 { font-size: 1.1rem; }
+.cloud-question__clues ol { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; counter-reset: clue; }
+.cloud-question__clues li { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border: 1px solid #c6e3e5; border-radius: 12px; background: #f4fbfb; line-height: 1.35; counter-increment: clue; }
+.cloud-question__clues li::before { display: grid; place-items: center; flex: 0 0 28px; width: 28px; height: 28px; border-radius: 50%; color: #fff; background: #087b87; font-weight: 900; content: counter(clue); }
+.cloud-question__prompt { color: var(--color-ink-muted); font-weight: 800; }

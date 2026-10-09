@@ -1,16 +1,18 @@
 import { sendSignInLinkToEmail, signInAnonymously } from "firebase/auth";
+import { httpsCallable } from "firebase/functions";
 import { MailCheck } from "lucide-react";
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button, Card, Field, Input, StatusNotice } from "../../design-system/components";
 import { useFirebaseEmulators } from "../../firebase/app";
 import { auth } from "../../firebase/auth";
+import { functions } from "../../firebase/functions";
+import { TERMS_VERSION } from "../../../shared/constants";
 import { GeekBrandPanel } from "./GeekEyesLogo";
 import "./landing.css";
 
 const pendingEmailKey = "aws-day-gt.pending-email";
 export function LoginPage() {
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
@@ -26,7 +28,17 @@ export function LoginPage() {
   }
   async function enterLocalDemo() {
     setBusy(true); setError("");
-    try { await signInAnonymously(auth); navigate("/onboarding", { replace: true }); }
+    try {
+      const user = auth.currentUser ?? (await signInAnonymously(auth)).user;
+      await httpsCallable(functions, "completeOnboarding")({
+        alias: `demo-${user.uid.slice(-6)}`,
+        interests: [],
+        challengeProfile: { primaryRole: "Development", experienceLevel: "Student", firstAwsCommunityDay: true, awsInterest: [] },
+        // Synthetic consent is confined to the Firebase emulator demo account.
+        consent: { termsVersion: TERMS_VERSION, accepted: true, photoPublication: false, marketing: false }
+      });
+      location.replace("/app/challenges");
+    }
     catch { setError("No pudimos iniciar la demo local. Comprueba que el emulador esté activo."); }
     finally { setBusy(false); }
   }

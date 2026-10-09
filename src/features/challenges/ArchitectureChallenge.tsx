@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { formatCredits } from "../../design-system/credits";
+import { incorrectAnswerPenalty } from "../../../shared/challenges/credit-policy";
 import { ServiceDecisionScene } from "./ServiceDecisionScene";
 import "./architecture.css";
 
@@ -32,7 +33,7 @@ export function ArchitectureChallenge({ savedStage, submit }: Props) {
       const result = await submit(stage, selected);
       if (result.status === "failed") {
         setDone(true);
-        setFeedback(`Perdiste ${formatCredits(result.auraDeducted ?? 20)}. ${result.incorrectReason ?? ""} ${result.solution ?? "Este reto terminó."} Continúa con otro reto.`);
+        setFeedback(`Perdiste ${formatCredits(result.auraDeducted ?? incorrectAnswerPenalty({ validationType: "interactive_architecture" }))}. ${result.incorrectReason ?? ""} ${result.solution ?? "Este reto terminó."} Continúa con otro reto.`);
       } else if (stage === 0 && result.status === "in_progress" && result.stage === 1) {
         setCorrect(true);
         setFeedback("¡Respuesta correcta! Pulsa Siguiente para la última situación.");
@@ -58,7 +59,7 @@ export function ArchitectureChallenge({ savedStage, submit }: Props) {
   }
 
   return <div className="architecture">
-    <div className="architecture__heading"><span className="eyebrow">Reto {stage + 1} de 2</span><h2>{situations[stage].prompt}</h2><p>Selecciona el servicio que resolvería la falla. Una respuesta incorrecta descuenta 20 créditos, muestra la explicación y cierra el reto.</p></div>
+    <div className="architecture__heading"><span className="eyebrow">Situación {stage + 1} de 2</span><h2>{situations[stage].prompt}</h2><p>Selecciona el servicio que resuelve esta falla y confirma tu elección para continuar.</p></div>
     <ServiceDecisionScene options={services} selected={selected} disabled={busy || correct || done} onSelect={(optionId) => { setSelected(optionId); setFeedback(""); }} />
     <div className="architecture__actions">
       {feedback && <p className="architecture__feedback" role="status" aria-live="polite">{feedback}</p>}
