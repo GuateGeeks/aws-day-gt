@@ -1,58 +1,89 @@
-import { sendSignInLinkToEmail, signInAnonymously } from "firebase/auth";
-import { httpsCallable } from "firebase/functions";
-import { MailCheck } from "lucide-react";
+import { sendSignInLinkToEmail } from "firebase/auth";
+import { ArrowLeft, MailCheck, ShieldCheck } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
-import { Button, Card, Field, Input, StatusNotice } from "../../design-system/components";
+import { Button, Card, Field, Input } from "../../design-system/components";
 import { useFirebaseEmulators } from "../../firebase/app";
 import { auth } from "../../firebase/auth";
-import { functions } from "../../firebase/functions";
-import { TERMS_VERSION } from "../../../shared/constants";
 import { GeekBrandPanel } from "./GeekEyesLogo";
 import "./landing.css";
 
 const pendingEmailKey = "aws-day-gt.pending-email";
+
+function sendErrorMessage(error: unknown) {
+  const code = typeof error === "object" && error !== null && "code" in error ? String(error.code) : "";
+  if (code === "auth/invalid-email") return "Revisa el formato del correo e inténtalo de nuevo.";
+  if (code === "auth/too-many-requests") return "Hiciste varias solicitudes. Espera un momento antes de intentarlo otra vez.";
+  if (code === "auth/unauthorized-continue-uri") return "Este dominio aún no está autorizado para iniciar sesión. Contacta al equipo del evento.";
+  if (code === "auth/operation-not-allowed") return "El acceso por enlace todavía no está habilitado en Firebase. Contacta al equipo del evento.";
+  if (code === "auth/network-request-failed") return "No pudimos conectar con Firebase. Revisa tu conexión e inténtalo otra vez.";
+  return "No pudimos enviar el enlace. Verifica tu correo e inténtalo de nuevo.";
+}
+
 export function LoginPage() {
+  const localAuth = useFirebaseEmulators;
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+
   async function submit(event: FormEvent) {
-    event.preventDefault(); setBusy(true); setError("");
+    event.preventDefault();
+    setBusy(true);
+    setError("");
+    const normalizedEmail = email.trim();
     try {
-      const normalizedEmail = email.trim();
-      await sendSignInLinkToEmail(auth, normalizedEmail, { url: `${location.origin}/auth/complete`, handleCodeInApp: true });
-      localStorage.setItem(pendingEmailKey, normalizedEmail); setEmail(normalizedEmail); setSent(true);
-    } catch { setError("No pudimos enviar el enlace. Verifica tu correo e intenta de nuevo."); }
-    finally { setBusy(false); }
-  }
-  async function enterLocalDemo() {
-    setBusy(true); setError("");
-    try {
-      const user = auth.currentUser ?? (await signInAnonymously(auth)).user;
-      await httpsCallable(functions, "completeOnboarding")({
-        alias: `demo-${user.uid.slice(-6)}`,
-        interests: [],
-        challengeProfile: { primaryRole: "Development", experienceLevel: "Student", firstAwsCommunityDay: true, awsInterest: [] },
-        // Synthetic consent is confined to the Firebase emulator demo account.
-        consent: { termsVersion: TERMS_VERSION, accepted: true, photoPublication: false, marketing: false }
+      await sendSignInLinkToEmail(auth, normalizedEmail, {
+        url: `${location.origin}/auth/complete`,
+        handleCodeInApp: true
       });
-      location.replace("/app/challenges");
+      localStorage.setItem(pendingEmailKey, normalizedEmail);
+      setEmail(normalizedEmail);
+      setSent(true);
+    } catch (reason) {
+      setError(sendErrorMessage(reason));
+    } finally {
+      setBusy(false);
     }
-    catch { setError("No pudimos iniciar la demo local. Comprueba que el emulador esté activo."); }
-    finally { setBusy(false); }
   }
-  return <main className="auth-page page"><Card className="auth-card stack"><Link to="/" className="eyebrow">← Inicio</Link><GeekBrandPanel compact /><h1>{useFirebaseEmulators ? "Prueba local de desafíos" : sent ? "Revisa tu correo" : "Entra a la experiencia"}</h1>
-    {useFirebaseEmulators ? <div className="stack"><p className="muted">Accede con una cuenta temporal para recorrer los Challenges. Los datos de esta prueba quedan solo en tu computadora.</p><Button type="button" variant="accent" block loading={busy} onClick={enterLocalDemo}>Entrar en demo local</Button>{error && <StatusNotice tone="error">{error}</StatusNotice>}</div>
-      : sent ? <div className="auth-delivery" role="status">
+
+  return <main className="auth-page page">
+    <Card className="auth-card stack">
+      <Link to="/" className="auth-backlink"><ArrowLeft aria-hidden size={18} /> Inicio</Link>
+      <GeekBrandPanel compact />
+      {sent ? <>
+        <div className="auth-heading">
+          <p className="eyebrow">Acceso seguro</p>
+          <h1>{localAuth ? "Enlace local listo" : "Revisa tu correo"}</h1>
+          <p className="muted">{localAuth ? "Firebase Emulator generó un enlace para esta dirección:" : "Enviamos un enlace de acceso a esta dirección:"}</p>
+        </div>
+        <div className="auth-delivery" role="status" aria-live="polite">
           <span className="auth-delivery__icon" aria-hidden="true"><MailCheck size={24} strokeWidth={2.2} /></span>
           <div className="auth-delivery__copy">
-            <p>Te enviamos un enlace de acceso a:</p>
             <strong className="auth-delivery__email">{email}</strong>
-            <p className="auth-delivery__hint">Abre el correo para entrar. Si no lo encuentras, revisa la carpeta de spam.</p>
+            {localAuth ? <p className="auth-delivery__hint">Copia el enlace de la terminal donde ejecutas Firebase Emulator y ábrelo en este navegador.</p> : <>
+              <p className="auth-delivery__hint">Abre el enlace del correo para continuar. Si lo abres en otro dispositivo, te pediremos confirmar el correo.</p>
+              <p className="auth-delivery__hint">Si no lo encuentras, revisa la carpeta de correo no deseado.</p>
+            </>}
           </div>
-          <button className="auth-delivery__change" type="button" onClick={() => setSent(false)}>Usar otro correo</button>
+          <button className="auth-delivery__change" type="button" onClick={() => { setSent(false); setError(""); }}>Usar otro correo</button>
         </div>
-        : <form className="stack" onSubmit={submit}><p className="muted">Usaremos tu correo únicamente para identificar tu progreso.</p><Field id="email" label="Correo electrónico" error={error}><Input id="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@correo.com" /></Field><Button type="submit" variant="accent" block loading={busy}>Enviar enlace de acceso</Button></form>}</Card></main>;
+      </> : <>
+        <div className="auth-heading">
+          <p className="eyebrow">AWS Community Day Guatemala</p>
+          <h1>Entra a tu cuenta</h1>
+          <p className="muted">Escribe el correo que usas en el evento. Te enviaremos un enlace seguro; no necesitas contraseña.</p>
+        </div>
+        <form className="stack auth-form" onSubmit={submit}>
+          <Field id="email" label="Correo electrónico" hint="Si es tu primera vez, podrás crear tu perfil después de confirmar el correo." error={error}>
+            <Input id="email" type="email" autoComplete="email" inputMode="email" autoCapitalize="none" spellCheck={false} required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="tu@correo.com" />
+          </Field>
+          <Button type="submit" variant="accent" block loading={busy}>Enviar enlace de acceso</Button>
+        </form>
+        <p className="auth-privacy"><ShieldCheck aria-hidden size={17} /> Tu correo sirve para identificar tu progreso y no se mostrará en el ranking.</p>
+      </>}
+    </Card>
+  </main>;
 }
+
 export { pendingEmailKey };
