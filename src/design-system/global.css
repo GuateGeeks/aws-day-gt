@@ -128,6 +128,9 @@ textarea.ds-input { min-height: 132px; resize: vertical; }
 .event-mark { display: block; width: 158px; height: auto; padding: 9px 11px; border-radius: 15px; background: linear-gradient(145deg, #142c41, #075b67); box-shadow: 0 8px 20px #0b3c4930; }
 .section-hero { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 0; align-items: stretch; overflow: hidden; padding: 0; border: 1.5px solid #8dbfc4; border-radius: var(--radius-xl); background: #fff; box-shadow: var(--shadow-1); }
 .section-hero--with-aside { grid-template-columns: 210px minmax(0, 1fr) minmax(160px, 220px); }
+.section-hero--stacked { grid-template-columns: minmax(0, 1fr) minmax(160px, 220px); }
+.section-hero--stacked .section-hero__brand { grid-column: 1 / -1; min-height: 150px; }
+.section-hero--stacked .section-hero__brand .event-mark--integrated { width: min(54%, 390px); }
 .section-hero__brand { display: grid; place-items: center; min-height: 178px; padding: clamp(22px, 3vw, 32px); background: radial-gradient(circle at 90% 15%, #087b87 0%, #0e4252 44%, #142c41 100%); border-bottom: 5px solid #f69a21; }
 .section-hero__brand .event-mark--integrated { width: min(100%, 190px); padding: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .section-hero__content { min-width: 0; }
@@ -281,8 +284,11 @@ textarea.ds-input { min-height: 132px; resize: vertical; }
 }
 @media (max-width: 559px) {
   .section-hero, .section-hero--with-aside { grid-template-columns: 1fr; gap: 0; padding: 0; }
+  .section-hero--stacked { grid-template-columns: 1fr; }
   .section-hero__brand { min-height: 118px; padding: var(--space-4) var(--space-5); }
   .section-hero__brand .event-mark--integrated { width: min(76%, 230px); }
+  .section-hero--stacked .section-hero__brand { min-height: 118px; }
+  .section-hero--stacked .section-hero__brand .event-mark--integrated { width: min(76%, 230px); }
   .section-hero__content { padding: var(--space-5); }
   .section-hero__content { text-align: left; }
   .section-hero__aside { width: 100%; padding: 0 var(--space-5) var(--space-5); border: 0; background: #fff; }

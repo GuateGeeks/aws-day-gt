@@ -26,11 +26,12 @@ describe("Aura ranking", () => {
       { rank: 1, userId: "registered", alias: "Nueva", auraTotal: 200, completedChallenges: 1 },
       { rank: 2, userId: "registered-zero", alias: "Histórico", auraTotal: 0, completedChallenges: 0 }
     ], personalRank: 2 } });
-    renderRanking();
+    const { container } = renderRanking();
     expect(screen.getByText(/cargando ranking/i)).toBeInTheDocument();
     expect(await screen.findByText("Nueva")).toBeInTheDocument();
     expect(screen.getAllByRole("img", { name: "AWS Community Day Guatemala" })).toHaveLength(1);
     expect(screen.getByRole("img", { name: "AWS Community Day Guatemala" })).toHaveClass("event-mark--integrated");
+    expect(container.querySelector(".section-hero--stacked")).toBeInTheDocument();
     expect(screen.getByText("Histórico (tú)")).toBeInTheDocument();
     expect(screen.getByText("Tu posición")).toBeInTheDocument();
     expect(screen.getByText("#2")).toBeInTheDocument();
