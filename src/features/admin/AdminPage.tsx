@@ -13,6 +13,12 @@ import { AdminTabs, type AdminSection } from "./AdminTabs";
 import { DeletionQueue } from "./DeletionQueue";
 import "./admin.css";
 
+function timestampMillis(value: unknown): number {
+  if (value && typeof value === "object" && "toMillis" in value) return (value as { toMillis: () => number }).toMillis();
+  if (typeof value === "string") return Date.parse(value) || 0;
+  return 0;
+}
+
 export function AdminPage() {
   const { profile } = useAuth();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
@@ -37,8 +43,13 @@ export function AdminPage() {
   ), []);
 
   useEffect(() => onSnapshot(
-    query(collection(db, "deletionRequests"), where("status", "in", ["requested", "failed"]), orderBy("requestedAt", "desc"), limit(50)),
-    (snapshot) => { setDeletionRequests(snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }) as unknown as DeletionRequest)); setDeletionError(false); setDeletionLoading(false); },
+    query(collection(db, "deletionRequests"), where("status", "in", ["requested", "failed"]), limit(50)),
+    (snapshot) => {
+      setDeletionRequests(snapshot.docs
+        .map((entry) => ({ id: entry.id, ...entry.data() }) as unknown as DeletionRequest)
+        .sort((left, right) => timestampMillis(right.requestedAt) - timestampMillis(left.requestedAt)));
+      setDeletionError(false); setDeletionLoading(false);
+    },
     () => { setDeletionError(true); setDeletionLoading(false); }
   ), []);
 
