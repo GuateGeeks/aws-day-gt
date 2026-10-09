@@ -1,10 +1,10 @@
-import { connectFirestoreEmulator, getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
+import { connectFirestoreEmulator, getFirestore, initializeFirestore, memoryLocalCache } from "firebase/firestore";
 import { firebaseApp, useFirebaseEmulators } from "./app";
 
 let database;
 try {
   database = initializeFirestore(firebaseApp, {
-    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+    localCache: memoryLocalCache()
   });
 } catch {
   database = getFirestore(firebaseApp);
