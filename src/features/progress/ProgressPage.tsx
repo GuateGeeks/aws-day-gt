@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Card, ProgressBar, StatusNotice } from "../../design-system/components";
 import { CreditAmount, formatCredits } from "../../design-system/credits";
 import { CreditDashboard } from "../../design-system/CreditDashboard";
-import { EventLogo } from "../../design-system/EventLogo";
+import { EventSectionHeader } from "../../design-system/EventSectionHeader";
 import { incorrectAnswerPenalty } from "../../../shared/challenges/credit-policy";
 import { useChallenges } from "../challenges/useChallenges";
 import { challengeSummary, nextAvailableChallenge } from "../challenges/challenge-view";
@@ -15,7 +15,7 @@ export function ProgressPage() {
   if (loading) return <section className="stack progress-page"><h1>Progreso</h1><p role="status">Cargando tu progreso…</p></section>;
 
   return <section className="stack progress-page">
-    <header className="progress-intro"><EventLogo className="event-mark--section" /><p className="eyebrow">Tu recorrido</p><h1>Tu progreso</h1><p className="muted">Cada reto cuenta. Aquí puedes ver lo que ganaste, lo que se descontó y lo que te falta por descubrir.</p></header>
+    <EventSectionHeader eyebrow="Tu recorrido" title="Tu progreso" description="Cada reto cuenta. Aquí puedes ver lo que ganaste, lo que se descontó y lo que te falta por descubrir." />
     {error && <StatusNotice tone="error">{error}</StatusNotice>}
     <CreditDashboard balance={auraTotal} balanceFallback={error ? "Créditos no disponibles" : "Cargando créditos…"} deducted={auraDeductedTotal} available={auraPotential} inReview={auraInReview} />
     <div className="progress-completion"><div className="progress-completion__top"><span>Retos completados</span><strong>{totalCompleted} / {total}</strong></div><ProgressBar value={totalCompleted} max={total} label="Retos completados" /><p>{mainCompleted} retos base · {bonusCompleted} preguntas AWS</p></div>

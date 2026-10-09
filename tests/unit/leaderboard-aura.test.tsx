@@ -29,7 +29,8 @@ describe("Aura ranking", () => {
     renderRanking();
     expect(screen.getByText(/cargando ranking/i)).toBeInTheDocument();
     expect(await screen.findByText("Nueva")).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: "AWS Community Day Guatemala" })).toBeInTheDocument();
+    expect(screen.getAllByRole("img", { name: "AWS Community Day Guatemala" })).toHaveLength(1);
+    expect(screen.getByRole("img", { name: "AWS Community Day Guatemala" })).toHaveClass("event-mark--section");
     expect(screen.getByText("Histórico (tú)")).toBeInTheDocument();
     expect(screen.getByText("Tu posición")).toBeInTheDocument();
     expect(screen.getByText("#2")).toBeInTheDocument();

@@ -12,8 +12,11 @@ const mainChallenges = ["C01", "C02", "C04", "C06", "C07", "C08", "C09", "C12", 
 describe("Credit challenges page", () => {
   it("shows nine main cards including the GuateGeeks stand publication", () => {
     mock.items = mainChallenges.map((challenge) => ({ challenge, progress: { status: "available", auraAwarded: 0 } }));
-    render(<MemoryRouter><ChallengesPage /></MemoryRouter>);
+    const { container } = render(<MemoryRouter><ChallengesPage /></MemoryRouter>);
     expect(screen.getByRole("heading", { name: "Tus desafíos" })).toBeInTheDocument();
+    expect(screen.getAllByRole("img", { name: "AWS Community Day Guatemala" })).toHaveLength(1);
+    expect(container.querySelector(".journey-overview > .section-hero .event-mark")).toBeInTheDocument();
+    expect(within(screen.getByLabelText("Resumen de créditos")).queryByRole("img")).not.toBeInTheDocument();
     expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(9);
     expect(screen.getByRole("heading", { name: "Comparte la experiencia GuateGeeks" })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Experiencia VR GuateGeeks" })).not.toBeInTheDocument();

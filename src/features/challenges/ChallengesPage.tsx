@@ -6,6 +6,7 @@ import type { ChallengeState } from "../../../shared/challenges/types";
 import { Card, Chip, EmptyState, ProgressBar, StatusNotice } from "../../design-system/components";
 import { CreditAmount, formatCredits } from "../../design-system/credits";
 import { CreditDashboard } from "../../design-system/CreditDashboard";
+import { EventSectionHeader } from "../../design-system/EventSectionHeader";
 import { challengeSummary, nextAvailableChallenge } from "./challenge-view";
 import { useChallenges, type AssignedChallenge } from "./useChallenges";
 import { SubmissionWindowNotice } from "../submissions/SubmissionWindowNotice";
@@ -29,7 +30,7 @@ export function ChallengesPage() {
   const next = nextAvailableChallenge(items);
   const total = items.length || 17;
   return <section className="stack challenges-page">
-    <header className="journey-overview"><div className="journey-overview__heading"><div><p className="eyebrow">AWS Community Day Guatemala</p><h1>Tus desafíos</h1><p className="muted">Elige un reto y suma créditos a tu recorrido.</p></div><div className="journey-overview__progress"><strong>{totalCompleted} de {total} {total === 1 ? "reto completado" : "retos completados"}</strong><ProgressBar value={totalCompleted} max={total} label="Retos completados" /></div></div><CreditDashboard balance={auraTotal} balanceFallback={error ? "Créditos no disponibles" : "Cargando créditos…"} deducted={auraDeductedTotal} available={auraPotential} inReview={auraInReview} /></header>
+    <div className="journey-overview"><EventSectionHeader eyebrow="Tu recorrido" title="Tus desafíos" description="Elige un reto y suma créditos a tu recorrido." aside={<div className="journey-overview__progress"><strong>{totalCompleted} de {total} {total === 1 ? "reto completado" : "retos completados"}</strong><ProgressBar value={totalCompleted} max={total} label="Retos completados" /></div>} /><CreditDashboard balance={auraTotal} balanceFallback={error ? "Créditos no disponibles" : "Cargando créditos…"} deducted={auraDeductedTotal} available={auraPotential} inReview={auraInReview} /></div>
     <SubmissionWindowNotice />
     {next && <Link className="challenge-next" to={`/app/challenges/${next.challenge.id}`}><span><small>CONTINÚA TU RECORRIDO</small><strong>{next.challenge.title}</strong><span>{next.challenge.id === "C08" && next.progress.architectureStep === 1 ? "Paso 2 de 2 listo" : `Gana ${formatCredits(next.challenge.auraReward)} al completarlo`}</span></span><span className="challenge-next__arrow" aria-hidden>→</span></Link>}
     {error && <StatusNotice tone="error">{error}</StatusNotice>}
