@@ -4,7 +4,7 @@
 
 **Goal:** Build an unauthenticated `/live` event screen with a Three.js QR-connection cloud, consent-safe approved photo gallery, track pulse, and live interaction insights.
 
-**Architecture:** A public callable Cloud Function reads private event collections, filters and anonymizes them, signs only consent-eligible approved images, and returns a bounded schema-validated snapshot. The React page polls that endpoint, retains stale data during failures, and feeds focused presentation components; Three.js is isolated behind a renderer adapter with a 2D fallback.
+**Architecture:** A public callable Cloud Function reads private event collections, filters and anonymizes them, and returns a bounded schema-validated snapshot with opaque same-origin media IDs. A media proxy rechecks approval and current consent before streaming an image, so raw Storage paths remain private. The React page polls the snapshot endpoint, retains stale data during failures, and feeds focused presentation components; Three.js is isolated behind a renderer adapter with a 2D fallback.
 
 **Tech Stack:** React 19, TypeScript, Firebase Functions/Firestore/Storage, Zod, Three.js, Vitest, Testing Library, Playwright
 
@@ -14,7 +14,7 @@
 
 - Create `shared/public-visualization.ts`: shared public response schema and inferred types.
 - Create `functions/src/public/visualization-data.ts`: pure anonymization, graph, gallery eligibility, track, metric, and insight projection.
-- Create `functions/src/public/get-visualization.ts`: Firestore/Storage data loader and unauthenticated callable.
+- Create `functions/src/public/get-visualization.ts`: Firestore data loader, unauthenticated callable, and consent-checking image proxy.
 - Modify `functions/src/index.ts`: export the callable.
 - Create `src/features/live/usePublicVisualization.ts`: validated polling state machine.
 - Create `src/features/live/community-cloud.ts`: Three.js renderer lifecycle and deterministic positions.
@@ -135,7 +135,7 @@ export const getPublicEventVisualization = onCall(
 );
 ```
 
-`signEvidencePhoto` uses a ten-minute V4 read URL. Missing objects are skipped rather than failing the whole snapshot.
+Gallery URLs use `/live-media/<opaque-photo-id>`. The hosting rewrite sends those requests to `getPublicEventImage`, which rechecks moderation and current consent, validates the object metadata, and streams the bytes without exposing the private Storage path. Missing objects are skipped rather than failing the whole snapshot.
 
 - [ ] **Step 4: Export the callable from `functions/src/index.ts`.**
 

@@ -64,13 +64,13 @@ The response contains:
 - `generatedAt` and event identifier;
 - nodes with opaque deterministic IDs, alias, profile category, and degree;
 - edges containing only opaque source and target IDs;
-- gallery items with alias, short-lived image URL, and optional dimensions;
+- gallery items with alias, opaque same-origin media URL, and optional dimensions;
 - track labels, counts, and percentages;
 - aggregate totals and deterministic insight strings.
 
 It never contains raw Firebase UIDs, emails, consent records, Storage paths, moderation notes, or unapproved submissions. Opaque IDs are produced with a server-side one-way digest scoped to this visualization.
 
-The function queries current event data, applies privacy filtering, limits payload size, and signs approved image URLs with a short expiry. The client polls approximately every 20 seconds. A single in-flight request is allowed, and responses are schema-validated before becoming visible.
+The function queries current event data, applies privacy filtering, limits payload size, and returns opaque `/live-media/<photo-id>` URLs. A separate media function resolves those IDs server-side, rechecks approval and current consent, validates the object, and streams the image without exposing its Storage path. The client polls approximately every 20 seconds. A single in-flight request is allowed, and responses are schema-validated before becoming visible.
 
 ## Components and boundaries
 
@@ -82,6 +82,7 @@ The function queries current event data, applies privacy filtering, limits paylo
 - `EventInsight`: cycles server-provided safe insights.
 - `LiveMetrics`: renders the four large summary values.
 - `public-visualization` function module: collects, filters, anonymizes, aggregates, bounds, and returns public data.
+- `getPublicEventImage`: reauthorizes each opaque gallery request and proxies only a currently eligible image.
 
 Pure server helpers handle graph normalization, track aggregation, and safe insight generation so they can be unit tested without Firebase.
 

@@ -13,14 +13,13 @@ import { ProgressPage } from "../features/progress/ProgressPage";
 import { ChallengesPage } from "../features/challenges/ChallengesPage";
 import { ChallengeDetailPage } from "../features/challenges/ChallengeDetailPage";
 import { GeekIdPage } from "../features/challenges/GeekIdPage";
-import { LiveEventPage } from "../features/live/LiveEventPage";
 
 export const router = createBrowserRouter([
   { path: "/", element: <LandingPage /> },
   { path: "/prototipo-sala-aura.html", element: <Navigate to="/app/challenges/C08" replace /> },
   { path: "/login", element: <LoginPage /> },
   { path: "/auth/complete", element: <AuthCompletePage /> },
-  { path: "/live", element: <LiveEventPage /> },
+  { path: "/live", lazy: async () => ({ Component: (await import("../features/live/LiveEventPage")).LiveEventPage }) },
   { path: "/onboarding", element: <OnboardingPage /> },
   { element: <ProtectedRoute />, children: [
     { path: "/app", element: <AppShell />, children: [

@@ -17,7 +17,7 @@ export const publicVisualizationEdgeSchema = z.object({
 export const publicVisualizationPhotoSchema = z.object({
   id: z.string().regex(/^ph_[a-f0-9]{16}$/),
   alias: z.string().trim().min(1).max(24),
-  url: z.string().url(),
+  url: z.string().regex(/^\/live-media\/ph_[a-f0-9]{16}$/),
   width: z.number().int().positive().max(10_000).optional(),
   height: z.number().int().positive().max(10_000).optional()
 }).strict();

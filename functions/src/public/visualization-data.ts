@@ -38,7 +38,7 @@ export interface VisualizationSource {
   trackOptions: ReadonlyArray<VisualizationTrackOption>;
 }
 
-export type PhotoSigner = (storagePath: string) => Promise<string | null>;
+export type PhotoSigner = (storagePath: string, publicId: string) => Promise<string | null>;
 
 function digest(prefix: string, value: string) {
   return `${prefix}_${createHash("sha256").update(value).digest("hex").slice(0, 16)}`;
@@ -46,6 +46,25 @@ function digest(prefix: string, value: string) {
 
 export function publicNodeId(eventId: string, uid: string) {
   return digest("p", `${eventId}:${uid}`);
+}
+
+export function publicPhotoId(eventId: string, submissionId: string) {
+  return digest("ph", `${eventId}:${submissionId}`);
+}
+
+export function resolvePublicPhotoStoragePath(
+  eventId: string,
+  photoId: string,
+  submissions: ReadonlyArray<VisualizationSourceSubmission>,
+  users: ReadonlyArray<VisualizationSourceUser>
+) {
+  const submission = submissions.find((candidate) => publicPhotoId(eventId, candidate.id) === photoId);
+  if (!submission || submission.status !== "approved" || submission.moderationStatus !== "approved") return null;
+  if (typeof submission.userId !== "string" || typeof submission.image?.storagePath !== "string") return null;
+  const user = users.find((candidate) => candidate.uid === submission.userId);
+  if (user?.consent?.photoPublication !== true) return null;
+  const expectedPrefix = `evidence/${eventId}/${submission.userId}/`;
+  return submission.image.storagePath.startsWith(expectedPrefix) ? submission.image.storagePath : null;
 }
 
 function cleanAlias(value: unknown) {
@@ -140,12 +159,13 @@ export async function buildPublicVisualization(
 
   const photos = (await Promise.all(eligiblePhotos.map(async (submission) => {
     const storagePath = submission.image!.storagePath as string;
+    const id = publicPhotoId(input.eventId, submission.id);
     let url: string | null = null;
-    try { url = await signPhoto(storagePath); } catch { return null; }
+    try { url = await signPhoto(storagePath, id); } catch { return null; }
     if (!url || typeof submission.userId !== "string") return null;
     const user = users.get(submission.userId)!;
     return {
-      id: digest("ph", `${input.eventId}:${submission.id}`),
+      id,
       alias: cleanAlias(user.alias)!,
       url,
       ...(positiveDimension(submission.image?.width) ? { width: positiveDimension(submission.image?.width) } : {}),

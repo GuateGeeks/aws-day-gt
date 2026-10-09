@@ -16,7 +16,7 @@ describe.skipIf(!process.env.FIRESTORE_EMULATOR_HOST)("public event visualizatio
       refs.challenge("C12").set({ eventId: EVENT_ID, configuration: { tracks: [{ id: "ai", label: "AI & Agents" }] } })
     ]);
 
-    const snapshot = await getPublicEventVisualizationSnapshot(async (path) => `https://images.example/${encodeURIComponent(path)}`);
+    const snapshot = await getPublicEventVisualizationSnapshot(async (_path, id) => `/live-media/${id}`);
 
     expect(snapshot.edges).toHaveLength(1);
     expect(snapshot.photos).toHaveLength(1);

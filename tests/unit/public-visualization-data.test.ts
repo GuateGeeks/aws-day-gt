@@ -31,7 +31,7 @@ const source = {
 
 describe("public visualization projection", () => {
   it("anonymizes QR connections and filters photos by approval and current consent", async () => {
-    const signPhoto = vi.fn(async () => "https://images.example/approved-a.webp?signature=short-lived");
+    const signPhoto = vi.fn(async (_storagePath: string, publicId: string) => `/live-media/${publicId}`);
     const result = await buildPublicVisualization(source, signPhoto);
 
     expect(result.nodes).toEqual(expect.arrayContaining([
@@ -41,9 +41,11 @@ describe("public visualization projection", () => {
     expect(result.nodes).toHaveLength(2);
     expect(result.edges).toHaveLength(1);
     expect(result.photos.map((photo) => photo.alias)).toEqual(["Ada"]);
+    expect(result.photos[0]?.url).toMatch(/^\/live-media\/ph_[a-f0-9]{16}$/);
     expect(result.tracks).toEqual([{ id: "ai", label: "AI", count: 1, percentage: 100 }]);
     expect(result.metrics).toMatchObject({ participants: 2, connections: 1, approvedPhotos: 1, leadingTrack: { id: "ai", label: "AI" } });
     expect(signPhoto).toHaveBeenCalledTimes(1);
+    expect(signPhoto.mock.calls[0]?.[1]).toBe(result.photos[0]?.id);
     expect(JSON.stringify(result)).not.toMatch(/uid-a|ada@example|evidence\//);
   });
 
