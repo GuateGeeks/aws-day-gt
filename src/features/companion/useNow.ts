@@ -44,14 +44,17 @@ export function readClockOffset(search: string, storage: Pick<Storage, "getItem"
   }
 }
 
-/** The October 8 rehearsal mirrors Guatemala time onto the official October 10 schedule. */
+/** The October 8–9 rehearsal mirrors Guatemala time onto the official October 10 schedule. */
 export function isLocalRehearsal(realNow: Date, enabled: boolean, offset = 0): boolean {
   const guatemalaDay = new Date(realNow.getTime() - 6 * 60 * 60_000).toISOString().slice(0, 10);
-  return enabled && offset === 0 && guatemalaDay === "2026-10-08";
+  return enabled && offset === 0 && (guatemalaDay === "2026-10-08" || guatemalaDay === "2026-10-09");
 }
 
 export function effectiveEventNow(realNow: Date, enabled: boolean, offset = 0): Date {
-  return new Date(realNow.getTime() + offset + (isLocalRehearsal(realNow, enabled, offset) ? 2 * 24 * 60 * 60_000 : 0));
+  if (!isLocalRehearsal(realNow, enabled, offset)) return new Date(realNow.getTime() + offset);
+  const guatemalaDay = new Date(realNow.getTime() - 6 * 60 * 60_000).toISOString().slice(0, 10);
+  const rehearsalDays = guatemalaDay === "2026-10-08" ? 2 : 1;
+  return new Date(realNow.getTime() + rehearsalDays * 24 * 60 * 60_000);
 }
 
 export function isLocalRehearsalActive(): boolean {

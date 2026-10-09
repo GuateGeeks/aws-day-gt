@@ -3,21 +3,22 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { AdminPage } from "../../src/features/admin/AdminPage";
 
 const mocks = vi.hoisted(() => ({
-  snapshotSuccess: undefined as undefined | ((snapshot: { docs: Array<{ id: string; data: () => Record<string, unknown> }> }) => void),
-  snapshotError: undefined as undefined | (() => void),
+  listeners: new Map<string, {
+    success: (snapshot: { docs: Array<{ id: string; data: () => Record<string, unknown> }> }) => void;
+    error: () => void;
+  }>(),
   where: vi.fn(() => "pending"),
   review: vi.fn(async () => ({ data: { status: "approved" } }))
 }));
 
 vi.mock("firebase/firestore", () => ({
-  collection: vi.fn(() => "submissions"),
+  collection: vi.fn((_db, path: string) => ({ path })),
   limit: vi.fn(() => "limit"),
   orderBy: vi.fn(() => "order"),
-  query: vi.fn(() => "pending-query"),
+  query: vi.fn((ref: { path: string }) => ref),
   where: mocks.where,
-  onSnapshot: vi.fn((_query, success, error) => {
-    mocks.snapshotSuccess = success;
-    mocks.snapshotError = error;
+  onSnapshot: vi.fn((ref: { path: string }, success, error) => {
+    mocks.listeners.set(ref.path, { success, error });
     return vi.fn();
   })
 }));
@@ -51,8 +52,7 @@ const pendingSubmission = {
 describe("AdminPage moderation queue", () => {
   afterEach(() => {
     cleanup();
-    mocks.snapshotSuccess = undefined;
-    mocks.snapshotError = undefined;
+    mocks.listeners.clear();
     mocks.review.mockClear();
     mocks.where.mockClear();
   });
@@ -61,10 +61,10 @@ describe("AdminPage moderation queue", () => {
     render(<AdminPage />);
     expect(screen.getByText("Cargando bandeja de moderación…")).toBeInTheDocument();
 
-    act(() => mocks.snapshotSuccess?.({ docs: [] }));
+    act(() => mocks.listeners.get("submissions")?.success({ docs: [] }));
     expect(screen.getByText("Bandeja al día")).toBeInTheDocument();
 
-    act(() => mocks.snapshotError?.());
+    act(() => mocks.listeners.get("submissions")?.error());
     expect(screen.getByRole("alert")).toHaveTextContent("No pudimos cargar la bandeja de moderación.");
     expect(screen.queryByText("Bandeja al día")).not.toBeInTheDocument();
   });
@@ -72,7 +72,7 @@ describe("AdminPage moderation queue", () => {
   it("keeps review controls disabled until the private photograph is ready", () => {
     render(<AdminPage />);
     expect(mocks.where).toHaveBeenCalledWith("kind", "==", "challenge");
-    act(() => mocks.snapshotSuccess?.({ docs: [{ id: "submission-1", data: () => pendingSubmission }] }));
+    act(() => mocks.listeners.get("submissions")?.success({ docs: [{ id: "submission-1", data: () => pendingSubmission }] }));
     expect(screen.getByText(/confirma que la captura muestre el stand de GuateGeeks y la experiencia/i)).toBeInTheDocument();
 
     expect(screen.getByRole("button", { name: /Aprobar/u })).toBeDisabled();

@@ -1,11 +1,11 @@
 import { getAuth } from "firebase-admin/auth";
 import { FieldValue } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
-import { requireRole } from "../shared/auth";
+import { requireOwnerAdmin } from "../shared/auth";
 import { database, refs } from "../shared/refs";
 
 export const updateEventSettings = onCall({ region: "us-central1", enforceAppCheck: false }, async (request) => {
-  const actorUid = requireRole(request, ["admin"]);
+  const actorUid = requireOwnerAdmin(request);
   const allowed = ["registrationOpen", "missionsEnabled", "leaderboardEnabled", "uploadsEnabled", "photoMissionsEnabled", "maintenanceMode", "eventMode", "maxReplacements", "legal"];
   const updates = Object.fromEntries(Object.entries(request.data ?? {}).filter(([key]) => allowed.includes(key)));
   if (!Object.keys(updates).length) throw new HttpsError("invalid-argument", "NO_ALLOWED_SETTINGS");
@@ -15,7 +15,7 @@ export const updateEventSettings = onCall({ region: "us-central1", enforceAppChe
 });
 
 export const setStaffRole = onCall({ region: "us-central1", enforceAppCheck: false }, async (request) => {
-  const actorUid = requireRole(request, ["admin"]);
+  const actorUid = requireOwnerAdmin(request);
   const { uid, role } = request.data ?? {};
   if (typeof uid !== "string" || !["participant", "moderator", "admin"].includes(role)) throw new HttpsError("invalid-argument", "INVALID_ROLE");
   await getAuth().setCustomUserClaims(uid, { role });
@@ -27,6 +27,20 @@ export const setStaffRole = onCall({ region: "us-central1", enforceAppCheck: fal
 export const requestDataDeletion = onCall({ region: "us-central1", enforceAppCheck: false }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError("unauthenticated", "UNAUTHENTICATED");
-  await database.collection("deletionRequests").doc(uid).set({ uid, status: "requested", requestedAt: FieldValue.serverTimestamp() }, { merge: true });
+  const profile = await refs.user(uid).get();
+  const email = String(request.auth?.token.email ?? profile.data()?.email ?? "");
+  const [local, domain] = email.split("@");
+  const emailMasked = local && domain ? `${local.slice(0, 2)}••••@${domain}` : "Correo protegido";
+  await database.collection("deletionRequests").doc(uid).set({
+    uid,
+    alias: typeof profile.data()?.alias === "string" ? profile.data()?.alias : "Participante",
+    emailMasked,
+    status: "requested",
+    requestedAt: FieldValue.serverTimestamp(),
+    decidedAt: FieldValue.delete(),
+    decidedBy: FieldValue.delete(),
+    decisionNote: FieldValue.delete(),
+    failureCode: FieldValue.delete()
+  }, { merge: true });
   return { status: "requested" };
 });

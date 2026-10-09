@@ -1,10 +1,13 @@
-import { sendSignInLinkToEmail } from "firebase/auth";
+import { sendSignInLinkToEmail, signInAnonymously, signOut } from "firebase/auth";
+import { httpsCallable } from "firebase/functions";
 import { ArrowLeft, MailCheck, ShieldCheck } from "lucide-react";
 import { useState, type FormEvent } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { TERMS_VERSION } from "../../../shared/constants";
 import { Button, Card, Field, Input } from "../../design-system/components";
 import { useFirebaseEmulators } from "../../firebase/app";
 import { auth } from "../../firebase/auth";
+import { functions } from "../../firebase/functions";
 import { GeekBrandPanel } from "./GeekEyesLogo";
 import "./landing.css";
 import { clockPreviewSearch } from "../companion/useNow";
@@ -23,11 +26,33 @@ function sendErrorMessage(error: unknown) {
 
 export function LoginPage() {
   const routeLocation = useLocation();
+  const navigate = useNavigate();
   const localAuth = useFirebaseEmulators;
+  const localPreview = import.meta.env.DEV && localAuth;
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+
+  async function enterLocalPreview() {
+    setBusy(true);
+    setError("");
+    try {
+      const credential = await signInAnonymously(auth);
+      await httpsCallable(functions, "completeOnboarding")({
+        alias: `demo-${credential.user.uid.slice(0, 8)}`,
+        interests: [],
+        challengeProfile: { primaryRole: "Cloud", experienceLevel: "Mid", firstAwsCommunityDay: false, awsInterest: ["Serverless", "AI / Bedrock"] },
+        consent: { termsVersion: TERMS_VERSION, accepted: true, photoPublication: false, marketing: false }
+      });
+      navigate("/app/hoy", { replace: true });
+    } catch {
+      try { await signOut(auth); } catch { /* The emulator may not have created a session. */ }
+      setError("No se pudo preparar la cuenta de prueba. Comprueba que Auth, Firestore y Functions Emulator estén activos y que haya desafíos cargados.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -82,6 +107,7 @@ export function LoginPage() {
           </Field>
           <Button type="submit" variant="accent" block loading={busy}>Enviar enlace de acceso</Button>
         </form>
+        {localPreview && <div className="local-preview-access"><p className="eyebrow">Solo para pruebas locales</p><Button type="button" variant="secondary" block loading={busy} onClick={enterLocalPreview}>Entrar como participante de prueba</Button><p className="muted">Crea una cuenta temporal en Firebase Emulator. No se conecta a producción.</p></div>}
         <p className="auth-privacy"><ShieldCheck aria-hidden size={17} /> Tu correo sirve para identificar tu progreso y no se mostrará en el ranking.</p>
       </>}
     </Card>

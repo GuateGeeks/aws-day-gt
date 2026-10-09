@@ -2,6 +2,19 @@ export type Role = "participant" | "moderator" | "admin";
 export type EvidenceType = "photo" | "comment" | "word";
 export type MissionStatus = "available" | "submitted" | "approved" | "rejected" | "failed" | "replaced" | "cancelled" | "expired";
 export type SubmissionStatus = "pending" | "approved" | "rejected";
+export type DeletionRequestStatus = "requested" | "processing" | "rejected" | "failed";
+
+export interface DeletionRequest {
+  uid: string;
+  alias: string;
+  emailMasked: string;
+  status: DeletionRequestStatus;
+  requestedAt?: unknown;
+  decidedAt?: unknown;
+  decidedBy?: string;
+  decisionNote?: string;
+  failureCode?: string;
+}
 
 export interface EvidenceValidation {
   evidenceType: EvidenceType;

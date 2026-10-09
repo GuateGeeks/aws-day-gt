@@ -58,11 +58,13 @@ describe("Firestore participant boundaries", () => {
   it("keeps score documents private while allowing an owner to read their own progress", async () => {
     const owner = environment.authenticatedContext("u1", { role: "participant" }).firestore();
     const other = environment.authenticatedContext("u2", { role: "participant" }).firestore();
-    const moderator = environment.authenticatedContext("staff", { role: "moderator" }).firestore();
+    const moderator = environment.authenticatedContext("staff", { role: "moderator", email: "moderator@example.com" }).firestore();
+    const ownerAdmin = environment.authenticatedContext("owner", { role: "admin", email: "guategeeks3d@gmail.com" }).firestore();
     await assertSucceeds(getDoc(doc(owner, "scores/aws-community-day-gt-2026_u1")));
     await assertFails(getDoc(doc(other, "scores/aws-community-day-gt-2026_u1")));
     await assertFails(getDocs(collection(owner, "scores")));
-    await assertSucceeds(getDoc(doc(moderator, "scores/aws-community-day-gt-2026_u1")));
+    await assertFails(getDoc(doc(moderator, "scores/aws-community-day-gt-2026_u1")));
+    await assertSucceeds(getDoc(doc(ownerAdmin, "scores/aws-community-day-gt-2026_u1")));
   });
 
   it("lets an owner read Challenge state but never edit it", async () => {
@@ -92,10 +94,13 @@ describe("Firestore participant boundaries", () => {
     }
   });
 
-  it("allows moderators to inspect only Challenge photo submissions", async () => {
-    const db = environment.authenticatedContext("staff", { role: "moderator" }).firestore();
-    await assertFails(getDoc(doc(db, "submissions/aws-community-day-gt-2026_u1_M01")));
-    await assertSucceeds(getDoc(doc(db, "submissions/aws-community-day-gt-2026_u1_C15")));
+  it("allows only the GuateGeeks owner admin to inspect Challenge photo submissions", async () => {
+    const moderator = environment.authenticatedContext("staff", { role: "moderator", email: "moderator@example.com" }).firestore();
+    const otherAdmin = environment.authenticatedContext("other-admin", { role: "admin", email: "other@example.com" }).firestore();
+    const owner = environment.authenticatedContext("owner", { role: "admin", email: "guategeeks3d@gmail.com" }).firestore();
+    await assertFails(getDoc(doc(moderator, "submissions/aws-community-day-gt-2026_u1_C15")));
+    await assertFails(getDoc(doc(otherAdmin, "submissions/aws-community-day-gt-2026_u1_C15")));
+    await assertSucceeds(getDoc(doc(owner, "submissions/aws-community-day-gt-2026_u1_C15")));
   });
 
   it("shows station availability but never exposes official tokens", async () => {

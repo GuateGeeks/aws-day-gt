@@ -1,6 +1,7 @@
 {
   "indexes": [
     { "collectionGroup": "submissions", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "kind", "order": "ASCENDING" }, { "fieldPath": "status", "order": "ASCENDING" }, { "fieldPath": "submittedAt", "order": "DESCENDING" }] },
+    { "collectionGroup": "deletionRequests", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "status", "order": "ASCENDING" }, { "fieldPath": "requestedAt", "order": "DESCENDING" }] },
     { "collectionGroup": "scores", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "eventId", "order": "ASCENDING" }, { "fieldPath": "registeredForRanking", "order": "ASCENDING" }, { "fieldPath": "auraTotal", "order": "DESCENDING" }, { "fieldPath": "completedChallenges", "order": "DESCENDING" }, { "fieldPath": "auraReachedAt", "order": "ASCENDING" }] }
   ],
   "fieldOverrides": []

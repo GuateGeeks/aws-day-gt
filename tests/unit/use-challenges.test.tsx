@@ -1,4 +1,5 @@
-import { act, renderHook } from "@testing-library/react";
+import { act, render, renderHook } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { EVENT_ID } from "../../shared/constants";
 
@@ -29,13 +30,23 @@ vi.mock("../../src/firebase/data", () => ({ db: {} }));
 vi.mock("../../src/firebase/functions", () => ({ functions: {} }));
 vi.mock("../../src/features/auth/AuthProvider", () => ({ useAuth: () => ({ user: mock.user }) }));
 
-const { useChallenges } = await import("../../src/features/challenges/useChallenges");
+const { ChallengeDataProvider, useChallenges } = await import("../../src/features/challenges/useChallenges");
+const wrapper = ({ children }: { children: ReactNode }) => <ChallengeDataProvider>{children}</ChallengeDataProvider>;
 
 afterEach(() => { mock.user = { uid: "owner-1" }; mock.listeners.clear(); mock.listenerErrors.clear(); mock.stopped.length = 0; mock.ensures.length = 0; mock.failures.length = 0; });
 
 describe("useChallenges subscriptions", () => {
+  it("shares one Firebase subscription set between multiple consumers", async () => {
+    function Consumer() { useChallenges(); return null; }
+    const view = render(<ChallengeDataProvider><Consumer /><Consumer /></ChallengeDataProvider>);
+    expect(mock.ensures).toHaveLength(1);
+    await act(async () => mock.ensures.shift()!());
+    expect([...mock.listeners.keys()].filter((path) => path === "challengeAssignments/owner-1")).toHaveLength(1);
+    view.unmount();
+  });
+
   it("shows the updated C18 wording even when Firestore still has the old copy", async () => {
-    const { result, unmount } = renderHook(() => useChallenges());
+    const { result, unmount } = renderHook(() => useChallenges(), { wrapper });
     await act(async () => mock.ensures.shift()!());
     act(() => mock.listeners.get("challengeAssignments/owner-1")!({
       exists: () => true,
@@ -58,7 +69,7 @@ describe("useChallenges subscriptions", () => {
   });
 
   it("waits for migration before reading the owner's assignment and score", async () => {
-    const { result, unmount } = renderHook(() => useChallenges());
+    const { result, unmount } = renderHook(() => useChallenges(), { wrapper });
     const scorePath = `scores/${EVENT_ID}_owner-1`;
     const assignmentPath = "challengeAssignments/owner-1";
     expect(mock.listeners.has(scorePath)).toBe(false);
@@ -76,7 +87,7 @@ describe("useChallenges subscriptions", () => {
   });
 
   it("clears the previous owner's Aura when the user changes", async () => {
-    const { result, rerender, unmount } = renderHook(() => useChallenges());
+    const { result, rerender, unmount } = renderHook(() => useChallenges(), { wrapper });
     await act(async () => mock.ensures.shift()!());
     act(() => mock.listeners.get(`scores/${EVENT_ID}_owner-1`)!({ exists: () => true, data: () => ({ auraTotal: 200 }) }));
     mock.user = { uid: "owner-2" };
@@ -91,7 +102,7 @@ describe("useChallenges subscriptions", () => {
   });
 
   it("does not start listeners after its owner unmounts", async () => {
-    const { unmount } = renderHook(() => useChallenges());
+    const { unmount } = renderHook(() => useChallenges(), { wrapper });
     unmount();
     await act(async () => mock.ensures.shift()!());
     expect(mock.listeners.has(`scores/${EVENT_ID}_owner-1`)).toBe(false);
@@ -99,7 +110,7 @@ describe("useChallenges subscriptions", () => {
   });
 
   it("ignores an old owner's assignment response after switching users", async () => {
-    const { rerender, unmount } = renderHook(() => useChallenges());
+    const { rerender, unmount } = renderHook(() => useChallenges(), { wrapper });
     const finishOldAssignment = mock.ensures.shift()!;
     mock.user = { uid: "owner-2" };
     rerender();
@@ -113,7 +124,7 @@ describe("useChallenges subscriptions", () => {
   });
 
   it("reports a migration failure without reading the legacy assignment or missing score", async () => {
-    const { result, unmount } = renderHook(() => useChallenges());
+    const { result, unmount } = renderHook(() => useChallenges(), { wrapper });
     expect(mock.listeners.has("challengeAssignments/owner-1")).toBe(false);
     expect(result.current.items).toEqual([]);
     await act(async () => mock.failures.shift()!());
@@ -127,7 +138,7 @@ describe("useChallenges subscriptions", () => {
   });
 
   it("reports a score listener failure before its first snapshot", async () => {
-    const { result, unmount } = renderHook(() => useChallenges());
+    const { result, unmount } = renderHook(() => useChallenges(), { wrapper });
     await act(async () => mock.ensures.shift()!());
     const scorePath = `scores/${EVENT_ID}_owner-1`;
     act(() => mock.listenerErrors.get(scorePath)!());
@@ -137,7 +148,7 @@ describe("useChallenges subscriptions", () => {
   });
 
   it("waits through cached retired challenges until the nine-Challenge pack arrives", async () => {
-    const { result, unmount } = renderHook(() => useChallenges());
+    const { result, unmount } = renderHook(() => useChallenges(), { wrapper });
     await act(async () => mock.ensures.shift()!());
     const assignmentPath = "challengeAssignments/owner-1";
     const oldIds = Array.from({ length: 10 }, (_, index) => `C${String(index + 1).padStart(2, "0")}`);

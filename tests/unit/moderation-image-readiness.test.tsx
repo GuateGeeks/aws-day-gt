@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { getBlob } from "firebase/storage";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Submission } from "../../shared/types";
@@ -40,5 +40,19 @@ describe("Moderation image confirmation", () => {
     expect(approve).toBeDisabled();
     expect(reject).toBeDisabled();
     expect(onReview).not.toHaveBeenCalled();
+  });
+
+  it("collects a clear reason before rejecting an image", async () => {
+    const onReview = vi.fn(async () => {});
+    render(<ModerationCard submission={submission} onReview={onReview} />);
+    fireEvent.load(await screen.findByRole("img", { name: "Evidencia fotográfica del Challenge C16" }));
+    fireEvent.click(screen.getByRole("button", { name: "Rechazar" }));
+
+    const confirm = screen.getByRole("button", { name: "Confirmar rechazo" });
+    expect(confirm).toBeDisabled();
+    fireEvent.change(screen.getByPlaceholderText(/no se distingue el stand/i), { target: { value: "La imagen está borrosa." } });
+    fireEvent.click(confirm);
+
+    await waitFor(() => expect(onReview).toHaveBeenCalledWith(submission, "rejected", "La imagen está borrosa."));
   });
 });

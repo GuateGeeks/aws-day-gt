@@ -4,8 +4,8 @@ service cloud.firestore {
     function signedIn() { return request.auth != null; }
     function owns(uid) { return signedIn() && request.auth.uid == uid; }
     function role() { return signedIn() && request.auth.token.role != null ? request.auth.token.role : 'participant'; }
-    function staff() { return role() == 'moderator' || role() == 'admin'; }
     function admin() { return role() == 'admin'; }
+    function ownerAdmin() { return admin() && request.auth.token.email == 'guategeeks3d@gmail.com'; }
 
     match /events/{eventId} {
       allow read: if true;
@@ -17,7 +17,7 @@ service cloud.firestore {
     }
 
     match /users/{uid} {
-      allow read: if owns(uid) || staff();
+      allow read: if owns(uid) || ownerAdmin();
       allow create: if false;
       allow update: if owns(uid)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['interests', 'consent', 'lastLoginAt'])
@@ -45,12 +45,12 @@ service cloud.firestore {
     }
 
     match /challengeAssignments/{uid} {
-      allow read: if owns(uid) || staff();
+      allow read: if owns(uid) || ownerAdmin();
       allow write: if false;
     }
 
     match /challengeProgress/{progressId} {
-      allow read: if signedIn() && (resource.data.userId == request.auth.uid || staff());
+      allow read: if signedIn() && (resource.data.userId == request.auth.uid || ownerAdmin());
       allow write: if false;
     }
 
@@ -67,12 +67,12 @@ service cloud.firestore {
     }
 
     match /submissions/{submissionId} {
-      allow read: if signedIn() && resource.data.kind == 'challenge' && (resource.data.userId == request.auth.uid || staff());
+      allow read: if signedIn() && resource.data.kind == 'challenge' && (resource.data.userId == request.auth.uid || ownerAdmin());
       allow write: if false;
     }
 
     match /scores/{scoreId} {
-      allow read: if signedIn() && (resource.data.userId == request.auth.uid || staff());
+      allow read: if signedIn() && (resource.data.userId == request.auth.uid || ownerAdmin());
       allow write: if false;
     }
 
@@ -87,12 +87,12 @@ service cloud.firestore {
     }
 
     match /auditLogs/{auditId} {
-      allow read: if admin();
+      allow read: if ownerAdmin();
       allow write: if false;
     }
 
     match /deletionRequests/{uid} {
-      allow read: if owns(uid) || admin();
+      allow read: if owns(uid) || ownerAdmin();
       allow write: if false;
     }
 

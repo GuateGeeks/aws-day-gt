@@ -22,4 +22,10 @@ describe("Storage evidence boundaries", () => {
   it("prevents client updates and deletes", () => {
     expect(rules).toContain("allow update, delete: if false");
   });
+
+  it("allows evidence review only to the configured owner admin", () => {
+    expect(rules).toContain("request.auth.token.role == 'admin'");
+    expect(rules).toContain("request.auth.token.email == 'guategeeks3d@gmail.com'");
+    expect(rules).not.toContain("request.auth.token.role == 'moderator'");
+  });
 });

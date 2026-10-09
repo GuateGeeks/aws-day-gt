@@ -71,11 +71,16 @@ describe("simulated clock", () => {
     expect(rehearsalEnabledForHost("aws-day-gt.firebaseapp.com")).toBe(true);
     expect(rehearsalEnabledForHost("example.com")).toBe(false);
   });
-  it("runs the October 8 rehearsal at the matching event time and ends it automatically", () => {
+
+  it("keeps the October 10 agenda preview active during the October 9 rehearsal", () => {
+    const real = new Date("2026-10-09T10:25:00-06:00");
+    expect(effectiveEventNow(real, true)).toEqual(new Date("2026-10-10T10:25:00-06:00"));
+  });
+  it("runs the October 8 and 9 rehearsal at the matching event time and ends it automatically", () => {
     const real = new Date("2026-10-08T10:25:00-06:00");
     expect(effectiveEventNow(real, true, 0).toISOString()).toBe("2026-10-10T16:25:00.000Z");
     expect(effectiveEventNow(real, false, 0)).toEqual(real);
-    expect(effectiveEventNow(new Date("2026-10-09T10:25:00-06:00"), true, 0)).toEqual(new Date("2026-10-09T10:25:00-06:00"));
+    expect(effectiveEventNow(new Date("2026-10-09T10:25:00-06:00"), true, 0)).toEqual(new Date("2026-10-10T10:25:00-06:00"));
     expect(effectiveEventNow(real, true, 60_000)).toEqual(new Date(real.getTime() + 60_000));
   });
   it("stores an offset from ?ahora and clears it with real", () => {

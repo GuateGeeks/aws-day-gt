@@ -1,7 +1,7 @@
 import { FieldValue } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { isPhotoChallengeId } from "../../../shared/challenges/photo";
-import { requireRole } from "../shared/auth";
+import { requireOwnerAdmin } from "../shared/auth";
 import { database, refs } from "../shared/refs";
 
 export async function reviewSubmissionForStaff(actorUid: string, input: { userId: string; missionId: string; decision: "approved" | "rejected"; reasonCode?: string; note?: string }) {
@@ -31,5 +31,5 @@ export async function reviewSubmissionForStaff(actorUid: string, input: { userId
 }
 
 export const reviewSubmission = onCall({ region: "us-central1", enforceAppCheck: false }, async (request) => {
-  return reviewSubmissionForStaff(requireRole(request, ["moderator", "admin"]), request.data);
+  return reviewSubmissionForStaff(requireOwnerAdmin(request), request.data);
 });

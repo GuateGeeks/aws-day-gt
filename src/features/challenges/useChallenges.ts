@@ -1,6 +1,6 @@
 import { collection, doc, documentId, onSnapshot, query, where } from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
-import { useEffect, useState } from "react";
+import { createContext, createElement, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { EVENT_ID } from "../../../shared/constants";
 import { challenges } from "../../../shared/challenges/catalog";
 import type { Challenge, ChallengeAssignment, ChallengeProgress } from "../../../shared/challenges/types";
@@ -26,7 +26,7 @@ function withCurrentCopy(challenge: Challenge): Challenge {
   return { ...challenge, description: currentCopy.description };
 }
 
-export function useChallenges() {
+function useChallengeDataSource() {
   const { user } = useAuth();
   const userId = user?.uid;
   const [assignment, setAssignment] = useState<ChallengeAssignment | null>(null);
@@ -74,5 +74,19 @@ export function useChallenges() {
     const challenge = byChallenge.get(id), state = byProgress.get(id);
     return challenge && state ? [{ challenge: withCurrentCopy(challenge), progress: state }] : [];
   }), userId ?? "");
-  return { items, auraTotal, auraDeductedTotal, loading, error };
+  return useMemo(() => ({ items, auraTotal, auraDeductedTotal, loading, error }), [items, auraTotal, auraDeductedTotal, loading, error]);
+}
+
+type ChallengeData = ReturnType<typeof useChallengeDataSource>;
+const ChallengeDataContext = createContext<ChallengeData | null>(null);
+
+export function ChallengeDataProvider({ children }: { children: ReactNode }) {
+  const value = useChallengeDataSource();
+  return createElement(ChallengeDataContext.Provider, { value }, children);
+}
+
+export function useChallenges() {
+  const value = useContext(ChallengeDataContext);
+  if (!value) throw new Error("useChallenges must be used inside ChallengeDataProvider");
+  return value;
 }

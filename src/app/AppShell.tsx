@@ -6,6 +6,7 @@ import { AgendaReminderCenter } from "../features/companion/AgendaReminderCenter
 import { useNow } from "../features/companion/useNow";
 import { GuateGeeksLogo } from "../features/auth/GeekEyesLogo";
 import { useAuth } from "../features/auth/AuthProvider";
+import { ChallengeDataProvider } from "../features/challenges/useChallenges";
 
 const tabs = [
   { to: "/app/hoy", label: "Hoy", icon: Bot },
@@ -18,7 +19,7 @@ export function AppShell() {
   const now = useNow();
   const { profile } = useAuth();
   const initial = profile?.alias?.trim().slice(0, 1).toLocaleUpperCase("es-GT");
-  return <>
+  return <ChallengeDataProvider>
     <a className="skip-link" href="#content">Saltar al contenido</a>
     <main className="page">
       <header className="app-header">
@@ -31,5 +32,5 @@ export function AppShell() {
     </main>
     <FeatherCelebration />
     <AgendaReminderCenter now={now} />
-  </>;
+  </ChallengeDataProvider>;
 }

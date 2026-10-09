@@ -3,7 +3,7 @@ import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { z } from "zod";
 import { selectChallengePack } from "../../../shared/challenges/assignment";
 import type { Challenge } from "../../../shared/challenges/types";
-import { requireRole } from "../shared/auth";
+import { requireOwnerAdmin } from "../shared/auth";
 import { database, refs } from "../shared/refs";
 
 export async function configureSessionForAdmin(_actorUid: string, _raw: unknown) {
@@ -11,7 +11,7 @@ export async function configureSessionForAdmin(_actorUid: string, _raw: unknown)
 }
 
 export const configureChallengeSession = onCall({ region: "us-central1", enforceAppCheck: false }, async (request) => {
-  return configureSessionForAdmin(requireRole(request, ["admin"]), request.data);
+  return configureSessionForAdmin(requireOwnerAdmin(request), request.data);
 });
 
 const eventCodeSchema = z.object({
@@ -27,7 +27,7 @@ export async function configureEventCodeForAdmin(_actorUid: string, raw: unknown
 }
 
 export const configureEventCode = onCall({ region: "us-central1", enforceAppCheck: false }, async (request) => {
-  return configureEventCodeForAdmin(requireRole(request, ["admin"]), request.data);
+  return configureEventCodeForAdmin(requireOwnerAdmin(request), request.data);
 });
 
 const settingsSchema = z.object({
@@ -60,7 +60,7 @@ export async function updateChallengeSettingsForAdmin(actorUid: string, raw: unk
 }
 
 export const updateChallengeSettings = onCall({ region: "us-central1", enforceAppCheck: false }, async (request) => {
-  return updateChallengeSettingsForAdmin(requireRole(request, ["admin"]), request.data);
+  return updateChallengeSettingsForAdmin(requireOwnerAdmin(request), request.data);
 });
 
 const stationSchema = z.object({ stationId: z.literal("cloudforge"), name: z.string().min(3).max(120), active: z.boolean() });
@@ -80,7 +80,7 @@ export async function updateExperienceStationForAdmin(actorUid: string, raw: unk
 }
 
 export const updateExperienceStation = onCall({ region: "us-central1", enforceAppCheck: false }, async (request) => {
-  return updateExperienceStationForAdmin(requireRole(request, ["admin"]), request.data);
+  return updateExperienceStationForAdmin(requireOwnerAdmin(request), request.data);
 });
 
 const optionsSchema = z.array(z.object({ id: z.string().regex(/^[a-zA-Z0-9_-]{1,40}$/), label: z.string().min(1).max(160) })).min(2).max(10)
@@ -109,7 +109,7 @@ export async function configureCloudQuestionForAdmin(actorUid: string, raw: unkn
 }
 
 export const configureCloudQuestion = onCall({ region: "us-central1", enforceAppCheck: false }, async (request) => {
-  return configureCloudQuestionForAdmin(requireRole(request, ["admin"]), request.data);
+  return configureCloudQuestionForAdmin(requireOwnerAdmin(request), request.data);
 });
 
 export async function configureTrackPulseForAdmin(actorUid: string, raw: unknown) {
@@ -125,5 +125,5 @@ export async function configureTrackPulseForAdmin(actorUid: string, raw: unknown
 }
 
 export const configureTrackPulse = onCall({ region: "us-central1", enforceAppCheck: false }, async (request) => {
-  return configureTrackPulseForAdmin(requireRole(request, ["admin"]), request.data);
+  return configureTrackPulseForAdmin(requireOwnerAdmin(request), request.data);
 });

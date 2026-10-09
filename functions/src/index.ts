@@ -11,3 +11,4 @@ export { registerPhotoSubmission } from "./submissions/register-photo";
 export { reviewSubmission } from "./moderation/review-submission";
 export { getLeaderboardSnapshot } from "./scoring/leaderboard";
 export { updateEventSettings, setStaffRole, requestDataDeletion } from "./admin/operations";
+export { reviewDataDeletion } from "./admin/data-deletion";
