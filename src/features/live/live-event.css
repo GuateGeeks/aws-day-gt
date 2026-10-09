@@ -15,6 +15,7 @@
   grid-template-rows: auto minmax(0, 1fr) auto;
   gap: clamp(14px, 1.2vw, 24px);
   width: 100%;
+  height: 100dvh;
   min-height: 100dvh;
   overflow: hidden;
   padding: clamp(18px, 1.7vw, 34px);
@@ -121,7 +122,7 @@
 @keyframes live-loading { 50% { opacity: .45; transform: scale(.92); } }
 
 @media (max-width: 1100px), (max-aspect-ratio: 5 / 4) {
-  .live-event { min-height: 100dvh; overflow: auto; }
+  .live-event { height: auto; min-height: 100dvh; overflow: auto; }
   .live-stage { grid-template-columns: 1fr; }
   .live-network { min-height: min(72vh, 680px); }
   .live-story { grid-template-columns: 1fr 1fr; grid-template-rows: minmax(420px, auto); }
