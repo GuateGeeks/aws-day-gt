@@ -15,6 +15,7 @@ describe("Credit ledger", () => {
       { challenge: challenges.find((item) => item.id === "C07")!, progress: { status: "available" } }
     ];
     render(<MemoryRouter><ProgressPage /></MemoryRouter>);
+    expect(screen.getAllByRole("img", { name: "AWS Community Day Guatemala" })).toHaveLength(2);
     expect(screen.getByText("Tu saldo de créditos")).toBeInTheDocument();
     expect(screen.getAllByText("−20 créditos")).toHaveLength(3);
     expect(screen.getByText("Ganados")).toBeInTheDocument();

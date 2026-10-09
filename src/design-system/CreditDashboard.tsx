@@ -1,4 +1,5 @@
 import { CreditAmount, formatCredits } from "./credits";
+import { EventLogo } from "./EventLogo";
 
 interface CreditDashboardProps {
   balance: number | null;
@@ -18,6 +19,7 @@ export function CreditDashboard({ balance, balanceFallback = "Cargando créditos
 
   return <div className="credit-dashboard" aria-label="Resumen de créditos">
     <div className="credit-dashboard__balance">
+      <EventLogo className="event-mark--credits" />
       <span className="credit-dashboard__eyebrow">Tu saldo de créditos</span>
       {balance === null ? <strong className="credit-dashboard__fallback">{balanceFallback}</strong> : <CreditAmount value={balance} />}
       <small>Se actualiza al completar o fallar un reto.</small>
