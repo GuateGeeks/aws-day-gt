@@ -282,6 +282,12 @@ textarea.ds-input { min-height: 132px; resize: vertical; }
   .section-hero--with-aside .section-hero__aside { grid-column: 1 / -1; padding: var(--space-4) var(--space-5); border-top: 1px solid var(--color-border); border-left: 0; }
   .section-hero--with-aside .ranking-intro__position { width: min(100%, 190px); justify-self: center; text-align: center; }
 }
+@media (max-width: 899px) {
+  .section-hero--stacked { grid-template-columns: 1fr; }
+  .section-hero--stacked .section-hero__content { padding-bottom: var(--space-4); }
+  .section-hero--stacked .section-hero__aside { grid-column: 1; padding: 0 var(--space-5) var(--space-5); border: 0; background: #fff; }
+  .section-hero--stacked .ranking-intro__position { justify-self: center; width: min(100%, 190px); text-align: center; }
+}
 @media (max-width: 559px) {
   .section-hero, .section-hero--with-aside { grid-template-columns: 1fr; gap: 0; padding: 0; }
   .section-hero--stacked { grid-template-columns: 1fr; }
