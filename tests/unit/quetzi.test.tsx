@@ -6,7 +6,7 @@ import { quetziLine } from "../../shared/companion";
 import { QuetziGuide } from "../../src/features/companion/QuetziGuide";
 import { AgendaSpotlightCard } from "../../src/features/companion/CompanionCards";
 import { QuetziSprite } from "../../src/features/companion/QuetziSprite";
-import { effectiveEventNow, readClockOffset, rehearsalEnabledForHost } from "../../src/features/companion/useNow";
+import { clockPreviewSearch, effectiveEventNow, readClockOffset, rehearsalEnabledForHost } from "../../src/features/companion/useNow";
 
 const clock = vi.hoisted(() => ({ now: new Date("2026-10-08T09:00:00-06:00") }));
 vi.mock("../../src/features/auth/AuthProvider", () => ({ useAuth: () => ({ profile: { alias: "ana", interests: ["IA & Agentes"] } }) }));
@@ -91,6 +91,12 @@ describe("simulated clock", () => {
     expect(readClockOffset("?ahora=ensayo", fake, real)).toBe(0);
     expect(storage.has("quetzi.use-real-clock")).toBe(false);
     expect(readClockOffset("?ahora=nope", fake, real)).toBe(0);
+  });
+
+  it("preserves only valid visual clock previews through sign-in", () => {
+    expect(clockPreviewSearch("?ahora=2026-10-10T10%3A00&other=ignored")).toBe("?ahora=2026-10-10T10%3A00");
+    expect(clockPreviewSearch("?ahora=real")).toBe("?ahora=real");
+    expect(clockPreviewSearch("?ahora=malformed")).toBe("");
   });
 });
 

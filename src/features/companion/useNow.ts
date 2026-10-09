@@ -12,6 +12,13 @@ export function rehearsalEnabledForHost(hostname: string): boolean {
     || hostname === "aws-day-gt.web.app" || hostname === "aws-day-gt.firebaseapp.com";
 }
 
+/** Keeps event-day preview parameters across the login link flow. */
+export function clockPreviewSearch(search: string): string {
+  const param = new URLSearchParams(search).get("ahora");
+  return param === "real" || param === "ensayo" || (param !== null && LOCAL_TIME.test(param))
+    ? `?ahora=${encodeURIComponent(param)}` : "";
+}
+
 /**
  * `?ahora=2026-10-10T10:00` (Guatemala time) lets organizers preview the day.
  * `?ahora=real` shows the real date; `?ahora=ensayo` restores the October 8 rehearsal.

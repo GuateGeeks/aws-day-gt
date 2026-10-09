@@ -1,12 +1,13 @@
 import { sendSignInLinkToEmail } from "firebase/auth";
 import { ArrowLeft, MailCheck, ShieldCheck } from "lucide-react";
 import { useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button, Card, Field, Input } from "../../design-system/components";
 import { useFirebaseEmulators } from "../../firebase/app";
 import { auth } from "../../firebase/auth";
 import { GeekBrandPanel } from "./GeekEyesLogo";
 import "./landing.css";
+import { clockPreviewSearch } from "../companion/useNow";
 
 const pendingEmailKey = "aws-day-gt.pending-email";
 
@@ -21,6 +22,7 @@ function sendErrorMessage(error: unknown) {
 }
 
 export function LoginPage() {
+  const routeLocation = useLocation();
   const localAuth = useFirebaseEmulators;
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
@@ -34,7 +36,7 @@ export function LoginPage() {
     const normalizedEmail = email.trim();
     try {
       await sendSignInLinkToEmail(auth, normalizedEmail, {
-        url: `${location.origin}/auth/complete`,
+        url: `${location.origin}/auth/complete${clockPreviewSearch(routeLocation.search)}`,
         handleCodeInApp: true
       });
       localStorage.setItem(pendingEmailKey, normalizedEmail);

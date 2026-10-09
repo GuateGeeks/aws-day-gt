@@ -1,15 +1,17 @@
 import { isSignInWithEmailLink, signInWithEmailLink } from "firebase/auth";
 import { ArrowLeft, MailCheck } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button, Card, Field, Input, StatusNotice } from "../../design-system/components";
 import { auth } from "../../firebase/auth";
 import { GeekBrandPanel } from "./GeekEyesLogo";
 import { pendingEmailKey } from "./LoginPage";
 import "./landing.css";
+import { clockPreviewSearch } from "../companion/useNow";
 
 export function AuthCompletePage() {
   const navigate = useNavigate();
+  const routeLocation = useLocation();
   const started = useRef(false);
   const [email, setEmail] = useState("");
   const [needsEmail, setNeedsEmail] = useState(false);
@@ -22,7 +24,7 @@ export function AuthCompletePage() {
     try {
       await signInWithEmailLink(auth, value.trim(), location.href);
       localStorage.removeItem(pendingEmailKey);
-      navigate("/app", { replace: true });
+      navigate(`/app${clockPreviewSearch(routeLocation.search)}`, { replace: true });
     } catch (reason) {
       const code = typeof reason === "object" && reason !== null && "code" in reason ? String(reason.code) : "";
       if (code === "auth/invalid-email") {
@@ -35,7 +37,7 @@ export function AuthCompletePage() {
     } finally {
       setBusy(false);
     }
-  }, [navigate]);
+  }, [navigate, routeLocation.search]);
 
   useEffect(() => {
     if (started.current) return;
