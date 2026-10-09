@@ -51,7 +51,7 @@ describe("useChallenges subscriptions", () => {
     });
     const challenge = result.current.items.find((item) => item.challenge.id === "C18")?.challenge;
     expect(challenge?.title).toBe("Inscripciones sin perder el ritmo");
-    expect(challenge?.description).toContain("mantenga en espera");
+    expect(challenge?.description).toContain("conservar y procesar");
     expect(challenge?.configuration.scenario).toContain("conservar cada solicitud");
     expect(challenge?.configuration.options).toEqual([{ id: "sqs", label: "Amazon SQS" }]);
     unmount();

@@ -8,6 +8,7 @@ import { challengeProfileSchema } from "../../../shared/challenges/profile";
 import type { Challenge, ChallengeProgress } from "../../../shared/challenges/types";
 import { validateCloudResponse, validateCloudTrio, validateSocialPair, validateTrack, type ChallengeResponse } from "../../../shared/challenges/validators";
 import { requireUid } from "../shared/auth";
+import { assertSubmissionWindowOpen } from "../shared/submission-window";
 import { database, refs } from "../shared/refs";
 
 type CompletionInput = { challengeId: string; operationId: string; response?: ChallengeResponse & { geekToken?: string } };
@@ -97,6 +98,7 @@ export async function completeChallengeForUid(uid: string, input: CompletionInpu
     if (current.status === "completed") return { status: "completed", auraAwarded: current.auraAwarded ?? challenge.auraReward };
     if (current.status === "failed") return { status: "failed", auraAwarded: 0, auraDeducted: current.auraDeducted ?? wrongAnswerCost, solution: current.solution ?? "Consulta la solución con el equipo del evento.", ...(current.incorrectReason ? { incorrectReason: current.incorrectReason } : {}) };
     if (current.status === "locked" || current.status === "processing") throw new HttpsError("failed-precondition", "CHALLENGE_UNAVAILABLE");
+    assertSubmissionWindowOpen();
     if (challengeId === "C15") throw new HttpsError("failed-precondition", "PHOTO_REVIEW_REQUIRED");
 
     let evidence: Record<string, unknown> = {};

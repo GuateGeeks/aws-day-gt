@@ -15,6 +15,10 @@ describe("Storage evidence boundaries", () => {
     expect(rules).toContain("image/(webp|jpeg|png)");
   });
 
+  it("closes photo submissions at 4:00 p.m. Guatemala time on October 10", () => {
+    expect(rules).toContain("request.time < timestamp.value(1791669600000)");
+  });
+
   it("prevents client updates and deletes", () => {
     expect(rules).toContain("allow update, delete: if false");
   });

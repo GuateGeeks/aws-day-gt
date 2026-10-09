@@ -7,6 +7,7 @@ import { DomainError } from "../../../shared/errors";
 import { applyApprovedMission } from "../scoring/calculate";
 import { requireUid } from "../shared/auth";
 import { database, refs } from "../shared/refs";
+import { assertSubmissionWindowOpen } from "../shared/submission-window";
 import { resolveMissionSelection } from "./selection-result";
 
 export const submitTextMission = onCall({ region: "us-central1", enforceAppCheck: false }, async (request) => {
@@ -17,6 +18,7 @@ export const submitTextMission = onCall({ region: "us-central1", enforceAppCheck
     const operationRef = refs.operation(uid, operationId);
     const operation = await transaction.get(operationRef);
     if (operation.exists) return operation.data()?.result;
+    assertSubmissionWindowOpen();
     const assignmentRef = refs.userMission(uid, missionId);
     const missionRef = refs.mission(missionId);
     const answerKeyRef = refs.missionAnswerKey(missionId);

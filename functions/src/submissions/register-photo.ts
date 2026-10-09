@@ -7,13 +7,18 @@ import { requireUid } from "../shared/auth";
 import { adminApp } from "../shared/admin";
 import { photoModeration } from "../challenges/photo-moderation";
 import { database, refs } from "../shared/refs";
+import { assertSubmissionWindowOpen } from "../shared/submission-window";
 
 export function evidenceBucket() { return getStorage(adminApp).bucket(); }
 
 export async function registerPhotoForUid(uid: string, input: { missionId: string; operationId: string; storagePath: string }) {
   const { missionId, operationId, storagePath } = input ?? {};
   if (![missionId, operationId, storagePath].every((value) => typeof value === "string")) throw new HttpsError("invalid-argument", "INVALID_SUBMISSION");
+  if (!/^[a-zA-Z0-9_-]{1,80}$/.test(operationId)) throw new HttpsError("invalid-argument", "INVALID_SUBMISSION");
   if (!isPhotoChallengeId(missionId)) throw new HttpsError("failed-precondition", "CHALLENGE_REQUIRED");
+  const priorOperation = await refs.operation(uid, operationId).get();
+  if (priorOperation.exists) return priorOperation.data()?.result;
+  assertSubmissionWindowOpen();
   const expectedPrefix = `evidence/${EVENT_ID}/${uid}/${missionId}/`;
   if (!storagePath.startsWith(expectedPrefix)) throw new HttpsError("permission-denied", "INVALID_STORAGE_PATH");
   const bucket = evidenceBucket();
@@ -29,6 +34,7 @@ export async function registerPhotoForUid(uid: string, input: { missionId: strin
     const operationRef = refs.operation(uid, operationId);
     const operation = await transaction.get(operationRef);
     if (operation.exists) return operation.data()?.result;
+    assertSubmissionWindowOpen();
     const assignmentRef = refs.challengeProgress(uid, missionId);
     const [assignment, pack, challenge, profile] = await Promise.all([transaction.get(assignmentRef), transaction.get(refs.challengeAssignment(uid)), transaction.get(refs.challenge(missionId)), transaction.get(refs.user(uid))]);
     if (isBonusPhotoChallengeId(missionId) && !profile.data()?.onboardingComplete) throw new HttpsError("failed-precondition", "ONBOARDING_REQUIRED");

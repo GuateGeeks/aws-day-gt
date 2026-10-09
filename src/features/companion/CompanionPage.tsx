@@ -12,6 +12,7 @@ import { BrowserReminderButton } from "./AgendaReminderCenter";
 import { QuetziGuide } from "./QuetziGuide";
 import { isLocalRehearsalActive, useNow } from "./useNow";
 import "./companion.css";
+import { SubmissionWindowNotice } from "../submissions/SubmissionWindowNotice";
 
 export function CompanionPage() {
   const { profile } = useAuth(); const { items: challenges } = useChallenges(); const now = useNow();
@@ -24,8 +25,9 @@ export function CompanionPage() {
   return <section className="stack companion">
     <div className="companion-welcome">
       <GeekBrandPanel />
-      <div className="companion-welcome__body"><p className="eyebrow">AWS Community Day Guatemala 2026</p><h1>¡Bienvenido{profile?.alias ? `, ${profile.alias}` : ""}!</h1><p>Explora la experiencia y elige tu primer desafío. Cada reto completado suma créditos a tu recorrido.</p><Link className="ds-button ds-button--accent" to="/app/challenges">Vamos al challenge <ArrowRight aria-hidden size={20} /></Link></div>
+      <div className="companion-welcome__body"><h1>¡Bienvenido{profile?.alias ? `, ${profile.alias}` : ""}!</h1><p>Explora la experiencia y elige tu primer desafío. Cada reto completado suma créditos a tu recorrido.</p><Link className="ds-button ds-button--accent" to="/app/challenges">Vamos al challenge <ArrowRight aria-hidden size={20} /></Link></div>
     </div>
+    <SubmissionWindowNotice />
     {phase !== "post" && <AgendaSpotlightCard now={now} rehearsal={isLocalRehearsalActive()} />}
     {phase !== "post" && <BrowserReminderButton />}
     <QuetziGuide completed={completed} line={line} onTap={() => setTaps((count) => count + 1)} />

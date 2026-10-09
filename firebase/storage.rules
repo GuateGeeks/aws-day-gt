@@ -8,6 +8,7 @@ service firebase.storage {
       allow create: if signedIn()
         && request.auth.uid == uid
         && challengeId in ['C15', 'C16', 'C17']
+        && request.time < timestamp.value(1791669600000)
         && request.resource.size <= 1572864
         && request.resource.contentType.matches('image/(webp|jpeg|png)');
       allow read: if signedIn() && challengeId in ['C15', 'C16', 'C17'] && (request.auth.uid == uid || staff());

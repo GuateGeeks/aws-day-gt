@@ -60,7 +60,7 @@ export const challenges: Challenge[] = [
   }, true),
   { ...challenge("C13", "Experiencia VR GuateGeeks", "Actividad retirada del recorrido.", "EXPERIENCE", 250, "experience_completion", { stationId: "cloudforge" }), active: false },
   { ...challenge("C14", "VR Explorer", "Actividad retirada del recorrido.", "EXPERIENCE", 150, "experience_completion", { stationId: "vr-explorer" }), active: false },
-  challenge("C15", "Comparte la experiencia GuateGeeks", "Publica sobre la experiencia de GuateGeeks, etiqueta a la comunidad y adjunta una captura para revisión.", "COMMUNITY", 350, "community_photo", {}, true),
+  challenge("C15", "Comparte la experiencia GuateGeeks", "Visita el stand de GuateGeeks, comparte la experiencia en tus redes, etiqueta a GuateGeeks y adjunta una captura de la publicación para revisión.", "COMMUNITY", 350, "community_photo", {}, true),
   challenge("C16", "Selfie con speaker", "Comparte una selfie donde aparezcas junto a un speaker; el equipo revisará la imagen.", "COMMUNITY", 100, "community_photo"),
   challenge("C17", "Selfie en un stand", "Comparte una selfie en uno de los stands; el equipo verificará que se distingan tu rostro y el lugar.", "COMMUNITY", 100, "community_photo"),
   challenge("C18", "Inscripciones sin perder el ritmo", "Elige cómo conservar y procesar solicitudes mientras el servicio de confirmación está pausado.", "CLOUD", 150, "interactive_question", {

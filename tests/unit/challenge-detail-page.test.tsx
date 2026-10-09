@@ -31,7 +31,7 @@ describe("Challenge completion", () => {
     render(<MemoryRouter initialEntries={["/app/challenges/C08"]}><Routes><Route path="/app/challenges/:challengeId" element={<ChallengeDetailPage />} /></Routes></MemoryRouter>);
     expect(await screen.findByRole("button", { name: "DynamoDB" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Confirmar respuesta" })).toBeDisabled();
-    expect(screen.getByText(/Tienes una oportunidad.*10 créditos/u)).toBeInTheDocument();
+    expect(screen.queryByText(/Tienes una oportunidad.*10 créditos/u)).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Validar Challenge" })).not.toBeInTheDocument();
   });
 
@@ -91,7 +91,7 @@ describe("Challenge completion", () => {
     expect(screen.getByRole("heading", { name: "¿Qué servicio AWS resuelve este reto?" })).toBeInTheDocument();
     expect(document.querySelector("canvas")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Confirmar respuesta" })).toBeDisabled();
-    expect(screen.getByText(/Si no resuelves correctamente el reto, pierdes 10 créditos/u)).toBeInTheDocument();
+    expect(screen.queryByText(/Si no resuelves correctamente el reto, pierdes 10 créditos/u)).not.toBeInTheDocument();
   });
 
   it("presents Who Am I clues as a numbered list with choices", () => {

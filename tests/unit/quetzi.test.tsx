@@ -31,12 +31,10 @@ describe("Quetzi sprite", () => {
     expect(screen.getByRole("img")).toHaveAccessibleName("Geek, etapa Núcleo radiante");
   });
 
-  it("uses concentric circuits and no bird silhouette for the event guide", () => {
+  it("uses the transparent GuateGeeks eyes as the event guide", () => {
     const { container } = render(<QuetziSprite completed={3} />);
-    expect(container.querySelector("svg")).not.toHaveAttribute("shape-rendering", "crispEdges");
-    expect(container.querySelectorAll("path").length).toBeGreaterThan(2);
-    expect(container.querySelector(".quetzi__core")).toBeInTheDocument();
-    expect(container.querySelector(".quetzi__wing")).not.toBeInTheDocument();
+    expect(container.querySelector("img.quetzi")).toHaveAttribute("src", "/brand/geek-eyes.png");
+    expect(container.querySelector("svg, .quetzi__core, .quetzi__wing")).toBeNull();
   });
 
 });

@@ -8,6 +8,7 @@ import { CreditAmount, formatCredits } from "../../design-system/credits";
 import { CreditDashboard } from "../../design-system/CreditDashboard";
 import { challengeSummary, nextAvailableChallenge } from "./challenge-view";
 import { useChallenges, type AssignedChallenge } from "./useChallenges";
+import { SubmissionWindowNotice } from "../submissions/SubmissionWindowNotice";
 
 const categoryLabel = { CONNECT: "Conecta", CLOUD: "Cloud", SESSION: "Sesiones", EXPERIENCE: "Experiencias", COMMUNITY: "Comunidad" };
 const stateLabel: Record<ChallengeState, string> = { available: "Disponible", locked: "Bloqueado", in_progress: "En progreso", processing: "En revisión", completed: "Completado", failed: "Fallado · solución disponible", rejected: "Foto rechazada · reenvíala" };
@@ -15,7 +16,7 @@ const stateLabel: Record<ChallengeState, string> = { available: "Disponible", lo
 function ChallengeCard({ challenge, progress }: AssignedChallenge) {
   const status = challenge.active ? stateLabel[progress.status] : "Pausado temporalmente";
   const StatusIcon = progress.status === "completed" ? CheckCircle2 : progress.status === "failed" ? XCircle : progress.status === "locked" || !challenge.active ? LockKeyhole : CircleDashed;
-  return <Link to={`/app/challenges/${challenge.id}`} className="challenge-link"><Card className="challenge-card">
+  return <Link to={`/app/challenges/${challenge.id}`} className="challenge-link"><Card className={`challenge-card${progress.status === "completed" ? " challenge-card--completed" : ""}`}>
     <div className="challenge-card__top"><span className="eyebrow">{isAwsServiceChallengeId(challenge.id) ? "Cloud · extra" : categoryLabel[challenge.category]}</span><Chip><CreditAmount value={progress.status === "failed" ? -(progress.auraDeducted ?? incorrectAnswerPenalty(challenge)) : challenge.auraReward} signed /></Chip></div>
     <div className="challenge-card__body"><h3>{challenge.title}</h3><p className="muted">{challenge.description}</p></div>
     <span className={`challenge-card__status challenge-card__status--${progress.status}`}><StatusIcon aria-hidden size={17} />{challenge.id === "C08" && progress.status === "in_progress" ? "Paso 1 de 2 completado" : status}</span>
@@ -29,6 +30,7 @@ export function ChallengesPage() {
   const total = items.length || 17;
   return <section className="stack challenges-page">
     <header className="journey-overview"><div className="journey-overview__heading"><div><p className="eyebrow">AWS Community Day Guatemala</p><h1>Tus desafíos</h1><p className="muted">Elige un reto y suma créditos a tu recorrido.</p></div><div className="journey-overview__progress"><strong>{totalCompleted} de {total} {total === 1 ? "reto completado" : "retos completados"}</strong><ProgressBar value={totalCompleted} max={total} label="Retos completados" /></div></div><CreditDashboard balance={auraTotal} balanceFallback={error ? "Créditos no disponibles" : "Cargando créditos…"} deducted={auraDeductedTotal} available={auraPotential} inReview={auraInReview} /></header>
+    <SubmissionWindowNotice />
     {next && <Link className="challenge-next" to={`/app/challenges/${next.challenge.id}`}><span><small>CONTINÚA TU RECORRIDO</small><strong>{next.challenge.title}</strong><span>{next.challenge.id === "C08" && next.progress.architectureStep === 1 ? "Paso 2 de 2 listo" : `Gana ${formatCredits(next.challenge.auraReward)} al completarlo`}</span></span><span className="challenge-next__arrow" aria-hidden>→</span></Link>}
     {error && <StatusNotice tone="error">{error}</StatusNotice>}
     {loading ? <p role="status">Cargando Challenges…</p> : items.length ? <section className="challenge-section" aria-labelledby="all-challenges">
