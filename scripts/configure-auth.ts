@@ -18,7 +18,13 @@ const configUrl = `https://identitytoolkit.googleapis.com/admin/v2/projects/${pr
 const existingResponse = await fetch(configUrl, { headers });
 if (!existingResponse.ok) throw new Error(`Auth config read failed: ${existingResponse.status} ${await existingResponse.text()}`);
 const existing = await existingResponse.json() as { authorizedDomains?: string[] };
-const authorizedDomains = [...new Set([...(existing.authorizedDomains ?? []), `${projectId}.firebaseapp.com`, `${projectId}.web.app`])];
+const authorizedDomains = [...new Set([
+  ...(existing.authorizedDomains ?? []),
+  `${projectId}.firebaseapp.com`,
+  `${projectId}.web.app`,
+  "localhost",
+  "127.0.0.1"
+])];
 const update = await fetch(`${configUrl}?updateMask=signIn.email,authorizedDomains`, {
   method: "PATCH",
   headers,
