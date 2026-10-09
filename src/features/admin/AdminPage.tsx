@@ -46,7 +46,15 @@ export function AdminPage() {
     query(collection(db, "deletionRequests"), where("status", "in", ["requested", "failed"]), limit(50)),
     (snapshot) => {
       setDeletionRequests(snapshot.docs
-        .map((entry) => ({ id: entry.id, ...entry.data() }) as unknown as DeletionRequest)
+        .map((entry) => {
+          const data = entry.data();
+          return {
+            ...data,
+            uid: typeof data.uid === "string" ? data.uid : entry.id,
+            alias: typeof data.alias === "string" && data.alias.trim() ? data.alias : "Participante",
+            emailMasked: typeof data.emailMasked === "string" && data.emailMasked.trim() ? data.emailMasked : "Correo protegido"
+          } as unknown as DeletionRequest;
+        })
         .sort((left, right) => timestampMillis(right.requestedAt) - timestampMillis(left.requestedAt)));
       setDeletionError(false); setDeletionLoading(false);
     },

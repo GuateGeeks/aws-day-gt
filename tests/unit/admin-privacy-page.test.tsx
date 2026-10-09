@@ -50,4 +50,14 @@ describe("responsive owner administration center", () => {
     fireEvent.click(confirm);
     await waitFor(() => expect(mocks.reviewDeletion).toHaveBeenCalledWith({ uid: "user-1", decision: "approved" }));
   });
+
+  it("keeps legacy deletion requests actionable without exposing missing profile data", () => {
+    render(<AdminPage />);
+    act(() => mocks.listeners.get("submissions")?.({ docs: [] }));
+    act(() => mocks.listeners.get("deletionRequests")?.({ docs: [{ id: "legacy-user", data: () => ({ status: "requested" }) }] }));
+    fireEvent.click(screen.getByRole("tab", { name: /privacidad/i }));
+
+    expect(screen.getByRole("heading", { name: "Participante" })).toBeInTheDocument();
+    expect(screen.getByText(/Correo protegido/)).toBeInTheDocument();
+  });
 });
