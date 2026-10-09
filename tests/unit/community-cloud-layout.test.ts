@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildCloudLayout, positionForNode } from "../../src/features/live/community-cloud";
+import { buildCloudLayout, createNodeMaterial, positionForNode } from "../../src/features/live/community-cloud";
 
 const nodes = [
   { id: "p_0123456789abcdef", alias: "Ada", category: "Development" as const, degree: 1 },
@@ -21,5 +21,12 @@ describe("community cloud layout", () => {
     expect(layout.edges).toHaveLength(1);
     expect(layout.edges[0]).toMatchObject({ id: edges[0]!.id });
     expect(layout.edges[0]?.points).toHaveLength(2);
+  });
+
+  it("keeps the base material white without an absent vertex-color attribute", () => {
+    const material = createNodeMaterial();
+    expect(material.color.getHex()).toBe(0xffffff);
+    expect(material.vertexColors).toBe(false);
+    material.dispose();
   });
 });

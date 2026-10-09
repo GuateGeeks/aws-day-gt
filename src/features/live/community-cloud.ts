@@ -80,6 +80,10 @@ function edgeGeometry(edges: CloudLayoutEdge[]) {
   return new BufferGeometry().setAttribute("position", new Float32BufferAttribute(points, 3));
 }
 
+export function createNodeMaterial() {
+  return new MeshBasicMaterial({ color: 0xffffff });
+}
+
 export function createCommunityCloudScene(
   container: HTMLDivElement,
   nodes: PublicVisualizationNode[],
@@ -104,7 +108,7 @@ export function createCommunityCloudScene(
   scene.add(group);
 
   const nodeGeometry = new IcosahedronGeometry(0.18, 2);
-  const nodeMaterial = new MeshBasicMaterial({ vertexColors: true });
+  const nodeMaterial = createNodeMaterial();
   const nodeMesh = new InstancedMesh(nodeGeometry, nodeMaterial, layout.nodes.length);
   const matrix = new Matrix4();
   layout.nodes.forEach((node, index) => {
