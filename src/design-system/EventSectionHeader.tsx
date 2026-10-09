@@ -10,7 +10,7 @@ interface EventSectionHeaderProps {
 
 export function EventSectionHeader({ eyebrow, title, description, aside }: EventSectionHeaderProps) {
   return <header className={`section-hero${aside ? " section-hero--with-aside" : ""}`}>
-    <div className="section-hero__brand"><EventLogo className="event-mark--section" /></div>
+    <div className="section-hero__brand"><EventLogo className="event-mark--integrated" /></div>
     <div className="section-hero__content">
       <p className="eyebrow">{eyebrow}</p>
       <h1>{title}</h1>

@@ -16,6 +16,7 @@ describe("Credit challenges page", () => {
     expect(screen.getByRole("heading", { name: "Tus desafíos" })).toBeInTheDocument();
     expect(screen.getAllByRole("img", { name: "AWS Community Day Guatemala" })).toHaveLength(1);
     expect(container.querySelector(".journey-overview > .section-hero .event-mark")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "AWS Community Day Guatemala" })).toHaveClass("event-mark--integrated");
     expect(within(screen.getByLabelText("Resumen de créditos")).queryByRole("img")).not.toBeInTheDocument();
     expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(9);
     expect(screen.getByRole("heading", { name: "Comparte la experiencia GuateGeeks" })).toBeInTheDocument();

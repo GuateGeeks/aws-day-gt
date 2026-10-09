@@ -126,13 +126,15 @@ textarea.ds-input { min-height: 132px; resize: vertical; }
 .badge--earned { opacity: 1; border-color: var(--color-accent-fill); }
 .badge--earned svg { color: var(--color-accent-fill); }
 .event-mark { display: block; width: 158px; height: auto; padding: 9px 11px; border-radius: 15px; background: linear-gradient(145deg, #142c41, #075b67); box-shadow: 0 8px 20px #0b3c4930; }
-.section-hero { display: grid; grid-template-columns: 172px minmax(0, 1fr); gap: clamp(20px, 4vw, 38px); align-items: center; padding: clamp(20px, 4vw, 34px); border: 1.5px solid #8dbfc4; border-radius: var(--radius-xl); background: linear-gradient(120deg, #fff 0%, #eef8f5 100%); box-shadow: var(--shadow-1); }
-.section-hero--with-aside { grid-template-columns: 172px minmax(0, 1fr) minmax(150px, 220px); }
-.section-hero__brand { display: grid; place-items: center; align-self: stretch; padding-right: clamp(18px, 3vw, 30px); border-right: 1px solid var(--color-border); }
+.section-hero { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 0; align-items: stretch; overflow: hidden; padding: 0; border: 1.5px solid #8dbfc4; border-radius: var(--radius-xl); background: #fff; box-shadow: var(--shadow-1); }
+.section-hero--with-aside { grid-template-columns: 210px minmax(0, 1fr) minmax(160px, 220px); }
+.section-hero__brand { display: grid; place-items: center; min-height: 178px; padding: clamp(22px, 3vw, 32px); background: radial-gradient(circle at 90% 15%, #087b87 0%, #0e4252 44%, #142c41 100%); border-bottom: 5px solid #f69a21; }
+.section-hero__brand .event-mark--integrated { width: min(100%, 190px); padding: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .section-hero__content { min-width: 0; }
+.section-hero__content { display: grid; align-content: center; padding: clamp(22px, 4vw, 36px); }
 .section-hero h1 { margin: 4px 0 8px; font-size: clamp(2rem, 4vw, 2.8rem); }
 .section-hero__content .muted { max-width: 58ch; }
-.section-hero__aside { display: grid; min-width: 0; }
+.section-hero__aside { display: grid; align-content: center; min-width: 0; padding: clamp(20px, 3vw, 30px); border-left: 1px solid var(--color-border); background: linear-gradient(145deg, #fff, #eef8f5); }
 .ranking-intro__position { display: grid; justify-items: center; align-self: center; min-width: 112px; padding: 10px 14px; border-radius: 16px; background: #142c41; color: #fff; white-space: nowrap; }
 .ranking-intro__position small { font-size: var(--text-xs); }
 .ranking-intro__position strong { font: 900 1.7rem/1.1 var(--font-display); }
@@ -273,16 +275,17 @@ textarea.ds-input { min-height: 132px; resize: vertical; }
 .selfie-shortcut small { display: block; color: var(--color-ink-muted); font-size: var(--text-sm); }
 .selfie-shortcut__status { color: var(--color-primary); font-size: var(--text-sm); font-weight: 900; white-space: nowrap; }
 @media (min-width: 560px) and (max-width: 760px) {
-  .section-hero--with-aside { grid-template-columns: 160px minmax(0, 1fr); }
-  .section-hero--with-aside .section-hero__aside { grid-column: 1 / -1; padding-top: var(--space-4); border-top: 1px solid var(--color-border); }
+  .section-hero--with-aside { grid-template-columns: 180px minmax(0, 1fr); }
+  .section-hero--with-aside .section-hero__aside { grid-column: 1 / -1; padding: var(--space-4) var(--space-5); border-top: 1px solid var(--color-border); border-left: 0; }
   .section-hero--with-aside .ranking-intro__position { width: min(100%, 190px); justify-self: center; text-align: center; }
 }
 @media (max-width: 559px) {
-  .section-hero, .section-hero--with-aside { grid-template-columns: 1fr; gap: var(--space-4); padding: var(--space-5); }
-  .section-hero__brand { align-self: auto; padding: 0 0 var(--space-4); border-right: 0; border-bottom: 1px solid var(--color-border); }
-  .section-hero__brand .event-mark { width: min(158px, 60vw); }
+  .section-hero, .section-hero--with-aside { grid-template-columns: 1fr; gap: 0; padding: 0; }
+  .section-hero__brand { min-height: 118px; padding: var(--space-4) var(--space-5); }
+  .section-hero__brand .event-mark--integrated { width: min(76%, 230px); }
+  .section-hero__content { padding: var(--space-5); }
   .section-hero__content { text-align: left; }
-  .section-hero__aside { width: 100%; }
+  .section-hero__aside { width: 100%; padding: 0 var(--space-5) var(--space-5); border: 0; background: #fff; }
   .journey-overview__progress { text-align: center; }
   .credit-dashboard { grid-template-columns: 1fr; }
   .credit-dashboard__balance { padding: var(--space-5); }
