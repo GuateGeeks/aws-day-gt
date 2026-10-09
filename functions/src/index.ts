@@ -10,4 +10,5 @@ export { configureChallengeSession, configureEventCode, updateChallengeSettings,
 export { registerPhotoSubmission } from "./submissions/register-photo";
 export { reviewSubmission } from "./moderation/review-submission";
 export { getLeaderboardSnapshot } from "./scoring/leaderboard";
+export { getPublicEventVisualization } from "./public/get-visualization";
 export { updateEventSettings, setStaffRole, requestDataDeletion } from "./admin/operations";
